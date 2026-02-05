@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Grand Slam Ultimate - Online v12.3</title>
+  <title>Grand Slam Ultimate - Online v12.4</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* [기본 테마 유지] */
+    /* [기본 테마] */
     :root { --bg-gray: #F2F2F7; --text-dark: #1C1C1E; --text-gray: #8E8E93; --master-gradient: linear-gradient(135deg, #34C759 0%, #007AFF 100%); --purple-gradient: linear-gradient(135deg, #5856D6 0%, #AF52DE 100%); --grad-sky: linear-gradient(135deg, #5AC8FA 0%, #007AFF 100%); --grad-royal: linear-gradient(135deg, #007AFF 0%, #5856D6 100%); --grad-navy: linear-gradient(135deg, #002D5F 0%, #1C1C1E 100%); --up-red: #FF3B30; --down-blue: #007AFF; --banner-gradient: linear-gradient(to right, #34C759, #007AFF); }
     body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; padding-bottom: 90px; }
     #splash { position: fixed; inset: 0; background: #0f5132; display: flex; align-items: center; justify-content: center; z-index: 20000; }
@@ -42,17 +42,25 @@
     .section-card { background: white; padding: 20px; border-radius: 20px; min-height: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
     .section-card.active { display: block; }
     
-    /* [칼각 정렬 테이블 - 4분할 유지] */
+    /* ✅ [모바일 이름 짤림 해결] 4분할 비율 재조정 */
     .tennis-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .tennis-table td { padding: 14px 2px; border-bottom: 1px solid #E5E5EA; vertical-align: middle; }
     .rank-row { display: flex; align-items: center; width: 100%; }
-    .rank-left { width: 38%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
-    .rank-num { background: var(--master-gradient); color: white; padding: 5px 0; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; width: 28px; text-align: center; margin-right: 6px; flex-shrink: 0; }
+    
+    /* 1. 이름 (38% -> 45% 대폭 확장) */
+    .rank-left { width: 45%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+    .rank-num { background: var(--master-gradient); color: white; padding: 5px 0; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; width: 28px; text-align: center; margin-right: 4px; flex-shrink: 0; }
     .rank-name { font-size: 14px; font-weight: 800; color: #1C1C1E; overflow: hidden; text-overflow: ellipsis; }
-    .rank-sub { color: #8E8E93; font-size: 11px; font-weight: normal; margin-left: 3px; }
-    .rank-center { width: 22%; text-align: center; color: #8E8E93; font-size: 11px; white-space: nowrap; font-weight: 600; } 
-    .rank-record-area { width: 20%; text-align: right; font-size: 13px; color: #1C1C1E; white-space: nowrap; padding-right: 8px; }
-    .rank-score-area { width: 20%; text-align: right; white-space: nowrap; }
+    .rank-sub { color: #8E8E93; font-size: 10px; font-weight: normal; margin-left: 2px; } /* 서브 텍스트 폰트 살짝 축소 */
+    
+    /* 2. 승률 (22% -> 19% 축소) */
+    .rank-center { width: 19%; text-align: center; color: #8E8E93; font-size: 11px; white-space: nowrap; font-weight: 600; } 
+    
+    /* 3. 승패 기록 (20% -> 18% 축소) */
+    .rank-record-area { width: 18%; text-align: right; font-size: 13px; color: #1C1C1E; white-space: nowrap; padding-right: 6px; }
+    
+    /* 4. 점수 (20% -> 18% 축소) */
+    .rank-score-area { width: 18%; text-align: right; white-space: nowrap; }
     .rank-score { color: #007AFF; font-weight: 900; font-size: 16px; display: inline-block; }
     
     .sub-rank-title { font-size: 15px; font-weight: 800; color: var(--text-dark); margin: 30px 0 10px 0; }
@@ -79,10 +87,8 @@
     .pool-ladder { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: #f0f0f5 !important; border-radius: 15px; margin-bottom: 15px; }
     .pool-item.selected { border-color: #007AFF !important; background: #007AFF !important; color: white !important; font-weight: bold; box-shadow: 0 0 8px rgba(0,122,255,0.5); }
     .btn-purple-main { width: 100%; padding: 20px; background: linear-gradient(135deg, #8156e1 0%, #b252de 100%); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-    
-    /* ✅ [핵심 수정] 사다리 캔버스 자동 맞춤 (반응형) */
     #ladder-canvas-wrap { background: white; border-radius: 20px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; position: relative; width: 100%; }
-    #ladderCanvas { width: 100%; height: auto; display: block; } /* 캔버스가 화면에 맞춰 줄어들게 함 */
+    #ladderCanvas { width: 100%; height: auto; display: block; }
     
     .congrats-box { background: #fdf7ff; padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 14px; line-height: 1.8; border: 1.5px solid #AF52DE; color: #1C1C1E; display: none; text-align: center; }
   </style>
@@ -234,7 +240,7 @@
   function updateSeason() { renderRankTable('seasonTable', 'score', 'wins', 'losses', 'last'); renderRankTable('seasonDoubleTable', 'dScore', 'dWins', 'dLosses', 'lastD'); renderRankTable('seasonSingleTable', 'sScore', 'sWins', 'sLosses', 'lastS'); }
   function updateWeekly() { renderRankTable('weeklyTotalTable', 'weekly', 'wWins', 'wLosses', 'last'); renderRankTable('weeklyDoubleTable', 'wdScore', 'wdWins', 'wdLosses', 'lastD'); renderRankTable('weeklySingleTable', 'wsScore', 'wsWins', 'wsLosses', 'lastS'); }
 
-  /* [차트] */
+  /* ✅ [차트 수정] 숫자 실종 해결 (autoSkip: false) */
   function updateChartRange(rangeIdx) {
     document.querySelectorAll('.chart-btn').forEach((b,i) => b.className = i===rangeIdx ? 'chart-btn active' : 'chart-btn');
     const realWednesdays = [['2/4', '2/11', '2/18', '2/25', '3/4', '3/11', '3/18', '3/25'], ['4/1', '4/8', '4/15', '4/22', '4/29', '5/6', '5/13', '5/20', '5/27'], ['6/3', '6/10', '6/17', '6/24', '7/1', '7/8', '7/15', '7/22', '7/29'], ['8/5', '8/12', '8/19', '8/26', '9/2', '9/9', '9/16', '9/23', '9/30'], ['10/7', '10/14', '10/21', '10/28', '11/4', '11/11', '11/18', '11/25'], ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']];
@@ -263,7 +269,12 @@
         responsive: true, maintainAspectRatio: false,
         layout: { padding: { top: 30, bottom: 20, left: 10, right: 10 } },
         scales: {
-          y: { reverse: true, min: 1, max: players.length + 1, ticks: { stepSize: 1, callback: function(val) {return Number.isInteger(val)?val:'';} }, grid: { color: '#eee' } },
+          y: { 
+            reverse: true, min: 1, max: players.length + 1, 
+            // ✅ [핵심] autoSkip: false로 1,3,5,7 강제 표시!
+            ticks: { stepSize: 1, autoSkip: false, callback: function(val) {return Number.isInteger(val)?val:'';} }, 
+            grid: { color: '#eee' } 
+          },
           x: { grid: { display: false } }
         },
         plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } } }
@@ -317,7 +328,7 @@
   function adminResetAll(){ if(prompt("비번?")==="0707"){ players=[]; push(); location.reload(); } }
   function switchView(v, b) { document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none'); document.getElementById(`view-${v}`).style.display='block'; document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); b.classList.add('active'); if(v==='tennis')sync(); if(v==='ladder')renderLadderPlayerPool(); }
 
-  /* ✅ 사다리 게임 (중앙 정렬 + 자동 맞춤) */
+  /* 사다리 게임 로직 (완벽 보존) */
   var ldP = []; var ladderLines = []; var winHistory = []; var finalMapping = []; var ladderPaddingX = 40; var ladderGap = 0;
   function renderLadderPlayerPool() { const pool = $('ladder-player-pool'); if(!pool) return; pool.innerHTML = players.map(p => { const isSel = ldP.includes(p.name); return `<div class="pool-item ${isSel ? 'selected' : ''}" onclick="tkL('${p.name}')">${p.name}</div>`; }).join(''); updatePunishInputs(); }
   function tkL(n) { if(ldP.includes(n)) ldP = ldP.filter(x=>x!==n); else ldP.push(n); renderLadderPlayerPool(); }
@@ -328,21 +339,11 @@
     finalMapping = [...inputs].sort(() => Math.random() - 0.5);
     winHistory = []; $('ladder-final-msg').style.display = 'none'; $('ladder-setup-view').style.display = 'none'; $('ladder-game-view').style.display = 'block';
     const cvs = $('ladderCanvas'); const ctx = cvs.getContext('2d');
-    cvs.width = 600; cvs.height = 550; // 내부 해상도는 고정
-    
-    // 중앙 정렬 로직
+    cvs.width = 600; cvs.height = 550;
     const N = ldP.length; ladderPaddingX = 40; const usableWidth = cvs.width - (ladderPaddingX * 2); ladderGap = usableWidth / (N - 1);
-
-    ladderLines = []; for(let r=0; r<12; r++) { for(let i=0; i<N-1; i++) { if(Math.random() > 0.45) { 
-      const lineStartX = ladderPaddingX + (i * ladderGap);
-      ladderLines.push({ x: lineStartX, y: 130 + (r * 30) + (Math.random() * 5), from: i, to: i+1 }); i++; 
-    } } }
+    ladderLines = []; for(let r=0; r<12; r++) { for(let i=0; i<N-1; i++) { if(Math.random() > 0.45) { const lineStartX = ladderPaddingX + (i * ladderGap); ladderLines.push({ x: lineStartX, y: 130 + (r * 30) + (Math.random() * 5), from: i, to: i+1 }); i++; } } }
     drawLadderBase(ctx, cvs);
-    // 클릭 좌표 (CSS 리사이징 대응)
-    cvs.onclick = (e) => { const rect = cvs.getBoundingClientRect(); const x = (e.clientX - rect.left) * (cvs.width / rect.width); const y = (e.clientY - rect.top) * (cvs.height / rect.height); if(y < 110) { 
-      let idx = Math.round((x - ladderPaddingX) / ladderGap);
-      const exactX = ladderPaddingX + (idx * ladderGap); if (Math.abs(x - exactX) > ladderGap / 3) return; 
-      if(idx >= 0 && idx < N && !winHistory.some(w => w.name === ldP[idx])) stL(ctx, idx); } };
+    cvs.onclick = (e) => { const rect = cvs.getBoundingClientRect(); const x = (e.clientX - rect.left) * (cvs.width / rect.width); const y = (e.clientY - rect.top) * (cvs.height / rect.height); if(y < 110) { let idx = Math.round((x - ladderPaddingX) / ladderGap); const exactX = ladderPaddingX + (idx * ladderGap); if (Math.abs(x - exactX) > ladderGap / 3) return; if(idx >= 0 && idx < N && !winHistory.some(w => w.name === ldP[idx])) stL(ctx, idx); } };
   }
   function drawLadderBase(ctx, cvs) {
     ctx.clearRect(0, 0, cvs.width, cvs.height); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 3;
@@ -360,31 +361,6 @@
   }
   function updateCongratsBox() { const box = $('ladder-final-msg'); const winners = winHistory.filter(w => w.result !== "패스"); if(winners.length > 0) { box.style.display = 'block'; $('congrats-content').innerHTML = winners.map(w => `축하해요! <b>${w.name}</b>, <b>${w.result}</b> 감사히 먹겠습니다! 🎉`).join('<br>'); } }
   function resetLadderGame() { ldP = []; winHistory = []; $('ladder-setup-view').style.display='block'; $('ladder-game-view').style.display='none'; renderLadderPlayerPool(); }
-
-  /* 날씨 */
-  const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
-  function getWed(offset) { const d = new Date(); d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + offset); return d; }
-  async function loadWeather(d) {
-    const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
-    const weekDays = ['일','월','화','수','목','금','토'];
-    document.getElementById("dateDisplay").innerText = `${ds} ${weekDays[d.getDay()]}요일`;
-    document.getElementById("dateDisplay").style.display = "block";
-    try {
-      const api = `https://api.open-meteo.com/v1/forecast?latitude=37.48&longitude=126.86&hourly=temperature_2m,weather_code,precipitation,wind_speed_10m&timezone=Asia/Seoul&start_date=${ds}&end_date=${ds}`;
-      const r = await fetch(api); const j = await r.json();
-      $("tbody").innerHTML = ""; let totalRain = 0, maxWind = 0, avgTemp = 0, isClear = true, isSnow = false;
-      for (let i=5; i<=12; i++) {
-        const temp = j.hourly.temperature_2m[i], code = j.hourly.weather_code[i], rain = j.hourly.precipitation[i], wind = j.hourly.wind_speed_10m[i];
-        if (code > 2) isClear = false; if (code >= 71 && code <= 77) isSnow = true;
-        totalRain += rain; if (wind > maxWind) maxWind = wind; avgTemp += temp;
-        const icon = (rain > 0) ? "🌦️" : (WX[code] || "☁️");
-        $("tbody").innerHTML += `<tr><td>${i}시</td><td>${icon}</td><td>${temp.toFixed(1)}°</td><td>${rain.toFixed(1)}</td><td>${wind.toFixed(1)}</td></tr>`;
-      }
-      avgTemp /= 8;
-      let tip = (totalRain > 0 || isSnow) ? "💡 비/눈 소식! 테니스는 무리네요. ☔" : (maxWind >= 5) ? "💡 바람이 세요! 바람막이 필수! 💨" : (avgTemp <= 5) ? `💡 현재 ${avgTemp.toFixed(1)}도! 추워요. 판피린 마시고 치세요! ☕` : (avgTemp >= 25) ? "💡 덥네요! 아아 마시면서 치세요! 🥤" : isClear ? "💡 맑은 날씨! 선글라스 챙기세요! 😎" : "💡 테니스 치기 딱 좋은 날씨! 🎾";
-      $("tipContent").innerText = tip; $("dynamicTip").style.display="block"; $("tbl").style.display="table";
-    } catch(e) {}
-  }
 
   window.addEventListener("load",()=>{ setTimeout(()=>{$('splash').classList.add("hide"); setTimeout(()=>{$('splash').style.display="none"},700)},900); sync(); loadWeather(getWed(0)); });
 </script>
