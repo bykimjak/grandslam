@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Grand Slam Ultimate - Online v6.3</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root { 
+      --bg-gray: #F2F2F7; --text-dark: #1C1C1E; --text-gray: #8E8E93;
+      --master-gradient: linear-gradient(135deg, #34C759 0%, #007AFF 100%);
+      --purple-gradient: linear-gradient(135deg, #5856D6 0%, #AF52DE 100%);
+      --grad-sky: linear-gradient(135deg, #5AC8FA 0%, #007AFF 100%);
+      --grad-royal: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      --grad-navy: linear-gradient(135deg, #002D5F 0%, #1C1C1E 100%);
+      --up-red: #FF3B30; --down-blue: #007AFF;
+    }
+    body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; padding-bottom: 90px; }
+
+/* 인트로 스플래시 전체 */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #0f5132;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+}
+
+/* 로고 기본 상태 */
+#splash img {
+  width: 140px;
+  height: 140px;
+  border-radius: 24px;
+  opacity: 1;
+  transform: scale(1);
+  transition: transform 0.7s ease, opacity 0.6s ease;
+}
+
+/* 사라질 때: 5배 커지면서 페이드 */
+#splash.hide img {
+  transform: scale(5);
+  opacity: 0;
+}
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid #d1d1d6; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
+    .nav-item { flex: 1; text-align: center; color: var(--text-gray); font-size: 11px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
+    .nav-item.active { background: var(--master-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: #007AFF; }
+    .nav-icon { font-size: 24px; margin-bottom: 4px; }
+    .app-screen { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
+    .app-screen.active { display: block; }
+    .weather-card { border-radius: 24px; padding: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .weather-header { font-size: 20px; margin: 0 0 15px; color: var(--text-dark); text-align: center; font-weight: bold; }
+    .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .w-input { flex: 1; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; }
+    .w-btn { padding: 15px; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; }
+    #btnSearch { flex: 0.4; background: var(--master-gradient); }
+    
+    .btn-row { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
+    #btnRefresh { flex: 1; background: var(--master-gradient); opacity: 0.9; }
+    #btnNext { flex: 1; background: var(--purple-gradient); }
+    
+    .date-display { text-align: center; font-weight: 900; color: #007AFF; font-size: 18px; margin-bottom: 10px; padding: 10px; background: #f0f7ff; border-radius: 12px; display: none; }
+
+    #status { font-weight: 600; margin: 10px 0; font-size: 13px; border-radius: 10px; padding: 8px; display: none; text-align: center; }
+    .ok { display: block !important; background: #e8f9ee; color: #34C759; }
+    .weather-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .weather-table td { text-align: center; padding: 15px 2px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    h1.tennis-header { background: var(--master-gradient); color: white; margin: 0 0 20px 0; padding: 25px; text-align: center; border-radius: 20px; box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
+    .tab-menu { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 15px 5px; border: none; font-size: 13px; font-weight: bold; cursor: pointer; background: var(--purple-gradient); color: white; border-radius: 15px; opacity: 0.7; }
+    .tab-btn.active { background: var(--master-gradient) !important; opacity: 1; transform: scale(1.02); }
+    .section-card { background: white; padding: 20px; border-radius: 20px; min-height: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
+    .section-card.active { display: block; }
+    .sub-rank-title { font-size: 15px; font-weight: 800; color: var(--text-dark); margin: 30px 0 10px 0; }
+    .tennis-table { width: 100%; border-collapse: collapse; }
+    .tennis-table td { padding: 12px 5px; border-bottom: 1px solid #E5E5EA; }
+    .rank-num { background: var(--master-gradient); color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+    .one-line-info { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+    .player-name { font-weight: 800; flex: 1; margin-left: 10px; display: flex; align-items: center; gap: 5px; }
+    .last-rank { color: var(--text-gray); font-size: 11px; font-weight: normal; }
+    .stats-text { color: var(--text-gray); font-size: 12px; margin-right: 10px; }
+    .points-text { font-weight: 900; color: #007AFF; min-width: 40px; text-align: right; }
+    .type-btn { flex: 1; padding: 15px; border: 2px solid #E5E5EA; border-radius: 12px; background: white; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+    .type-btn.selected { color: #007AFF; border-color: #007AFF; }
+    .team-box { border: 2px solid #E5E5EA; border-radius: 15px; padding: 15px; text-align: center; background: #fafafa; margin-bottom: 10px; }
+    .score-box { width: 65px; height: 50px; font-size: 24px; text-align: center; border-radius: 10px; border: 1px solid #D1D1D6; }
+    .pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: var(--bg-gray); border-radius: 15px; }
+    .pool-item { padding: 10px 15px; background: white; border: 1px solid #D1D1D6; border-radius: 20px; font-size: 14px; }
+    .btn-main { width: 100%; padding: 20px; background: var(--master-gradient); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; margin-top: 15px; }
+    .btn-sub { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 900; color: #fff; margin-top: 10px; font-size: 13px; }
+    .btn-sub.sky { background: var(--grad-sky); }
+    .btn-sub.royal { background: var(--grad-royal); }
+    .btn-sub.navy { background: var(--grad-navy); }
+    #loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10000; justify-content:center; align-items:center; font-weight:bold; color:#007AFF; }
+
+    .rule-box { margin-top: 14px; padding: 14px; border: 1px solid #E5E5EA; border-radius: 14px; background: #fff; font-size: 13px; line-height: 1.6; }
+    .rule-box b { color:#007AFF; }
+    .rule-title { font-weight: 900; margin-bottom: 8px; }
+    .tip-box { margin-top: 15px; padding: 15px; background: #f0f7ff; border-radius: 16px; border-left: 5px solid #007AFF; }
+  </style>
+</head>
+
+<body>
+
+<!-- ✅ 인트로(스플래시) 추가 -->
+<div id="splash">
+  <img src="icon.png" alt="GrandSlam Logo">
+</div>
+
+<div id="loading-overlay">⌛ 데이터 동기화 중...</div>
+
+<div id="view-weather" class="app-screen active">
+  <div class="weather-card">
+    <div class="weather-header">토브클럽 광명날씨 🌤️</div>
+    <div class="search-row">
+      <input id="city" class="w-input" value="Gwangmyeong" />
+      <button id="btnSearch" class="w-btn" onclick="loadWeather(getWed(0))">검색</button>
+    </div>
+    <div class="btn-row">
+      <button id="btnRefresh" class="w-btn" onclick="loadWeather(getWed(0))">이번 주 날씨</button>
+      <button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button>
+    </div>
+    <div id="dateDisplay" class="date-display"></div>
+    <div id="status"></div>
+    <table id="tbl" class="weather-table" style="display:none;"><thead><tr><th>시간</th><th>날씨</th><th>온도</th><th>강수</th><th>바람</th></tr></thead><tbody id="tbody"></tbody></table>
+    <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
+  </div>
+</div>
+
+<div id="view-tennis" class="app-screen">
+  <h1 class="tennis-header" onclick="location.reload()">GRANDSLAM Ranking🎾</h1>
+  <div class="tab-menu"><button id="t1" class="tab-btn active" onclick="tab(1)">시즌랭킹</button><button id="t2" class="tab-btn" onclick="tab(2)">주간랭킹</button><button id="t3" class="tab-btn" onclick="tab(3)">경기기록</button><button id="t4" class="tab-btn" onclick="tab(4)">선수관리</button></div>
+
+  <div id="s1" class="section-card active">
+    <canvas id="seasonChart"></canvas>
+    <div class="sub-rank-title">📊 종합 순위표</div><table id="seasonTotalTable" class="tennis-table"><tbody></tbody></table>
+    <div class="sub-rank-title">👥 복식 랭킹</div><table id="seasonDoubleTable" class="tennis-table"><tbody></tbody></table>
+    <div class="sub-rank-title">👤 단식 랭킹</div><table id="seasonSingleTable" class="tennis-table"><tbody></tbody></table>
+  </div>
+
+  <div id="s2" class="section-card">
+    <div class="sub-rank-title">📊 주간 종합 순위</div><table id="weeklyTotalTable" class="tennis-table"><tbody></tbody></table>
+    <div class="sub-rank-title">👥 주간 복식 순위</div><table id="weeklyDoubleTable" class="tennis-table"><tbody></tbody></table>
+    <div class="sub-rank-title">👤 주간 단식 순위</div><table id="weeklySingleTable" class="tennis-table"><tbody></tbody></table>
+  </div>
+
+  <div id="s3" class="section-card">
+    <div style="display:flex; gap:8px;"><button id="m_db" class="type-btn selected" onclick="setM('double')">복식</button><button id="m_sg" class="type-btn" onclick="setM('single')">단식</button></div>
+    <div class="team-box"><div id="hN" style="font-weight:bold; color:#007AFF;"></div><input type="number" id="hS" class="score-box" placeholder="0"></div>
+    <div class="team-box"><div id="aN" style="font-weight:bold; color:#007AFF;"></div><input type="number" id="aS" class="score-box" placeholder="0"></div>
+    <button class="btn-main" onclick="save()">경기 결과 저장</button>
+    <div class="pool" id="pP"></div>
+    <div class="rule-box">
+      <div class="rule-title">[점수 획득 규칙]</div>
+      • <b>복식 승리</b>: 총점+3 / 복식+3 / W+1<br/>
+      • <b>복식 패배</b>: 총점 0 / 복식 0 / L+1<br/>
+      • <b>단식 승리</b>: 총점+4 / 단식+4 / W+1<br/>
+      • <b>단식 첫 패</b>: 총점-1 / 단식-1 / L+1<br/>
+      • <b>단식 2연패+</b>: 총점 0 / 단식 0 / L+1
+    </div>
+  </div>
+
+  <div id="s4" class="section-card">
+    <h3>👥 선수 등록</h3>
+    <input type="text" id="pI" placeholder="성함" style="width:70%; padding:15px; border-radius:12px; border:1px solid #ddd;"><button onclick="addP()" style="padding:15px; background:var(--master-gradient); color:white; border:none; border-radius:12px;">등록</button>
+    <table id="pL" class="tennis-table" style="margin-top:20px;"><tbody></tbody></table>
+    <hr><button class="btn-sub sky" onclick="resetScoresKeepPlayers()">점수 초기화</button><button class="btn-sub royal" onclick="resetWeeklyOnly()">주간 리셋</button><button class="btn-sub navy" onclick="adminResetAll()">전체 삭제</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="switchView('weather', this)"><div class="nav-icon">🌤️</div>날씨</div>
+  <div class="nav-item" onclick="switchView('tennis', this)"><div class="nav-icon">🏆</div>랭킹</div>
+</nav>
+
+<script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbz5sOzehzl_kHFvSmVsDkohAp6E2W13TmqVRyj8PVoB_6CViY2R1IYERPG60Lra16njWQ/exec";
+  var players = []; var mType = 'double'; var hT = []; var aT = []; var chart = null;
+
+  async function sync() { document.getElementById('loading-overlay').style.display='flex'; try{ const r=await fetch(GAS_URL); players=(await r.json()).map(ensure); updateSeason(); if(tabNow===1)renderChart(); }catch(e){} document.getElementById('loading-overlay').style.display='none'; }
+  async function push() { document.getElementById('loading-overlay').style.display='flex'; try{ await fetch(GAS_URL,{method:"POST",body:JSON.stringify(players)}); }catch(e){} document.getElementById('loading-overlay').style.display='none'; }
+  function ensure(p) { const fs=['score','weekly','wins','losses','dScore','sScore','dWins','dLosses','sWins','sLosses','wdScore','wsScore','wWins','wLosses','wdWins','wdLosses','wsWins','wsLosses','singlesLossStreak','last','lastD','lastS','lastW','lastWD','lastWS']; fs.forEach(f=>{ if(p[f]===undefined) p[f]=0; }); return p; }
+  var tabNow = 1;
+  function tab(n) { tabNow=n; for(let i=1; i<=4; i++){ document.getElementById('s'+i).style.display=(i==n?'block':'none'); document.getElementById('t'+i).className=(i==n?'tab-btn active':'tab-btn'); } if(n==1){updateSeason();renderChart();} if(n==2)updateWeekly(); if(n==3)renderPool(); if(n==4)updatePlayerList(); }
+  function sortG(arr,k,w,l){ return [...arr].sort((a,b)=>b[k]-a[k]||b[w]-a[w]||a[l]-b[l]||a.name.localeCompare(b.name,"ko")); }
+  function row(p,i,pk,wk,lk,lk2) { let df='-'; let pr=p[lk2]; if(pr>0){ if(pr>i+1)df=`<span style="color:var(--up-red)">▲${pr-(i+1)}</span>`; else if(pr<i+1)df=`<span style="color:var(--down-blue)">▼${(i+1)-pr}</span>`; } return `<tr><td><span class="rank-num">${i+1}</span></td><td><div class="one-line-info"><span class="player-name">${p.name} <span class="last-rank">${pr>0?`(${pr}위) ${df}`:''}</span></span><span class="stats-text">${p[wk]}승 ${p[lk]}패</span><span class="points-text">${p[pk]}점</span></div></td></tr>`; }
+  function updateSeason() { document.querySelector('#seasonTotalTable tbody').innerHTML = sortG(players,'score','wins','losses').map((p,i)=>row(p,i,'score','wins','losses','last')).join(''); document.querySelector('#seasonDoubleTable tbody').innerHTML = sortG(players,'dScore','dWins','dLosses').map((p,i)=>row(p,i,'dScore','dWins','dLosses','lastD')).join(''); document.querySelector('#seasonSingleTable tbody').innerHTML = sortG(players,'sScore','sWins','sLosses').map((p,i)=>row(p,i,'sScore','sWins','sLosses','lastS')).join(''); }
+  function updateWeekly() { document.querySelector('#weeklyTotalTable tbody').innerHTML = sortG(players,'weekly','wWins','wLosses').map((p,i)=>row(p,i,'weekly','wWins','wLosses','lastW')).join(''); document.querySelector('#weeklyDoubleTable tbody').innerHTML = sortG(players,'wdScore','wdWins','wdLosses').map((p,i)=>row(p,i,'wdScore','wdWins','wdLosses','lastWD')).join(''); document.querySelector('#weeklySingleTable tbody').innerHTML = sortG(players,'wsScore','wsWins','wsLosses').map((p,i)=>row(p,i,'wsScore','wsWins','wsLosses','lastWS')).join(''); }
+  async function save() { var hs=$( 'hS').value, as=$('aS').value; if(hT.length<(mType=='double'?2:1)||aT.length<(mType=='double'?2:1)||hs==as){alert("확인 요망"); return;} sortG(players,'score','wins','losses').forEach((p,i)=>players.find(o=>o.name==p.name).last=i+1); sortG(players,'dScore','dWins','dLosses').forEach((p,i)=>players.find(o=>o.name==p.name).lastD=i+1); sortG(players,'sScore','sWins','sLosses').forEach((p,i)=>players.find(o=>o.name==p.name).lastS=i+1); sortG(players,'weekly','wWins','wLosses').forEach((p,i)=>players.find(o=>o.name==p.name).lastW=i+1); sortG(players,'wdScore','wdWins','wdLosses').forEach((p,i)=>players.find(o=>o.name==p.name).lastWD=i+1); sortG(players,'wsScore','wsWins','wsLosses').forEach((p,i)=>players.find(o=>o.name==p.name).lastWS=i+1); var apply=(ns,isW)=>{ ns.forEach(n=>{ var p=players.find(x=>x.name==n); var g=0; if(mType=='double'){g=isW?3:0; p.dScore+=g; p.wdScore+=g; if(isW){p.dWins++; p.wdWins++;}else{p.dLosses++; p.wdLosses++;}} else {if(isW){g=4; p.singlesLossStreak=0; p.sWins++; p.wsWins++;} else {p.singlesLossStreak++; g=p.singlesLossStreak>=2?0:-1; p.sLosses++; p.wsLosses++;} p.sScore+=g; p.wsScore+=g;} p.score+=g; p.weekly+=g; if(isW){p.wins++; p.wWins++;}else{p.losses++; p.wLosses++;} }); }; if(parseInt(hs)>parseInt(as)){apply(hT,true); apply(aT,false);} else {apply(aT,true); apply(hT,false);} await push(); alert("저장!"); $('hS').value=''; $('aS').value=''; hT=[]; aT=[]; tab(1); }
+  function renderChart() { var ctx=$('seasonChart').getContext('2d'); var s=sortG(players,'score','wins','losses'); if(chart) chart.destroy(); const goldGrad = ctx.createLinearGradient(0,0,0,400); goldGrad.addColorStop(0,'#FDF5E6'); goldGrad.addColorStop(1,'#D4AF37'); const silverGrad = ctx.createLinearGradient(0,0,0,400); silverGrad.addColorStop(0,'#F5F5F5'); silverGrad.addColorStop(1,'#C0C0C0'); const bronzeGrad = ctx.createLinearGradient(0,0,0,400); bronzeGrad.addColorStop(0,'#FAF0E6'); bronzeGrad.addColorStop(1,'#CD7F32'); const normalGrad = ctx.createLinearGradient(0,0,0,400); normalGrad.addColorStop(0,'#34C759'); normalGrad.addColorStop(1,'#007AFF'); const colors = s.map((_, i) => i === 0 ? goldGrad : i === 1 ? silverGrad : i === 2 ? bronzeGrad : normalGrad); chart=new Chart(ctx,{type:'bar',data:{labels:s.map(p=>p.name),datasets:[{label:'점수',data:s.map(p=>p.score),backgroundColor:colors,borderRadius:6}]},options:{responsive:true}}); }
+  function addP(){ var n=$('pI').value.trim(); if(n&&!players.find(p=>p.name==n)){players.push(ensure({name:n})); push(); $('pI').value=''; updatePlayerList(); alert(n+' 등록!');} }
+  function delP(n){ if(confirm(n+' 삭제?')){players=players.filter(p=>p.name!=n); push(); updatePlayerList();} }
+  function setM(t){ mType=t; $('m_db').className=t=='double'?'type-btn selected':'type-btn'; $('m_sg').className=t=='single'?'type-btn selected':'type-btn'; hT=[]; aT=[]; rt(); }
+  function renderPool(){ $('pP').innerHTML=players.map(p=>`<div class="pool-item" onclick="pick('${p.name}')">${p.name}</div>`).join(''); }
+  function pick(n){ var max=mType=='double'?2:1; if(hT.includes(n)||aT.includes(n))return; if(hT.length<max)hT.push(n); else if(aT.length<max)aT.push(n); rt(); }
+  function rt(){ $('hN').innerText=hT.join(', '); $('aN').innerText=aT.join(', '); }
+  function updatePlayerList(){ document.querySelector('#pL tbody').innerHTML=players.map(p=>`<tr><td>${p.name}</td><td><button onclick="delP('${p.name}')" style="background:#ff3b30; color:white; border:none; padding:5px; border-radius:10px;">삭제</button></td></tr>`).join(''); }
+  const $ = (id) => document.getElementById(id);
+
+  const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
+  
+  function getWed(offset) {
+    const d = new Date();
+    d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + offset);
+    return d;
+  }
+
+  async function loadWeather(d) {
+    const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+    const weekDays = ['일','월','화','수','목','금','토'];
+    document.getElementById("dateDisplay").innerText = `${ds} ${weekDays[d.getDay()]}요일`;
+    document.getElementById("dateDisplay").style.display = "block";
+
+    try {
+      const api = `https://api.open-meteo.com/v1/forecast?latitude=37.48&longitude=126.86&hourly=temperature_2m,weather_code,precipitation,wind_speed_10m&timezone=Asia/Seoul&start_date=${ds}&end_date=${ds}`;
+      const r = await fetch(api); const j = await r.json();
+      $("tbody").innerHTML = ""; let totalRain = 0, maxWind = 0, avgTemp = 0, isClear = true, isSnow = false;
+
+      for (let i=5; i<=12; i++) {
+        const temp = j.hourly.temperature_2m[i], code = j.hourly.weather_code[i], rain = j.hourly.precipitation[i], wind = j.hourly.wind_speed_10m[i];
+        if (code > 2) isClear = false; if (code >= 71 && code <= 77) isSnow = true;
+        totalRain += rain; if (wind > maxWind) maxWind = wind; avgTemp += temp;
+
+        /* ✅ 강수량이 0보다 크면 "이슬비🌦️"로 강제 */
+        const icon = (rain > 0) ? "🌦️" : (WX[code] || "☁️");
+
+        $("tbody").innerHTML += `<tr><td>${i}시</td><td>${icon}</td><td>${temp.toFixed(1)}°</td><td>${rain.toFixed(1)}</td><td>${wind.toFixed(1)}</td></tr>`;
+      }
+      avgTemp /= 8;
+
+      let tip = (totalRain > 0 || isSnow) ? "💡 비/눈 소식! 테니스는 무리네요. ☔" :
+                (maxWind >= 5) ? "💡 바람이 세요! 바람막이 필수! 💨" :
+                (avgTemp <= 5) ? `💡 현재 ${avgTemp.toFixed(1)}도! 추워요. 판피린 마시고 치세요! ☕` :
+                (avgTemp >= 25) ? "💡 덥네요! 아아 마시면서 치세요! 🥤" :
+                isClear ? "💡 맑은 날씨! 선글라스 챙기세요! 😎" : "💡 테니스 치기 딱 좋은 날씨! 🎾";
+      $("tipContent").innerText = tip;
+      $("dynamicTip").style.display="block";
+      $("tbl").style.display="table";
+    } catch(e) {}
+  }
+  
+  function switchView(v, b) { document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none'); document.getElementById(`view-${v}`).style.display='block'; document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); b.classList.add('active'); if(v==='tennis')sync(); }
+  function resetScoresKeepPlayers(){ if(prompt("비번?")==="0707"){ players.forEach(p=>{ Object.keys(p).forEach(k=>{ if(k!=='name') p[k]=0; }); }); push(); tab(1); }}
+  function resetWeeklyOnly(){ if(prompt("비번?")==="0707"){ players.forEach(p=>{ ['weekly','wdScore','wsScore','wWins','wLosses','wdWins','wdLosses','wsWins','wsLosses','lastW','lastWD','lastWS'].forEach(f=>p[f]=0); }); push(); tab(2); }}
+  function adminResetAll(){ if(prompt("비번?")==="0707"){ players=[]; push(); location.reload(); } }
+
+  // 인트로: 잠깐 멈췄다가 → 확 커지며 사라짐
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const splash = document.getElementById("splash");
+    splash.classList.add("hide");
+
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 700); // 커지는 애니 끝난 뒤 제거
+  }, 900); // 0.9초간 중앙에 고정
+});
+
+  // 초기 실행
+  loadWeather(getWed(0)); 
+  sync();
+</script>
+</body>
+</html>
