@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Grand Slam Ultimate - Online v12.8</title>
+  <title>Grand Slam Ultimate - Online v12.9</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -49,25 +49,25 @@
     .section-card { background: white; padding: 20px; border-radius: 20px; min-height: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
     .section-card.active { display: block; }
     
-    /* [칼각 정렬 테이블 - 4분할 (모바일 최적화)] */
+    /* ✅ [칼각 정렬 테이블 - 겹침 방지 최종 수정] */
     .tennis-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .tennis-table td { padding: 14px 2px; border-bottom: 1px solid #E5E5EA; vertical-align: middle; }
     .rank-row { display: flex; align-items: center; width: 100%; }
     
-    /* 1. 이름 (45%) */
-    .rank-left { width: 45%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+    /* 1. 이름 (40%) - 승률에게 공간 양보 */
+    .rank-left { width: 40%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
     .rank-num { background: var(--master-gradient); color: white; padding: 5px 0; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; width: 28px; text-align: center; margin-right: 4px; flex-shrink: 0; }
     .rank-name { font-size: 14px; font-weight: 800; color: #1C1C1E; overflow: hidden; text-overflow: ellipsis; }
     .rank-sub { color: #8E8E93; font-size: 10px; font-weight: normal; margin-left: 2px; }
     
-    /* 2. 승률 (19%) */
-    .rank-center { width: 19%; text-align: center; color: #8E8E93; font-size: 11px; white-space: nowrap; font-weight: 600; } 
+    /* 2. 승률 (28%) - 대폭 확장 + 자간 축소 (겹침 원천 봉쇄) */
+    .rank-center { width: 28%; text-align: center; color: #8E8E93; font-size: 10px; white-space: nowrap; font-weight: 600; letter-spacing: -1px; } 
     
-    /* 3. 승패 기록 (18%) */
-    .rank-record-area { width: 18%; text-align: right; font-size: 13px; color: #1C1C1E; white-space: nowrap; padding-right: 6px; }
+    /* 3. 승패 기록 (15%) - 오른쪽으로 붙임 */
+    .rank-record-area { width: 15%; text-align: right; font-size: 13px; color: #1C1C1E; white-space: nowrap; padding-right: 6px; }
     
-    /* 4. 점수 (18%) */
-    .rank-score-area { width: 18%; text-align: right; white-space: nowrap; }
+    /* 4. 점수 (17%) - 고정 */
+    .rank-score-area { width: 17%; text-align: right; white-space: nowrap; }
     .rank-score { color: #007AFF; font-weight: 900; font-size: 16px; display: inline-block; }
     
     .sub-rank-title { font-size: 15px; font-weight: 800; color: var(--text-dark); margin: 30px 0 10px 0; }
@@ -117,7 +117,7 @@
     <table id="tbl" class="weather-table" style="display:none;"><thead><tr><th>시간</th><th>날씨</th><th>온도</th><th>강수</th><th>바람</th></tr></thead><tbody id="tbody"></tbody></table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
     
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v12.8</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v12.9</div>
   </div>
 </div>
 
@@ -220,7 +220,7 @@
   function ensure(p) { const fs=['score','wins','losses','last','dScore','dWins','dLosses','lastD','sScore','sWins','sLosses','lastS', 'weekly','wWins','wLosses','wdScore','wsScore','wdWins','wdLosses','wsWins','wsLosses']; fs.forEach(f=>{ if(p[f]===undefined) p[f]=0; }); return p; }
   function tab(n) { tabNow=n; for(let i=1; i<=4; i++){ $('s'+i).style.display=(i==n?'block':'none'); $('t'+i).className=(i==n?'tab-btn active':'tab-btn'); } if(n==1){updateSeason(); updateChartRange(0);} if(n==2)updateWeekly(); if(n==3)renderPool(); if(n==4)updatePlayerList(); }
 
-  /* [테이블 렌더러] 4분할 (모바일 최적화) */
+  /* [테이블 렌더러] 40:28:15:17 비율 조정 (겹침 해결) */
   function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
     const calcRate = (p) => { const t = p[winK] + p[lossK]; return t > 0 ? (p[winK] / t) : 0; };
     const getTotal = (p) => p[winK] + p[lossK];
