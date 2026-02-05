@@ -49,26 +49,26 @@
     .section-card { background: white; padding: 20px; border-radius: 20px; min-height: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
     .section-card.active { display: block; }
     
-    /* ✅ [칼각 정렬 테이블 - 겹침 방지 최종 수정] */
+    /* ✅ [칼각 정렬 테이블 - 4분할 (이름 짤림 해결)] */
     .tennis-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .tennis-table td { padding: 14px 2px; border-bottom: 1px solid #E5E5EA; vertical-align: middle; }
     .rank-row { display: flex; align-items: center; width: 100%; }
     
-    /* 1. 이름 (40%) - 승률에게 공간 양보 */
-    .rank-left { width: 40%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+    /* 1. 이름 (45% - 확실한 공간 확보) */
+    .rank-left { width: 45%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
     .rank-num { background: var(--master-gradient); color: white; padding: 5px 0; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; width: 28px; text-align: center; margin-right: 4px; flex-shrink: 0; }
     .rank-name { font-size: 14px; font-weight: 800; color: #1C1C1E; overflow: hidden; text-overflow: ellipsis; }
     .rank-sub { color: #8E8E93; font-size: 10px; font-weight: normal; margin-left: 2px; }
     
-    /* 2. 승률 (28%) - 대폭 확장 + 자간 축소 (겹침 원천 봉쇄) */
+    /* 2. 승률 (28% - 유지) */
     .rank-center { width: 28%; text-align: center; color: #8E8E93; font-size: 10px; white-space: nowrap; font-weight: 600; letter-spacing: -1px; } 
     
-    /* 3. 승패 기록 (15%) - 오른쪽으로 붙임 */
-    .rank-record-area { width: 15%; text-align: right; font-size: 13px; color: #1C1C1E; white-space: nowrap; padding-right: 6px; }
+    /* 3. 승패 기록 (13% - 축소 & 폰트 줄임) */
+    .rank-record-area { width: 13%; text-align: right; font-size: 11px; color: #1C1C1E; white-space: nowrap; padding-right: 4px; }
     
-    /* 4. 점수 (17%) - 고정 */
-    .rank-score-area { width: 17%; text-align: right; white-space: nowrap; }
-    .rank-score { color: #007AFF; font-weight: 900; font-size: 16px; display: inline-block; }
+    /* 4. 점수 (14% - 축소 & 폰트 줄임) */
+    .rank-score-area { width: 14%; text-align: right; white-space: nowrap; }
+    .rank-score { color: #007AFF; font-weight: 900; font-size: 14px; display: inline-block; }
     
     .sub-rank-title { font-size: 15px; font-weight: 800; color: var(--text-dark); margin: 30px 0 10px 0; }
     .type-btn { flex: 1; padding: 15px; border: 2px solid #E5E5EA; border-radius: 12px; background: white; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
@@ -220,7 +220,7 @@
   function ensure(p) { const fs=['score','wins','losses','last','dScore','dWins','dLosses','lastD','sScore','sWins','sLosses','lastS', 'weekly','wWins','wLosses','wdScore','wsScore','wdWins','wdLosses','wsWins','wsLosses']; fs.forEach(f=>{ if(p[f]===undefined) p[f]=0; }); return p; }
   function tab(n) { tabNow=n; for(let i=1; i<=4; i++){ $('s'+i).style.display=(i==n?'block':'none'); $('t'+i).className=(i==n?'tab-btn active':'tab-btn'); } if(n==1){updateSeason(); updateChartRange(0);} if(n==2)updateWeekly(); if(n==3)renderPool(); if(n==4)updatePlayerList(); }
 
-  /* [테이블 렌더러] 40:28:15:17 비율 조정 (겹침 해결) */
+  /* [테이블 렌더러] 45:28:13:14 (이름 짤림 방지 최적화) */
   function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
     const calcRate = (p) => { const t = p[winK] + p[lossK]; return t > 0 ? (p[winK] / t) : 0; };
     const getTotal = (p) => p[winK] + p[lossK];
@@ -251,7 +251,7 @@
   function updateSeason() { renderRankTable('seasonTable', 'score', 'wins', 'losses', 'last'); renderRankTable('seasonDoubleTable', 'dScore', 'dWins', 'dLosses', 'lastD'); renderRankTable('seasonSingleTable', 'sScore', 'sWins', 'sLosses', 'lastS'); }
   function updateWeekly() { renderRankTable('weeklyTotalTable', 'weekly', 'wWins', 'wLosses', 'last'); renderRankTable('weeklyDoubleTable', 'wdScore', 'wdWins', 'wdLosses', 'lastD'); renderRankTable('weeklySingleTable', 'wsScore', 'wsWins', 'wsLosses', 'lastS'); }
 
-  /* [차트] 2/4일만 표시 + 짤림 방지 + autoSkip false */
+  /* [차트] */
   function updateChartRange(rangeIdx) {
     document.querySelectorAll('.chart-btn').forEach((b,i) => b.className = i===rangeIdx ? 'chart-btn active' : 'chart-btn');
     const realWednesdays = [['2/4', '2/11', '2/18', '2/25', '3/4', '3/11', '3/18', '3/25'], ['4/1', '4/8', '4/15', '4/22', '4/29', '5/6', '5/13', '5/20', '5/27'], ['6/3', '6/10', '6/17', '6/24', '7/1', '7/8', '7/15', '7/22', '7/29'], ['8/5', '8/12', '8/19', '8/26', '9/2', '9/9', '9/16', '9/23', '9/30'], ['10/7', '10/14', '10/21', '10/28', '11/4', '11/11', '11/18', '11/25'], ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']];
@@ -333,7 +333,7 @@
   function pick(n){ var max=mType=='double'?2:1; if(hT.includes(n)||aT.includes(n)) return; if(hT.length<max)hT.push(n); else if(aT.length<max)aT.push(n); $('hN').innerText=hT.join(','); $('aN').innerText=aT.join(','); }
   function setM(t){ mType=t; $('m_db').className=t=='double'?'type-btn selected':'type-btn'; $('m_sg').className=t=='single'?'type-btn selected':'type-btn'; hT=[]; aT=[]; $('hN').innerText=''; $('aN').innerText=''; }
   
-  /* ✅ [선수 관리: 삭제 버튼 오른쪽 정렬] */
+  /* [선수 관리: 삭제 버튼 오른쪽 정렬] */
   function updatePlayerList(){ document.querySelector('#pL tbody').innerHTML=players.map(p=>`<tr><td>${p.name}</td><td style="text-align:right;"><button onclick="delP('${p.name}')" style="background:#ff3b30; color:white; border:none; padding:5px; border-radius:10px;">삭제</button></td></tr>`).join(''); }
   
   function resetScoresKeepPlayers(){ if(prompt("비번?")==="0707"){ players.forEach(p=>{ Object.keys(p).forEach(k=>{ if(k!=='name') p[k]=0; }); }); push(); tab(1); }}
