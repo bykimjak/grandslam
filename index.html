@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate - Online v1.39</title>
+  <title>GrandSlam Ultimate - Online v1.43</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -46,7 +46,7 @@
     .header-banner .material-symbols-outlined { font-size: 30px; }
 
     .weather-card { border-radius: 24px; padding: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    /* ✅ 날씨 검색 영역 모바일 튀어나옴 방지 교정 */
+    /* ✅ 날씨 검색창 정렬: 입력란 70% 고정 */
     .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: space-between; width: 100%; } 
     .w-input { width: 70%; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; } 
     .w-btn { flex: 1; padding: 15px 0; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; text-align: center; }
@@ -145,12 +145,18 @@
       <button id="btnRefresh" class="w-btn" onclick="loadWeather(getWed(0))">이번 주 날씨</button>
       <button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button>
     </div>
+    
+    <button onclick="window.open('https://search.naver.com/search.naver?query=광명+날씨', '_blank')" class="btn-sub sky" style="width:100%; margin-bottom:15px; height:45px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+      <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
+      Naver 날씨 확인
+    </button>
+
     <div id="dateDisplay" class="date-display"></div>
     <div id="status"></div>
     <table id="tbl" class="weather-table" style="display:none;"><thead><tr><th>시간</th><th>날씨</th><th>온도</th><th>강수</th><th>바람</th></tr></thead><tbody id="tbody"></tbody></table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
     
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v1.39</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v1.43</div>
   </div>
 </div>
 
@@ -301,7 +307,7 @@
       options: { 
         responsive: true, 
         maintainAspectRatio: false, 
-        layout: { padding: { top: 35, bottom: 20, left: 10, right: 10 } }, // ✅ 1위 상단 짤림 방지 최적 설정
+        layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } }, // ✅ 짤림 방지 50 유지
         scales: { 
           y: { 
             reverse: true, 
@@ -347,7 +353,6 @@
   function stL(ctx, sIdx) { let cX = sIdx, cY = 80; ctx.strokeStyle = 'red'; ctx.lineWidth = 6; const sL = [...ladderLines].sort((a,b) => a.y - b.y); const tm = setInterval(() => { const absX = 40 + (cX * ladderGap); if(cY >= 480) { clearInterval(tm); const res = finalMapping[cX]; winHistory.push({ name: ldP[sIdx], result: res }); if(res !== "패스") { $('ladder-final-msg').style.display = 'block'; $('congrats-content').innerHTML = winHistory.filter(w => w.result !== "패스").map(w => `축하해요! <b>${w.name}</b>, <b>${w.result}</b> 감사합니다! 🎉`).join('<br>'); } alert(`${ldP[sIdx]} 결과: ${res}`); return; } let nY = cY + 6, mv = false; for(let l of sL) { if(l.y > cY && l.y < nY + 2) { if(l.from === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX + ladderGap, l.y); ctx.stroke(); cX++; cY = l.y + 1; mv = true; break; } else if(l.to === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX - ladderGap, l.y); ctx.stroke(); cX--; cY = l.y + 1; mv = true; break; } } } if(!mv) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, nY); ctx.stroke(); cY = nY; } }, 15); }
   function resetLadderGame() { ldP = []; winHistory = []; $('ladder-setup-view').style.display='block'; $('ladder-game-view').style.display='none'; renderLadderPlayerPool(); }
 
-  /* ✅ 날씨 로직 원본 복구 (v12.9) */
   const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
   function getWed(o) { const d = new Date(); d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + o); return d; }
   async function loadWeather(d) {
