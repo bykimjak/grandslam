@@ -46,8 +46,9 @@
     .header-banner .material-symbols-outlined { font-size: 30px; }
 
     .weather-card { border-radius: 24px; padding: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: stretch; }
-    .w-input { flex: 1; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; }
+    /* ✅ 입력창을 꽉 채워 우측 버튼과 정렬 맞춤 */
+    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: stretch; width: 100%; } 
+    .w-input { flex: 1; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; } 
     .w-btn { padding: 15px; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; }
     #btnSearch { min-width: 65px; background: var(--wimbledon-sage); }
     
@@ -137,7 +138,7 @@
       토브클럽 광명날씨
     </div>
     <div class="search-row"><input id="city" class="w-input" value="Gwangmyeong" /><button id="btnSearch" class="w-btn">검색</button></div>
-    <div class="btn-row"><button id="btnRefresh" class="w-btn">이번 주 날씨</button><button id="btnNext" class="w-btn">다음 주 날씨</button></div>
+    <div class="btn-row"><button id="btnRefresh" class="w-btn" onclick="loadWeather(getWed(0))">이번 주 날씨</button><button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button></div>
     <div id="dateDisplay" class="date-display"></div>
     <div id="status"></div>
     <table id="tbl" class="weather-table" style="display:none;"><thead><tr><th>시간</th><th>날씨</th><th>온도</th><th>강수</th><th>바람</th></tr></thead><tbody id="tbody"></tbody></table>
@@ -276,7 +277,17 @@
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
     const sorted = [...players].sort((a,b) => b.score - a.score);
     const ranks = {}; sorted.forEach((p, i) => ranks[p.name] = i + 1);
-    const datasets = players.map((p, i) => ({ label: p.name, data: labels.map((_, idx) => (rangeIdx === 0 && idx === 0) ? ranks[p.name] : null), borderColor: colors[i % colors.length], backgroundColor: colors[i % colors.length], pointRadius: 5, borderWidth: 2, spanGaps: true }));
+    const datasets = players.map((p, i) => ({ 
+      label: p.name, 
+      data: labels.map((_, idx) => (rangeIdx === 0 && idx === 0) ? ranks[p.name] : null), 
+      borderColor: colors[i % colors.length], 
+      backgroundColor: colors[i % colors.length], 
+      pointRadius: 5, 
+      borderWidth: 2, 
+      spanGaps: true,
+      clip: false 
+    }));
+    
     if(chart) chart.destroy();
     chart = new Chart($('seasonChart').getContext('2d'), { 
       type: 'line', 
@@ -284,17 +295,22 @@
       options: { 
         responsive: true, 
         maintainAspectRatio: false, 
-        layout: { padding: { top: 40, bottom: 10 } }, // ✅ 1위 상단 짤림 방지용 고정 여백
+        layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } }, // ✅ 상단 짤림 방지 (50 유지)
         scales: { 
-          y: { reverse: true, min: 1, max: players.length + 1, ticks: { stepSize: 1, autoSkip: false }, grid: { color: '#eee' } }, 
+          y: { 
+            reverse: true, 
+            min: 1, 
+            max: players.length + 1, 
+            ticks: { stepSize: 1, autoSkip: false, callback: function(val) {return Number.isInteger(val)?val:'';} }, 
+            grid: { color: '#eee' } 
+          }, 
           x: { grid: { display: false } } 
         }, 
-        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } 
+        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } } } 
       } 
     });
   }
 
-  async function push() { $('loading-overlay').style.display='flex'; try{ await fetch(GAS_URL,{method:"POST",body:JSON.stringify(players)}); }catch(e){} $('loading-overlay').style.display='none'; }
   async function save() {
     var hs=$('hS').value, as=$('aS').value; if(!hs || !as || hs==as) return alert("점수 확인!");
     const apply = (ns, isW) => ns.forEach(n => { 
