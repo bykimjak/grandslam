@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate - Online v1.37</title>
+  <title>GrandSlam Ultimate - Online v1.39</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -46,11 +46,11 @@
     .header-banner .material-symbols-outlined { font-size: 30px; }
 
     .weather-card { border-radius: 24px; padding: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    /* ✅ 입력창을 꽉 채워 우측 버튼과 정렬 맞춤 */
-    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: stretch; width: 100%; } 
-    .w-input { flex: 1; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; } 
-    .w-btn { padding: 15px; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; }
-    #btnSearch { min-width: 65px; background: var(--wimbledon-sage); }
+    /* ✅ 날씨 검색 영역 모바일 튀어나옴 방지 교정 */
+    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: space-between; width: 100%; } 
+    .w-input { width: 70%; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; } 
+    .w-btn { flex: 1; padding: 15px 0; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; text-align: center; }
+    #btnSearch { background: var(--wimbledon-sage); }
     
     .btn-row { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
     #btnRefresh { flex: 1; background: var(--aussie-blue); }
@@ -137,14 +137,20 @@
       <span class="material-symbols-outlined">wb_sunny</span>
       토브클럽 광명날씨
     </div>
-    <div class="search-row"><input id="city" class="w-input" value="Gwangmyeong" /><button id="btnSearch" class="w-btn">검색</button></div>
-    <div class="btn-row"><button id="btnRefresh" class="w-btn" onclick="loadWeather(getWed(0))">이번 주 날씨</button><button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button></div>
+    <div class="search-row">
+      <input id="city" class="w-input" value="Gwangmyeong" />
+      <button id="btnSearch" class="w-btn" onclick="loadWeather(getWed(0))">검색</button>
+    </div>
+    <div class="btn-row">
+      <button id="btnRefresh" class="w-btn" onclick="loadWeather(getWed(0))">이번 주 날씨</button>
+      <button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button>
+    </div>
     <div id="dateDisplay" class="date-display"></div>
     <div id="status"></div>
     <table id="tbl" class="weather-table" style="display:none;"><thead><tr><th>시간</th><th>날씨</th><th>온도</th><th>강수</th><th>바람</th></tr></thead><tbody id="tbody"></tbody></table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
     
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v1.37</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v1.39</div>
   </div>
 </div>
 
@@ -200,8 +206,8 @@
   <div id="s4" class="section-card">
     <h3>👥 선수 등록</h3>
     <div class="search-row" style="margin-bottom:20px;">
-        <input type="text" id="pI" class="w-input" placeholder="성함">
-        <button onclick="addP()" style="min-width: 65px; padding:15px; background:var(--wimbledon-sage); color:white; border:none; border-radius:12px; font-weight:bold; margin-left:8px; white-space: nowrap;">등록</button>
+        <input type="text" id="pI" class="w-input" style="width:75%;" placeholder="성함">
+        <button onclick="addP()" class="w-btn" style="background:var(--wimbledon-sage); margin-left:8px;">등록</button>
     </div>
     <table id="pL" class="tennis-table" style="margin-top:20px;"><tbody></tbody></table>
     <hr>
@@ -295,7 +301,7 @@
       options: { 
         responsive: true, 
         maintainAspectRatio: false, 
-        layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } }, // ✅ 상단 짤림 방지 (50 유지)
+        layout: { padding: { top: 35, bottom: 20, left: 10, right: 10 } }, // ✅ 1위 상단 짤림 방지 최적 설정
         scales: { 
           y: { 
             reverse: true, 
@@ -341,9 +347,29 @@
   function stL(ctx, sIdx) { let cX = sIdx, cY = 80; ctx.strokeStyle = 'red'; ctx.lineWidth = 6; const sL = [...ladderLines].sort((a,b) => a.y - b.y); const tm = setInterval(() => { const absX = 40 + (cX * ladderGap); if(cY >= 480) { clearInterval(tm); const res = finalMapping[cX]; winHistory.push({ name: ldP[sIdx], result: res }); if(res !== "패스") { $('ladder-final-msg').style.display = 'block'; $('congrats-content').innerHTML = winHistory.filter(w => w.result !== "패스").map(w => `축하해요! <b>${w.name}</b>, <b>${w.result}</b> 감사합니다! 🎉`).join('<br>'); } alert(`${ldP[sIdx]} 결과: ${res}`); return; } let nY = cY + 6, mv = false; for(let l of sL) { if(l.y > cY && l.y < nY + 2) { if(l.from === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX + ladderGap, l.y); ctx.stroke(); cX++; cY = l.y + 1; mv = true; break; } else if(l.to === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX - ladderGap, l.y); ctx.stroke(); cX--; cY = l.y + 1; mv = true; break; } } } if(!mv) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, nY); ctx.stroke(); cY = nY; } }, 15); }
   function resetLadderGame() { ldP = []; winHistory = []; $('ladder-setup-view').style.display='block'; $('ladder-game-view').style.display='none'; renderLadderPlayerPool(); }
 
+  /* ✅ 날씨 로직 원본 복구 (v12.9) */
   const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
-  async function loadWeather(d) { const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10); $('dateDisplay').innerText = `${ds} ${['일','월','화','수','목','금','토'][d.getDay()]}요일`; $('dateDisplay').style.display = "block"; try { const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=37.48&longitude=126.86&hourly=temperature_2m,weather_code,precipitation,wind_speed_10m&timezone=Asia/Seoul&start_date=${ds}&end_date=${ds}`); const j = await r.json(); $("tbody").innerHTML = ""; let tR = 0, mW = 0, aT = 0, iC = true, iS = false; for (let i=5; i<=12; i++) { const t = j.hourly.temperature_2m[i], c = j.hourly.weather_code[i], rn = j.hourly.precipitation[i], w = j.hourly.wind_speed_10m[i]; if (c > 2) iC = false; if (c >= 71 && c <= 77) iS = true; tR += rn; mW = Math.max(mW, w); aT += t; $("tbody").innerHTML += `<tr><td>${i}시</td><td>${rn > 0 ? "🌦️" : (WX[c] || "☁️")}</td><td>${t.toFixed(1)}°</td><td>${rn.toFixed(1)}</td><td>${w.toFixed(1)}</td></tr>`; } aT /= 8; $("tipContent").innerText = (tR > 0 || iS) ? "💡 비/눈 소식! 테니스는 무리네요. ☔" : (mW >= 5) ? "💡 바람이 세요! 바람막이 필수! 💨" : (aT <= 5) ? `💡 현재 ${aT.toFixed(1)}도! 추워요. 판피린 마시고 치세요! ☕` : (aT >= 25) ? "💡 덥네요! 아아 마시면서 치세요! 🥤" : iC ? "💡 맑은 날씨! 선글라스 챙기세요! 😎" : "💡 테니스 치기 딱 좋은 날씨! 🎾"; $("dynamicTip").style.display="block"; $("tbl").style.display="table"; } catch(e) {} }
   function getWed(o) { const d = new Date(); d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + o); return d; }
+  async function loadWeather(d) {
+    const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+    $('dateDisplay').innerText = `${ds} ${['일','월','화','수','목','금','토'][d.getDay()]}요일`;
+    $('dateDisplay').style.display = "block";
+    try {
+      const api = `https://api.open-meteo.com/v1/forecast?latitude=37.48&longitude=126.86&hourly=temperature_2m,weather_code,precipitation,wind_speed_10m&timezone=Asia/Seoul&start_date=${ds}&end_date=${ds}`;
+      const r = await fetch(api); const j = await r.json();
+      $("tbody").innerHTML = ""; let tR = 0, mW = 0, aT = 0, iC = true, iS = false;
+      for (let i=5; i<=12; i++) {
+        const t = j.hourly.temperature_2m[i], c = j.hourly.weather_code[i], rn = j.hourly.precipitation[i], w = j.hourly.wind_speed_10m[i];
+        if (c > 2) iC = false; if (c >= 71 && c <= 77) iS = true;
+        tR += rn; mW = Math.max(mW, w); aT += t;
+        const icon = (rn > 0) ? "🌦️" : (WX[c] || "☁️");
+        $("tbody").innerHTML += `<tr><td>${i}시</td><td>${icon}</td><td>${t.toFixed(1)}°</td><td>${rn.toFixed(1)}</td><td>${w.toFixed(1)}</td></tr>`;
+      }
+      aT /= 8;
+      let tip = (tR > 0 || iS) ? "💡 비/눈 소식! 테니스는 무리네요. ☔" : (mW >= 5) ? "💡 바람이 세요! 바람막이 필수! 💨" : (aT <= 5) ? `💡 현재 ${aT.toFixed(1)}도! 추워요. 판피린 마시고 치세요! ☕` : (aT >= 25) ? "💡 덥네요! 아아 마시면서 치세요! 🥤" : iC ? "💡 맑은 날씨! 선글라스 챙기세요! 😎" : "💡 테니스 치기 딱 좋은 날씨! 🎾";
+      $("tipContent").innerText = tip; $("dynamicTip").style.display="block"; $("tbl").style.display="table";
+    } catch(e) {}
+  }
 
   window.addEventListener("load",()=>{ setTimeout(()=>{$('splash').classList.add("hide"); setTimeout(()=>{$('splash').style.display="none"},700)},900); sync(); loadWeather(getWed(0)); });
 </script>
