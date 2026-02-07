@@ -3,188 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v2.50</title>
+  <title>GrandSlam Ultimate v3.2</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  
   <style>
-    /* =========================================
-       1. 공통 및 기존 스타일 (v1.43 원본 유지)
-       ========================================= */
-    :root { 
-      --bg-gray: #F2F2F7; 
-      --text-dark: #1C1C1E; 
-      --text-gray: #8E8E93; 
-      /* ✅ 김작님이 원하신 바로 그 윔블던 색 */
-      --wimbledon-sage: #5D9C76;    
-      --aussie-blue: #669DB3;       
-      --roland-clay: #D98C73;       
-      --up-red: #FF3B30; 
-      --down-blue: #007AFF; 
-    }
-    
-    body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; padding-bottom: 90px; }
+    /* [절대원칙] v2.57 스타일 100% 유지 (토너먼트 중앙정렬 포함) */
+    :root { --bg-gray: #F2F2F7; --text-dark: #1C1C1E; --text-gray: #8E8E93; --wimbledon-sage: #5D9C76; --aussie-blue: #669DB3; --roland-clay: #D98C73; --up-red: #FF3B30; --down-blue: #007AFF; }
+    body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; padding-bottom: 90px; font-weight: 400; }
     #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; align-items: center; justify-content: center; z-index: 20000; }
     #splash img { width: 140px; height: 140px; border-radius: 24px; transition: transform 0.7s ease, opacity 0.6s ease; }
     #splash.hide img { transform: scale(5); opacity: 0; }
-    
+
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-top: 1px solid #d1d1d6; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
-    .nav-item { flex: 1; text-align: center; color: #C7C7CC; font-size: 10px; font-weight: 500; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; transition: color 0.2s; }
-    .nav-item.active { color: var(--wimbledon-sage); font-weight: 700; }
-    .nav-icon { margin-bottom: 4px; }
+    .nav-item { flex: 1; text-align: center; color: #C7C7CC; font-size: 10px; font-weight: 400; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; transition: color 0.2s; }
+    .nav-item.active { color: var(--wimbledon-sage); }
     .material-symbols-outlined { font-size: 28px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
-    .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400; }
+    .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 300; }
 
     .app-screen { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
     .app-screen.active { display: block; }
 
-    .header-banner { 
-      background: var(--wimbledon-sage); color: white; margin: 0 0 20px 0; padding: 20px; text-align: center; 
-      border-radius: 16px; box-shadow: 0 4px 15px rgba(93, 156, 118, 0.3); 
-      display: flex; align-items: center; justify-content: center; gap: 10px; 
-      font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
-    }
-    .header-banner .material-symbols-outlined { font-size: 30px; }
-
+    .header-banner { background: var(--wimbledon-sage); color: white; margin: 0 0 20px 0; padding: 20px; text-align: center; border-radius: 16px; box-shadow: 0 4px 15px rgba(93, 156, 118, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 20px; font-weight: 400; letter-spacing: -0.5px; }
     .weather-card { border-radius: 24px; padding: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: space-between; width: 100%; } 
-    .w-input { width: 70%; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; } 
-    .w-btn { flex: 1; padding: 15px 0; border: none; border-radius: 12px; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; text-align: center; }
+
+    .search-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: space-between; width: 100%; }
+    .w-input { width: 70%; padding: 14px; border: 1px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; font-weight: 400; }
+    .w-btn { flex: 1; padding: 15px 0; border: none; border-radius: 12px; color: #fff; font-weight: 400; cursor: pointer; font-size: 15px; transition: opacity 0.2s; white-space: nowrap; text-align: center; }
     #btnSearch { background: var(--wimbledon-sage); }
-    
+
     .btn-row { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-    
-    /* ✅ 날씨 버튼 색상 로직 복구 (기본: 프랑스색 / 활성: 호주색) */
-    #btnRefresh, #btnNext { 
-      flex: 1; 
-      background: var(--roland-clay); /* 기본(비활성)은 프랑스색 */
-      color: white; 
-      opacity: 0.8; 
-      border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 15px; padding: 15px 0; transition: all 0.2s;
-    }
-    #btnRefresh.active, #btnNext.active { 
-      background: var(--aussie-blue) !important; /* 활성은 호주색 */
-      opacity: 1; 
-      box-shadow: 0 4px 10px rgba(102, 157, 179, 0.4);
-    }
-    
-    .date-display { text-align: center; font-weight: 900; color: var(--aussie-blue); font-size: 16px; margin-bottom: 10px; padding: 10px; background: #f0f7ff; border-radius: 12px; display: none; }
-    #status { font-weight: 600; margin: 10px 0; font-size: 9px; border-radius: 10px; padding: 8px; display: none; text-align: center; }
-    .ok { display: block !important; background: #e8f9ee; color: #34C759; }
+    #btnRefresh, #btnNext { flex: 1; background: var(--roland-clay); color: white; opacity: 0.8; border: none; border-radius: 12px; font-weight: 400; cursor: pointer; font-size: 15px; padding: 15px 0; transition: all 0.2s; }
+    #btnRefresh.active, #btnNext.active { background: var(--aussie-blue) !important; opacity: 1; box-shadow: 0 4px 10px rgba(102, 157, 179, 0.4); }
 
-    /* ✅ 날씨 테이블 스타일 (v2.47 유지) */
     .weather-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    .weather-table th { 
-        color: var(--wimbledon-sage); 
-        border-bottom: 2px solid var(--wimbledon-sage); 
-        padding: 8px; 
-        text-align: center; 
-        font-weight: 800; 
-        background: rgba(93, 156, 118, 0.1); 
-    }
-    .weather-table td { 
-        text-align: center; 
-        padding: 15px 2px; 
-        border-bottom: 1px solid #f0f0f0; 
-        font-weight: 600;
-        color: var(--text-dark);
-    }
+    .weather-table th { color: var(--wimbledon-sage); border-bottom: 2px solid var(--wimbledon-sage); padding: 8px; text-align: center; font-weight: 400; background: rgba(93, 156, 118, 0.1); }
+    .weather-table td { text-align: center; padding: 15px 2px; border-bottom: 1px solid #f0f0f0; font-weight: 400; color: var(--text-dark); }
 
-    .tip-box { margin-top: 15px; padding: 15px; background: var(--roland-clay); color: white; font-weight: bold; border-radius: 16px; box-shadow: 0 4px 10px rgba(217, 140, 115, 0.3); }
-    
+    .tip-box { margin-top: 15px; padding: 15px; background: var(--roland-clay); color: white; font-weight: 400; border-radius: 16px; box-shadow: 0 4px 10px rgba(217, 140, 115, 0.3); }
+
     .tab-menu { display: flex; gap: 8px; margin-bottom: 20px; }
-    .tab-btn { 
-      flex: 1; padding: 12px 0; border: none; font-size: 13px; font-weight: 700; cursor: pointer; 
-      border-radius: 12px; transition: all 0.2s; 
-      background: var(--roland-clay); color: white; opacity: 0.8;
-    }
-    .tab-btn.active { 
-      background: var(--aussie-blue) !important; color: white; opacity: 1; 
-      transform: scale(1.02); box-shadow: 0 2px 8px rgba(102, 157, 179, 0.4);
-    }
+    .tab-btn { flex: 1; padding: 12px 0; border: none; font-size: 13px; font-weight: 400; cursor: pointer; border-radius: 12px; transition: all 0.2s; background: var(--roland-clay); color: white; opacity: 0.8; }
+    .tab-btn.active { background: var(--aussie-blue) !important; color: white; opacity: 1; transform: scale(1.02); box-shadow: 0 2px 8px rgba(102, 157, 179, 0.4); }
 
     .section-card { background: white; padding: 20px; border-radius: 20px; min-height: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
     .section-card.active { display: block; }
-    
-    /* ✅ 랭킹 테이블 (v2.46 유지) */
-    .tennis-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-    .tennis-table th { 
-        color: var(--wimbledon-sage); 
-        border-bottom: 2px solid var(--wimbledon-sage); 
-        padding: 8px; 
-        text-align: center; 
-        font-weight: 800; 
-        background: rgba(93, 156, 118, 0.1); 
-    }
-    .tennis-table td { 
-        padding: 12px 8px; 
-        border-bottom: 1px solid #eee; 
-        text-align: center; 
-        font-weight: 600; 
-        color: var(--text-dark); 
-    }
-    .point-text { color: var(--wimbledon-sage); font-weight: 900; }
-    .sub-info { font-size: 10px; color: #8E8E93; font-weight: normal; }
 
-    .sub-rank-title { font-size: 15px; font-weight: 800; color: var(--text-dark); margin: 30px 0 10px 0; display: flex; align-items: center; gap: 5px; }
+    .tennis-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; table-layout: fixed; }
+    .tennis-table th { color: var(--wimbledon-sage); border-bottom: 2px solid var(--wimbledon-sage); padding: 8px; text-align: center; font-weight: 400; background: rgba(93, 156, 118, 0.1); }
+    .tennis-table td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: 400; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; }
+
+    .point-text { color: var(--wimbledon-sage); font-weight: 400; }
+    .sub-info { font-size: 10px; color: #8E8E93; font-weight: 400; }
+    .sub-rank-title { font-size: 15px; font-weight: 400; color: var(--text-dark); margin: 30px 0 10px 0; display: flex; align-items: center; gap: 5px; }
     .sub-rank-title .material-symbols-outlined { font-size: 18px; color: var(--wimbledon-sage); }
 
-    .type-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: all 0.2s; background: var(--roland-clay); color: white; opacity: 0.8; }
+    .type-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: 400; cursor: pointer; margin-bottom: 15px; transition: all 0.2s; background: var(--roland-clay); color: white; opacity: 0.8; }
     .type-btn.selected { background: var(--aussie-blue); color: white; opacity: 1; box-shadow: 0 4px 10px rgba(102, 157, 179, 0.4); }
 
     .team-box { border: 2px solid #E5E5EA; border-radius: 15px; padding: 15px; text-align: center; background: white; margin-bottom: 10px; }
-    #hN, #aN { color: var(--aussie-blue) !important; }
-    .score-box { width: 70px; height: 55px; font-size: 26px; text-align: center; border-radius: 12px; border: 1px solid #D1D1D6; background: #F2F2F7; color: var(--text-dark); font-weight: 900; }
+    #hN, #aN { color: var(--aussie-blue) !important; font-weight: 400; }
+
+    .score-box { width: 70px; height: 55px; font-size: 26px; text-align: center; border-radius: 12px; border: 1px solid #D1D1D6; background: #F2F2F7; color: var(--text-dark); font-weight: 400; }
 
     .pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; }
-    .pool-item { padding: 10px 15px; background: white; border: 1px solid #D1D1D6; border-radius: 20px; font-size: 14px; cursor: pointer; color: var(--text-dark); }
-    
-    .btn-main { width: 100%; padding: 20px; background: var(--wimbledon-sage); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; margin-top: 15px; }
-    .btn-sub { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 900; color: #fff; margin-top: 10px; font-size: 13px; cursor: pointer; }
+    .pool-item { padding: 10px 15px; background: white; border: 1px solid #D1D1D6; border-radius: 20px; font-size: 14px; cursor: pointer; color: var(--text-dark); font-weight: 400; }
+    .pool-item.selected { border-color: var(--aussie-blue) !important; background: var(--aussie-blue) !important; color: white !important; font-weight: 400; box-shadow: 0 0 8px rgba(102, 157, 179, 0.5); }
+
+    .btn-main { width: 100%; padding: 20px; background: var(--wimbledon-sage); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 400; margin-top: 15px; }
+    .btn-sub { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 400; color: #fff; margin-top: 10px; font-size: 13px; cursor: pointer; }
     .btn-sub.sky { background: var(--aussie-blue); }
     .btn-sub.royal { background: var(--roland-clay); }
     .btn-sub.navy { background: #0C2340; }
-    
-    #loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10000; justify-content:center; align-items:center; font-weight:bold; color:var(--wimbledon-sage); }
-    .rule-box { margin-top: 14px; padding: 14px; border: 1px solid #E5E5EA; border-radius: 14px; background: #fff; font-size: 13px; line-height: 1.6; }
-    .rule-title { font-weight: 900; margin-bottom: 8px; color: var(--wimbledon-sage); }
 
-    .chart-nav { display: flex; overflow-x: auto; gap: 6px; margin-bottom: 15px; padding-bottom: 5px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-    .chart-btn { padding: 6px 14px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; color: #555; font-weight: bold; flex-shrink: 0; }
+    #loading-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10000; justify-content:center; align-items:center; font-weight: 400; color:var(--wimbledon-sage); }
+
+    .date-display{ display: none; width: 100%; margin: 0 0 15px 0; padding: 12px 14px; border-radius: 14px; background: #EAF4FF; border: 1px solid #D6E9FF;
+      color: var(--aussie-blue); text-align: center; font-size: 16px; font-weight: 400; box-sizing: border-box; }
+
+    .chart-btn { padding: 6px 14px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; background: white; cursor: pointer; color: #555; font-weight: 400; flex-shrink: 0; }
     .chart-btn.active { background: var(--wimbledon-sage); color: white; border-color: transparent; box-shadow: 0 2px 6px rgba(93, 156, 118, 0.3); }
 
-    .pool-ladder { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; margin-bottom: 15px; }
-    .pool-item.selected { border-color: var(--aussie-blue) !important; background: var(--aussie-blue) !important; color: white !important; font-weight: bold; box-shadow: 0 0 8px rgba(102, 157, 179, 0.5); }
-    .btn-purple-main { width: 100%; padding: 20px; background: var(--wimbledon-sage); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-    
-    #ladder-canvas-wrap { background: white; border-radius: 20px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; position: relative; width: 100%; }
-    #ladderCanvas { width: 100%; height: auto; display: block; }
-    
-    .congrats-box { background: rgba(217, 140, 115, 0.1); padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 14px; line-height: 1.8; border: 2px solid var(--roland-clay); color: #1C1C1E; display: none; text-align: center; font-weight: bold; }
+    /* 토너먼트 */
+    .tour-section-title { font-size: 16px; font-weight: 400; color: var(--text-dark) !important; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .tour-section-title .material-symbols-outlined { color: var(--wimbledon-sage) !important; font-size: 18px; }
 
-    /* ✅ 수정: 토너먼트 섹션 타이틀 스타일 변경 (검정색 글씨, 아이콘 색상은 유지) */
-    .tour-section-title { 
-      font-size: 16px; font-weight: 800; color: var(--text-dark) !important; /* 글씨색 검정으로 변경 */
-      margin-bottom: 12px; display: flex; align-items: center; gap: 6px; 
-    }
-    .tour-section-title .material-symbols-outlined { color: var(--wimbledon-sage) !important; font-size: 18px; /* 아이콘 크기 및 색상 지정 */ }
-    
     .player-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
     .p-chk { display: none; }
-    .p-label { background: white; border: 2px solid #ddd; color: #888; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .p-label { background: white; border: 2px solid #ddd; color: #888; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 400; cursor: pointer; transition: 0.2s; }
     .p-chk:checked + .p-label { background: var(--aussie-blue); color: white; border-color: var(--aussie-blue); box-shadow: 0 2px 6px rgba(102, 157, 179, 0.3); }
-    .p-rank { font-size: 10px; opacity: 0.8; display: block; font-weight: normal; }
+    .p-rank { font-size: 10px; opacity: 0.8; display: block; font-weight: 400; }
 
     .opt-row { display: flex; gap: 10px; margin-bottom: 20px; }
-    .opt-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; color: white; opacity: 0.8; background: var(--roland-clay); }
+    .opt-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 400; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; color: white; opacity: 0.8; background: var(--roland-clay); }
     .opt-btn.active { background: var(--aussie-blue) !important; opacity: 1; box-shadow: 0 2px 8px rgba(102, 157, 179, 0.4); transform: scale(1.02); }
 
     #bracket-section { display: none; margin-top: 40px; border-top: 2px dashed #eee; padding-top: 40px; overflow-x: auto; }
-    .bracket-title { text-align: center; font-size: 18px; font-weight: 900; color: #FFCC00; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .gold-trophy { color: #FFCC00; font-size: 24px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); font-variation-settings: 'FILL' 1; }
+    .bracket-title { text-align: center; font-size: 24px; font-weight: 400; color: var(--wimbledon-sage); margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .bracket-title .material-symbols-outlined { font-size: 32px; color: var(--wimbledon-sage); font-variation-settings: 'FILL' 1; }
 
     .bracket-container { width: 100%; overflow-x: auto; display: flex; padding-bottom: 10px; }
     .bracket-tree { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px; margin: 0 auto; min-width: max-content; }
@@ -195,31 +113,54 @@
     .match-box { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 10px; width: 100%; box-sizing: border-box; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; z-index: 2; min-width: 140px; }
     .match-box.final-stage { min-height: 120px; border: 2px solid #eee; transform: scale(1.05); display: flex; flex-direction: column; justify-content: center; }
 
-    .team { padding: 8px; border-radius: 8px; cursor: pointer; margin: 4px 0; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; transition: 0.2s; }
-    .team.no-rank { justify-content: center; text-align: center; }
-    .team:hover { background: #eee; }
-    
-    .team.winner, .match-box.final-stage .team.winner { background: var(--roland-clay) !important; color: white !important; box-shadow: 0 2px 5px rgba(217, 140, 115, 0.4); }
-    .team.loser { opacity: 0.4; text-decoration: line-through; color: #999; pointer-events: none; }
-    .seed { font-size: 10px; opacity: 0.7; font-weight: normal; margin-right: 6px; background: rgba(0,0,0,0.1); padding: 2px 5px; border-radius: 4px; }
     .match-box::before, .match-box::after { display: none !important; }
 
     .champ-wrapper { text-align: center; margin-bottom: 25px; display: none; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 100%; }
-    .champ-badge { background: white; border: 2px solid var(--wimbledon-sage); color: var(--wimbledon-sage); padding: 12px 15px; border-radius: 30px; font-weight: 900; font-size: 16px; box-shadow: 0 4px 15px rgba(93, 156, 118, 0.2); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 240px; box-sizing: border-box; }
+    .champ-badge { background: white; border: 2px solid var(--wimbledon-sage); color: var(--wimbledon-sage); padding: 12px 15px; border-radius: 30px; font-weight: 400; font-size: 16px; box-shadow: 0 4px 15px rgba(93, 156, 118, 0.2); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 240px; box-sizing: border-box; }
 
     .loser-bench { margin-top: 30px; padding: 15px; background: #fff; border-radius: 12px; border: 2px dashed #ddd; text-align: center; display: none; }
-    .loser-bench h4 { margin: 0 0 10px 0; color: #666; font-size: 14px; }
-    .loser-chip { display: inline-block; padding: 8px 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 20px; margin: 4px; font-size: 12px; font-weight: bold; color: #555; cursor: pointer; transition: 0.2s; }
+    .loser-bench h4 { margin: 0 0 10px 0; color: #666; font-size: 14px; font-weight: 400; }
+    .loser-chip { display: inline-block; padding: 8px 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 20px; margin: 4px; font-size: 12px; font-weight: 400; color: #555; cursor: pointer; transition: 0.2s; }
     .loser-chip:hover { background: var(--aussie-blue); color: white; border-color: var(--aussie-blue); }
 
     .score-section { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; }
-    
-    /* ✅ 실시간 랭킹 (v2.42 수치 유지) */
     .tour-score-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-    .tour-score-table th { color: var(--wimbledon-sage); border-bottom: 2px solid var(--wimbledon-sage); padding: 8px; text-align: center; font-weight: 800; background: rgba(93, 156, 118, 0.1); }
-    .tour-score-table td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: 600; color: var(--dark); }
-    
+    .tour-score-table th { color: var(--wimbledon-sage); border-bottom: 2px solid var(--wimbledon-sage); padding: 8px; text-align: center; font-weight: 400; background: rgba(93, 156, 118, 0.1); }
+    .tour-score-table td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: 400; color: var(--text-dark); }
+
     .rank-1-icon { font-variation-settings: 'FILL' 1; color: #FFD700; font-size: 18px; }
+    .team { padding: 8px; border-radius: 8px; cursor: pointer; margin: 4px 0; font-size: 12px; font-weight: 400; display: flex; justify-content: center; align-items: center; background: #f9f9f9; transition: 0.2s; text-align: center; }
+    .team.winner, .match-box.final-stage .team.winner { background: var(--roland-clay) !important; color: white !important; box-shadow: 0 2px 5px rgba(217, 140, 115, 0.4); }
+    .team.loser { opacity: 0.4; text-decoration: line-through; color: #999; pointer-events: none; }
+
+    /* 개인통계 */
+    .form-dot { width: 14px; height: 14px; border-radius: 50%; }
+    .win-dot { background: var(--wimbledon-sage); }
+    .loss-dot { background: var(--up-red); }
+
+    /* 사다리 */
+    .pool-ladder { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; margin-bottom: 15px; }
+    .btn-purple-main { width: 100%; padding: 20px; background: var(--wimbledon-sage); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 400; margin-top: 15px; cursor: pointer; }
+    #ladder-canvas-wrap { background: white; border-radius: 20px; overflow: hidden; margin-top: 15px; border: 1px solid #eee; position: relative; width: 100%; }
+    #ladderCanvas { width: 100%; height: auto; display: block; }
+    .congrats-box { background: rgba(217, 140, 115, 0.1); padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 14px; line-height: 1.8; border: 2px solid var(--roland-clay); color: #1C1C1E; display: none; text-align: center; font-weight: 400; }
+
+    .rule-box{ margin-top: 14px; padding: 12px 12px; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.05); font-size: 10px; line-height: 1.55; color: #666; font-weight: 400; }
+    .rule-box b{ color:#1C1C1E; font-weight: 400; }
+    .rule-box .r-tt{ display:flex; align-items:center; gap:6px; margin-bottom:8px; color:#1C1C1E; font-size: 12px; }
+    .rule-box .r-tt .material-symbols-outlined{ font-size: 18px; color: var(--wimbledon-sage); font-variation-settings: 'FILL' 1; }
+    .rule-box .r-mini{ font-size: 9px; color:#777; }
+    .rule-box .r-line{ margin-top:6px; }
+
+    @media (max-width: 420px){
+      .tennis-table th:nth-child(1), .tennis-table td:nth-child(1){ width: 12%; white-space: nowrap; }
+      .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 44%; white-space: nowrap; }
+      .tennis-table th:nth-child(3), .tennis-table td:nth-child(3){ width: 20%; white-space: nowrap; }
+      .tennis-table th:nth-child(4), .tennis-table td:nth-child(4){ width: 12%; white-space: nowrap; }
+      .tennis-table th:nth-child(5), .tennis-table td:nth-child(5){ width: 12%; white-space: nowrap; }
+      .tennis-table td{ padding: 11px 6px; }
+      .tennis-table th{ padding: 8px 6px; }
+    }
   </style>
 </head>
 
@@ -229,10 +170,7 @@
 
 <div id="view-weather" class="app-screen active">
   <div class="weather-card">
-    <div class="header-banner">
-      <span class="material-symbols-outlined">wb_sunny</span>
-      광명시 날씨
-    </div>
+    <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>토브클럽 광명날씨</div>
     <div class="search-row">
       <input id="city" class="w-input" value="Gwangmyeong" />
       <button id="btnSearch" class="w-btn" onclick="loadWeather(getWed(0))">검색</button>
@@ -242,39 +180,28 @@
       <button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button>
     </div>
     <button onclick="window.open('https://search.naver.com/search.naver?query=광명+날씨', '_blank')" class="btn-sub sky" style="width:100%; margin-bottom:15px; height:45px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
-      <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
-      Naver 날씨 확인
+      <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>Naver 날씨 확인
     </button>
     <div id="dateDisplay" class="date-display"></div>
     <div id="status"></div>
     <table id="tbl" class="weather-table" style="display:none;">
-      <thead>
-        <tr>
-          <th style="width:20%;">시간</th>
-          <th style="width:20%;">날씨</th>
-          <th style="width:20%;">온도</th>
-          <th style="width:20%;">강수</th>
-          <th style="width:20%;">바람</th>
-        </tr>
-      </thead>
+      <thead><tr><th style="width:20%;">시간</th><th style="width:20%;">날씨</th><th style="width:20%;">온도</th><th style="width:20%;">강수</th><th style="width:20%;">바람</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:bold; padding-right:5px;">v2.50</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.2</div>
   </div>
 </div>
 
 <div id="view-tennis" class="app-screen">
-  <div class="header-banner" onclick="location.reload()">
-    <span class="material-symbols-outlined">emoji_events</span>
-    GrandSlam Ranking
-  </div>
+  <div class="header-banner" onclick="location.reload()"><span class="material-symbols-outlined">emoji_events</span>GrandSlam Ranking</div>
   <div class="tab-menu">
     <button id="t1" class="tab-btn active" onclick="tab(1)">시즌랭킹</button>
     <button id="t2" class="tab-btn" onclick="tab(2)">주간랭킹</button>
     <button id="t3" class="tab-btn" onclick="tab(3)">경기기록</button>
     <button id="t4" class="tab-btn" onclick="tab(4)">선수관리</button>
   </div>
+
   <div id="s1" class="section-card active">
     <div class="sub-rank-title"><span class="material-symbols-outlined">bar_chart</span>순위 변동 추이</div>
     <div class="chart-nav">
@@ -286,75 +213,175 @@
       <button class="chart-btn" onclick="updateChartRange(5)">12-1월</button>
     </div>
     <div style="height:320px; position:relative;"><canvas id="seasonChart"></canvas></div>
-    <div class="sub-rank-title"><span class="material-symbols-outlined">format_list_numbered</span>종합 순위표</div>
-    <table id="seasonTable" class="tennis-table"></table>
-    <div class="sub-rank-title"><span class="material-symbols-outlined">groups</span>복식 랭킹</div>
-    <table id="seasonDoubleTable" class="tennis-table"></table>
-    <div class="sub-rank-title"><span class="material-symbols-outlined">person</span>단식 랭킹</div>
-    <table id="seasonSingleTable" class="tennis-table"></table>
+    <div class="sub-rank-title"><span class="material-symbols-outlined">format_list_numbered</span>종합 순위표</div><table id="seasonTable" class="tennis-table"></table>
+    <div class="sub-rank-title"><span class="material-symbols-outlined">groups</span>복식 랭킹</div><table id="seasonDoubleTable" class="tennis-table"></table>
+    <div class="sub-rank-title"><span class="material-symbols-outlined">person</span>단식 랭킹</div><table id="seasonSingleTable" class="tennis-table"></table>
   </div>
+
   <div id="s2" class="section-card">
     <div class="sub-rank-title">📅 주간 종합 순위</div><table id="weeklyTotalTable" class="tennis-table"></table>
     <div class="sub-rank-title">👥 주간 복식 순위</div><table id="weeklyDoubleTable" class="tennis-table"></table>
     <div class="sub-rank-title">👤 주간 단식 순위</div><table id="weeklySingleTable" class="tennis-table"></table>
   </div>
+
   <div id="s3" class="section-card">
-    <div style="display:flex; gap:8px;"><button id="m_db" class="type-btn selected" onclick="setM('double')">복식</button><button id="m_sg" class="type-btn" onclick="setM('single')">단식</button></div>
-    <div class="team-box"><div id="hN" style="font-weight:bold;"></div><input type="number" id="hS" class="score-box" placeholder="0"></div>
-    <div class="team-box"><div id="aN" style="font-weight:bold;"></div><input type="number" id="aS" class="score-box" placeholder="0"></div>
+    <div style="display:flex; gap:8px;">
+      <button id="m_db" class="type-btn selected" onclick="setM('double')">복식</button>
+      <button id="m_sg" class="type-btn" onclick="setM('single')">단식</button>
+    </div>
+
+    <div class="team-box">
+      <div id="hN" style="font-weight:400;"></div>
+      <input type="number" id="hS" class="score-box" placeholder="0">
+    </div>
+    <div class="team-box">
+      <div id="aN" style="font-weight:400;"></div>
+      <input type="number" id="aS" class="score-box" placeholder="0">
+    </div>
+
     <button class="btn-main" onclick="save()">결과 저장</button>
+
     <div class="pool" id="pP"></div>
+
     <div class="rule-box">
-      <div class="rule-title">[점수획득 기준]</div>
-      참여점수 +1<br/>복식 승리 : +2, 총점 3점 / W+1<br/>복식 패배 : -0.7, 총점 0.3점 / L+1<br/>단식 승리 : +3, 총점 4점 / W+1<br/>단식 패배 : -0.5, 총점 0.5점 / L+1<br/><b>순위 : 점수>승률>승수>경기참여수</b>
+      <div class="r-tt"><span class="material-symbols-outlined">info</span>점수 획득 기준</div>
+      <div class="r-mini">🎾 <b>참여</b>: +1</div>
+      <div class="r-line r-mini">👥 <b>복식</b></div>
+      <div class="r-mini">- 승리: <b>+2</b> (총점 3점) / W+1</div>
+      <div class="r-mini">- 패배: <b>-0.7</b> (총점 0.3점) / L+1</div>
+      <div class="r-line r-mini">👤 <b>단식</b></div>
+      <div class="r-mini">- 승리: <b>+3</b> (총점 4점) / W+1</div>
+      <div class="r-mini">- 패배: <b>-0.5</b> (총점 0.5점) / L+1</div>
+      <div class="r-line r-mini">🏆 <b>순위</b>: 점수 &gt; 승률 &gt; 승수 &gt; 경기참여수</div>
     </div>
   </div>
+
   <div id="s4" class="section-card">
     <h3>👥 선수 등록</h3>
     <div class="search-row" style="margin-bottom:20px;">
-        <input type="text" id="pI" class="w-input" style="width:75%;" placeholder="성함">
-        <button onclick="addP()" class="w-btn" style="background:var(--wimbledon-sage); margin-left:8px;">등록</button>
+      <input type="text" id="pI" class="w-input" style="width:75%;" placeholder="성함">
+      <button onclick="addP()" class="w-btn" style="background:var(--wimbledon-sage); margin-left:8px;">등록</button>
     </div>
+
     <table id="pL" class="tennis-table"><tbody></tbody></table>
+
     <hr>
     <button class="btn-sub sky" onclick="resetScoresKeepPlayers()">점수 초기화</button>
     <button class="btn-sub royal" onclick="resetWeeklyOnly()">주간 리셋</button>
     <button class="btn-sub navy" onclick="adminResetAll()">전체 삭제</button>
     <hr>
+
+    <button id="btnOmitNim" class="btn-sub sky" onclick="toggleOmitNim()">모바일 이름 '님' 생략: ON</button>
     <button id="btnTourMode" class="btn-sub" style="background:#34C759;" onclick="toggleTournamentMode()">🟩 토너먼트 연습 모드 (기록반영 X)</button>
+
+    <div class="rule-box" style="margin-top:16px;">
+      <div class="r-tt"><span class="material-symbols-outlined">database</span>v3.2 저장 구조</div>
+      <div class="r-mini">- <b>Data</b>: 전체 덮어쓰기</div>
+      <div class="r-mini">- <b>MatchLog</b>: appendRow로 누적</div>
+      <div class="r-line r-mini">- 개인통계(파트너/천적/최근폼)는 <b>MatchLog 기반</b>으로 계산</div>
+    </div>
+  </div>
+</div>
+
+<div id="view-stats" class="app-screen">
+  <div class="section-card" style="display:block;">
+    <div class="header-banner"><span class="material-symbols-outlined" style="font-size:30px;">monitoring</span>GrandSlam 개인통계</div>
+
+    <div class="tour-section-title">
+      <span class="material-symbols-outlined">group_add</span>참가 선수 선택
+      <span style="font-size:11px; color:var(--text-gray); font-weight:normal;">(통계 정보를 원하는 선수를 클릭!)</span>
+    </div>
+    <div class="player-grid" id="stats-pList"></div>
+
+    <div id="stats-report" style="display:none;">
+      <div style="text-align:center; margin-bottom:20px;">
+        <h2 id="target-name" style="margin:0; font-weight:400; font-size: 22px;">선수 리포트</h2>
+        <div style="width:40px; height:3px; background:var(--roland-clay); margin:8px auto;"></div>
+      </div>
+
+      <div class="tour-section-title" style="justify-content:center; margin-top:0;">
+        <span class="material-symbols-outlined">reorder</span>현재 폼 (최근 10경기)
+      </div>
+      <div id="form-dots" style="display:flex; gap:6px; justify-content:center; margin-bottom:20px;"></div>
+
+      <div style="display:flex; gap:10px;">
+        <div class="team-box" style="flex:1; border:1px solid var(--aussie-blue); background:rgba(102, 157, 179, 0.05);">
+          <div style="font-size:11px; color:var(--aussie-blue); font-weight:bold;">최고의 파트너</div>
+          <div id="res-partner" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-partner-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">단식 0승 0패 / 복식 0승 0패</div>
+        </div>
+        <div class="team-box" style="flex:1; border:1px solid var(--up-red); background:rgba(255, 59, 48, 0.05);">
+          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">최고의 천적</div>
+          <div id="res-enemy" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-enemy-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">단식 0승 0패 / 복식 0승 0패</div>
+        </div>
+      </div>
+
+      <table class="tour-score-table">
+        <thead><tr><th>구분</th><th>승률</th><th>승패</th><th>포인트</th></tr></thead>
+        <tbody id="res-table"></tbody>
+        <tfoot id="res-foot"></tfoot>
+      </table>
+
+      <div id="advice-box" class="tip-box" style="margin-top:20px; border-radius:16px; padding:15px; color:white;">
+        <div id="res-advice">-</div>
+      </div>
+
+      <div class="rule-box" style="margin-top:14px;">
+        <div class="r-tt"><span class="material-symbols-outlined">receipt_long</span>MatchLog 기반 계산</div>
+        <div class="r-mini">- 최근 폼: 해당 선수의 MatchLog 최신 10경기(W/L)</div>
+        <div class="r-mini">- 파트너: <b>복식에서 같은 편</b>으로 뛴 사람 중 승률/승수 우선</div>
+        <div class="r-mini">- 천적: <b>상대편</b>으로 만난 사람 중 승률(=내가 진 비율) 우선</div>
+      </div>
+    </div>
+
+    <div id="welcome-msg" style="text-align:center; padding:50px 0; color:#ccc;">
+      <span class="material-symbols-outlined" style="font-size:40px;">query_stats</span><br>선수를 클릭하면 분석이 시작됩니다.
+    </div>
   </div>
 </div>
 
 <div id="view-tournament" class="app-screen">
   <div class="section-card" style="display:block;">
-    <div class="header-banner">
-      <span class="material-symbols-outlined" style="font-size:32px;">leaderboard</span>
-      GrandSlam Tournament
-    </div>
+    <div class="header-banner"><span class="material-symbols-outlined" style="font-size:32px;">leaderboard</span>GrandSlam Tournament</div>
+
     <div id="setup-area">
       <div class="tour-section-title"><span class="material-symbols-outlined">group_add</span>참가 선수 선택 (<span id="cnt">0</span>명)</div>
       <div class="player-grid" id="pList"></div>
+
       <div class="tour-section-title"><span class="material-symbols-outlined">shuffle</span>배치 방식</div>
       <div class="opt-row">
         <button class="opt-btn active" onclick="setOpt('mode', 'rank', this)">랭킹 반영</button>
         <button class="opt-btn" onclick="setOpt('mode', 'random', this)">무작위</button>
       </div>
+
       <div class="tour-section-title"><span class="material-symbols-outlined">category</span>경기 종목</div>
       <div class="opt-row">
         <button class="opt-btn active" onclick="setOpt('type', 'single', this)">단식 (1vs1)</button>
         <button class="opt-btn" onclick="setOpt('type', 'double', this)">복식 (2vs2)</button>
       </div>
+
       <button class="btn-main" onclick="makeBracket()">대진표 생성하기</button>
     </div>
+
     <div id="bracket-section">
-      <div class="bracket-title">🏆 대진표</div>
+      <div class="bracket-title"><span class="material-symbols-outlined">emoji_events</span>대진표</div>
       <div class="bracket-container"><div class="bracket-tree" id="tree-root"></div></div>
-      <div id="loser-bench" class="loser-bench"><h4>🏃 패자 대기석 (클릭하여 대기팀에 투입)</h4><div id="loser-list"></div></div>
+
+      <div id="loser-bench" class="loser-bench">
+        <h4>🏃 패자 대기석 (클릭하여 대기팀에 투입)</h4>
+        <div id="loser-list"></div>
+      </div>
+
       <div class="score-section">
         <div class="tour-section-title">실시간 랭킹</div>
         <div id="rules-display"></div>
-        <table class="tour-score-table"><thead><tr><th>순위</th><th>이름</th><th>승/패</th><th>포인트</th></tr></thead><tbody id="score-tbody"></tbody></table>
+        <table class="tour-score-table">
+          <thead><tr><th>순위</th><th>이름</th><th>승/패</th><th>포인트</th></tr></thead>
+          <tbody id="score-tbody"></tbody>
+        </table>
       </div>
+
       <button class="btn-sub sky" style="margin-top:20px;" onclick="resetPage()">처음부터 다시</button>
     </div>
   </div>
@@ -364,12 +391,13 @@
   <div class="section-card" style="display:block;">
     <div class="header-banner"><span class="material-symbols-outlined">stairs</span>GrandSlam 사다리</div>
     <div id="ladder-setup-view">
-      <div style="font-weight:800; margin-bottom:10px;">1. 참여 선수 선택 (클릭)</div>
+      <div style="font-weight:400; margin-bottom:10px;">1. 참여 선수 선택 (클릭)</div>
       <div class="pool-ladder" id="ladder-player-pool"></div>
-      <div style="font-weight:800; margin-bottom:10px;">2. 벌칙 입력 (미입력 시 '패스')</div>
+      <div style="font-weight:400; margin-bottom:10px;">2. 벌칙 입력 (미입력 시 '패스')</div>
       <div id="ladder-punish-list"></div>
       <button class="btn-purple-main" onclick="initLadderGame()">사다리 생성하기</button>
     </div>
+
     <div id="ladder-game-view" style="display:none; text-align:center;">
       <p style="font-size:13px; color:var(--text-gray); margin-bottom:15px;">이름을 클릭하면 붉은 선이 내려갑니다!</p>
       <div id="ladder-canvas-wrap"><canvas id="ladderCanvas"></canvas></div>
@@ -382,155 +410,1246 @@
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="switchView('weather', this)"><span class="material-symbols-outlined nav-icon">wb_sunny</span>날씨</div>
   <div class="nav-item" onclick="switchView('tennis', this)"><span class="material-symbols-outlined nav-icon">emoji_events</span>랭킹</div>
+  <div class="nav-item" onclick="switchView('stats', this)"><span class="material-symbols-outlined nav-icon">monitoring</span>통계</div>
   <div class="nav-item" onclick="switchView('tournament', this)"><span class="material-symbols-outlined nav-icon">leaderboard</span>토너먼트</div>
   <div class="nav-item" onclick="switchView('ladder', this)"><span class="material-symbols-outlined nav-icon">stairs</span>사다리</div>
 </nav>
 
 <script>
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbz5sOzehzl_kHFvSmVsDkohAp6E2W13TmqVRyj8PVoB_6CViY2R1IYERPG60Lra16njWQ/exec";
-  var players = []; var mType = 'double'; var hT = []; var aT = []; var chart = null; var tabNow = 1;
+  /* ✅ v3.2 GAS_URL 반영 */
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbzEVEAYpQa4GRl2BwIZ2R47BABHV7LsQfnxlv-ibQz7AhF3daKWgfolVykQF4iMrr8ukw/exec";
+  const ADMIN_PIN = "0707";
+
+  var players = [];
+  var matchLog = []; // ✅ v3.2: MatchLog 누적(appendRow) 기반 통계
+  var mType = 'double';
+  var hT = [];
+  var aT = [];
+  var chart = null;
+  var tabNow = 1;
   var tournamentMode = 'practice';
+  let adminUnlocked = false;
+  let omitNimOnMobile = (localStorage.getItem("omitNimOnMobile") ?? "1") === "1";
+
   const $ = (id) => document.getElementById(id);
 
-  async function sync() { $('loading-overlay').style.display='flex'; try{ const r=await fetch(GAS_URL); players=(await r.json()).map(ensure); updateSeason(); updateWeekly(); if(tabNow===1)updateChartRange(0); renderLadderPlayerPool(); initTournament(); }catch(e){} $('loading-overlay').style.display='none'; }
-  async function push() { $('loading-overlay').style.display='flex'; try{ await fetch(GAS_URL,{method:"POST",body:JSON.stringify(players)}); }catch(e){} $('loading-overlay').style.display='none'; }
-  
-  function ensure(p) { const fs=['score','wins','losses','last','dScore','dWins','dLosses','lastD','sScore','sWins','sLosses','lastS', 'weekly','wWins','wLosses','wdScore','wsScore','wdWins','wdLosses','wsWins','wsLosses']; fs.forEach(f=>{ if(p[f]===undefined) p[f]=0; }); return p; }
-  function tab(n) { tabNow=n; for(let i=1; i<=4; i++){ if($('s'+i)) $('s'+i).style.display=(i==n?'block':'none'); if($('t'+i)) $('t'+i).className=(i==n?'tab-btn active':'tab-btn'); } if(n==1){updateSeason(); updateChartRange(0);} if(n==2)updateWeekly(); if(n==3)renderPool(); if(n==4)updatePlayerList(); }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]));
+  }
 
-  // ✅ 랭킹 테이블 렌더링: v2.46 (5컬럼, 왼쪽 정렬) 유지
+  function displayName(name) {
+    const n = String(name || "");
+    const isMobile = window.matchMedia && window.matchMedia("(max-width: 420px)").matches;
+    if (omitNimOnMobile && isMobile && n.endsWith("님")) return n.slice(0, -1);
+    return n;
+  }
+
+  function refreshOmitNimBtn() {
+    const b = $("btnOmitNim");
+    if (!b) return;
+    b.innerText = `모바일 이름 '님' 생략: ${omitNimOnMobile ? "ON" : "OFF"}`;
+  }
+
+  function toggleOmitNim() {
+    omitNimOnMobile = !omitNimOnMobile;
+    localStorage.setItem("omitNimOnMobile", omitNimOnMobile ? "1" : "0");
+    refreshOmitNimBtn();
+    updateSeason();
+    updateWeekly();
+    if (tabNow === 1) updateChartRange(0);
+    renderStatsPlayerList();
+  }
+
+  async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...options, signal: ctrl.signal });
+      return res;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
+  function setStatus(html) {
+    const el = $('status');
+    if (!el) return;
+    el.innerHTML = html || '';
+  }
+
+  /* =========================
+     ✅ v3.2 GAS 통신 포맷 (유연 처리)
+     - GET: [players] 또는 { data:[players], matchLog:[...] }
+     - POST: { action:"save", data:[players], matchLogAppend:[log] }
+     - POST: { action:"saveDataOnly", data:[players] }
+     ========================= */
+
+  function normalizeMatchLog(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter(Boolean)
+      .map(x => ({
+        id: x.id || x._id || x.ts || String(Date.now()) + Math.random(),
+        ts: x.ts || x.timestamp || x.time || Date.now(),
+        date: x.date || x.ds || "",
+        type: x.type || x.mType || "double",
+        home: Array.isArray(x.home) ? x.home : (typeof x.home === "string" ? x.home.split(",").map(s=>s.trim()).filter(Boolean) : []),
+        away: Array.isArray(x.away) ? x.away : (typeof x.away === "string" ? x.away.split(",").map(s=>s.trim()).filter(Boolean) : []),
+        hs: Number(x.hs ?? x.homeScore ?? x.hS ?? 0),
+        as: Number(x.as ?? x.awayScore ?? x.aS ?? 0),
+        winner: x.winner || "",
+        memo: x.memo || ""
+      }));
+  }
+
+  async function sync() {
+    $('loading-overlay').style.display = 'flex';
+    setStatus(`<div style="color:#888; font-size:12px; margin-bottom:10px;">데이터 불러오는 중...</div>`);
+    try {
+      const r = await fetchWithTimeout(GAS_URL, {}, 15000);
+      if (!r.ok) throw new Error("GAS GET 실패: " + r.status);
+      const data = await r.json();
+
+      // ✅ 구버전/신버전 모두 처리
+      if (Array.isArray(data)) {
+        players = (data || []).map(ensure);
+        matchLog = matchLog || [];
+      } else {
+        players = (data?.data || data?.players || []).map(ensure);
+        matchLog = normalizeMatchLog(data?.matchLog || data?.logs || []);
+      }
+
+      updateSeason();
+      updateWeekly();
+      if (tabNow === 1) updateChartRange(0);
+      renderLadderPlayerPool();
+      initTournament();
+      renderStatsPlayerList();
+      refreshOmitNimBtn();
+      setStatus('');
+    } catch (e) {
+      setStatus(`<div style="color:#ff3b30; font-size:12px; margin-bottom:10px;">데이터 동기화 실패 😵‍💫</div>`);
+    } finally {
+      $('loading-overlay').style.display = 'none';
+    }
+  }
+
+  async function pushPayload(payload) {
+    $('loading-overlay').style.display = 'flex';
+    setStatus(`<div style="color:#888; font-size:12px; margin-bottom:10px;">저장 중...</div>`);
+    try {
+      const r = await fetchWithTimeout(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }, 15000);
+      if (!r.ok) throw new Error("GAS POST 실패: " + r.status);
+
+      // GAS가 응답으로 최신 matchLog를 보내주는 케이스도 대비
+      let resp = null;
+      try { resp = await r.json(); } catch(_) {}
+      if (resp && typeof resp === "object") {
+        if (Array.isArray(resp.data)) players = resp.data.map(ensure);
+        if (Array.isArray(resp.matchLog)) matchLog = normalizeMatchLog(resp.matchLog);
+      }
+      setStatus('');
+      return true;
+    } catch (e) {
+      setStatus(`<div style="color:#ff3b30; font-size:12px; margin-bottom:10px;">저장 실패 😵‍💫</div>`);
+      return false;
+    } finally {
+      $('loading-overlay').style.display = 'none';
+    }
+  }
+
+  async function pushDataOnly() {
+    return await pushPayload({ action: "saveDataOnly", data: players });
+  }
+
+  async function pushWithMatchLogAppend(logEntry) {
+    return await pushPayload({ action: "save", data: players, matchLogAppend: [logEntry] });
+  }
+
+  function ensure(p) {
+    const fs=['score','wins','losses','last','dScore','dWins','dLosses','lastD','sScore','sWins','sLosses','lastS', 'weekly','wWins','wLosses','wdScore','wsScore','wdWins','wdLosses','wsWins','wsLosses','lastW','lastWD','lastWS'];
+    fs.forEach(f=>{ if(p[f]===undefined) p[f]=0; });
+    if(!p.name) p.name = "NONAME";
+    return p;
+  }
+
+  function tab(n) {
+    if(n === 4 && !adminUnlocked){
+      const pw = prompt("선수관리 비번?");
+      if(pw !== ADMIN_PIN) { alert("비번 틀림!"); return; }
+      adminUnlocked = true;
+    }
+    tabNow=n;
+    for(let i=1; i<=4; i++){
+      if($('s'+i)) $('s'+i).style.display=(i==n?'block':'none');
+      if($('t'+i)) $('t'+i).className=(i==n?'tab-btn active':'tab-btn');
+    }
+    if(n==1){ updateSeason(); updateChartRange(0); }
+    if(n==2) updateWeekly();
+    if(n==3) renderPool();
+    if(n==4) { updatePlayerList(); refreshOmitNimBtn(); }
+  }
+
   function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
-    const calcRate = (p) => { const t = p[winK] + p[lossK]; return t > 0 ? (p[winK] / t) : 0; };
-    const getTotal = (p) => p[winK] + p[lossK];
-    const wrSorted = [...players].sort((a,b) => calcRate(b) - calcRate(a) || b[winK] - a[winK] || getTotal(b) - getTotal(a));
-    const wrRanks = {}; let currentWrRank = 1;
-    wrSorted.forEach((p, i) => { if (i > 0) { const prev = wrSorted[i-1]; if (calcRate(p) !== calcRate(prev) || p[winK] !== prev[winK]) currentWrRank = i + 1; } wrRanks[p.name] = currentWrRank; });
-    const sorted = [...players].sort((a,b) => b[scoreK] - a[scoreK] || calcRate(b) - calcRate(a) || b[winK] - a[winK] || getTotal(b) - getTotal(a));
-    
+    const calcRate = (p) => {
+      const t = p[winK] + p[lossK];
+      return t > 0 ? (p[winK] / t) : 0;
+    };
+
+    const wrSorted = [...players].sort((a,b) => calcRate(b) - calcRate(a) || b[winK] - a[winK]);
+    const wrRanks = {};
+    let currentWrRank = 1;
+    wrSorted.forEach((p, i) => {
+      if (i > 0) {
+        const prev = wrSorted[i-1];
+        if (calcRate(p) !== calcRate(prev)) currentWrRank = i + 1;
+      }
+      wrRanks[p.name] = currentWrRank;
+    });
+
+    const sorted = [...players].sort((a,b) => b[scoreK] - a[scoreK] || calcRate(b) - calcRate(a));
     const table = $(tableId);
-    table.innerHTML = `<thead><tr><th style="width:12%;">순위</th><th style="width:33%;">이름</th><th style="width:20%;">승률</th><th style="width:20%;">승패</th><th style="width:15%;">포인트</th></tr></thead><tbody></tbody>`;
+    table.innerHTML = `<thead><tr><th style="width:12%;">순위</th><th style="width:44%;">이름</th><th style="width:20%;">승률</th><th style="width:12%;">승/패</th><th style="width:12%;">포인트</th></tr></thead><tbody></tbody>`;
 
     let currentRank = 1;
     table.querySelector('tbody').innerHTML = sorted.map((p, i) => {
-      if (i > 0) { const prev = sorted[i-1]; if (p[scoreK] !== prev[scoreK] || calcRate(p) !== calcRate(prev) || p[winK] !== prev[winK] || getTotal(p) !== getTotal(prev)) currentRank = i + 1; }
-      const wrRank = wrRanks[p.name];
-      const rate = (calcRate(p) * 100).toFixed(1);
-      let df = (p[lastK] > 0 && p[lastK] !== currentRank) ? (p[lastK] > currentRank ? `<span style="color:var(--up-red)">▲${p[lastK] - currentRank}</span>` : `<span style="color:var(--down-blue)">▼${currentRank - p[lastK]}</span>`) : '-';
+      if (i > 0) {
+        const prev = sorted[i-1];
+        if (p[scoreK] !== prev[scoreK]) currentRank = i + 1;
+      }
       const rankIcon = (currentRank === 1) ? '<span class="material-symbols-outlined rank-1-icon">emoji_events</span>' : currentRank;
-      
+      let df = (p[lastK] > 0 && p[lastK] !== currentRank)
+        ? (p[lastK] > currentRank ? `<span style="color:var(--up-red)">▲${p[lastK] - currentRank}</span>` : `<span style="color:var(--down-blue)">▼${currentRank - p[lastK]}</span>`)
+        : '-';
+
+      const shownName = displayName(p.name);
       return `<tr>
         <td>${rankIcon}</td>
-        <td style="text-align:left; padding-left:10px;">
-          <div style="font-weight:800; display:inline-block;">${p.name}</div>
-          <span class="sub-info" style="margin-left:4px;">(${p[lastK]||'-'}위)${df}</span>
+        <td style="text-align:left; padding-left:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          <span style="font-weight:400;">${escapeHtml(shownName)}</span>
+          <span class="sub-info" style="margin-left:4px; white-space:nowrap;">(${p[lastK]||'-'}위)${df}</span>
         </td>
-        <td class="sub-info">${rate}% <span style="margin-left:2px;">(${wrRank}위)</span></td>
-        <td style="font-size:11px;">${p[winK]}승 ${p[lossK]}패</td>
-        <td class="point-text">${p[scoreK].toFixed(1)}</td>
+        <td class="sub-info" style="white-space:nowrap;">${(calcRate(p)*100).toFixed(1)}% (${wrRanks[p.name]}위)</td>
+        <td style="font-size:11px; white-space:nowrap;">${p[winK]}/${p[lossK]}</td>
+        <td class="point-text">${Number(p[scoreK]).toFixed(1)}</td>
       </tr>`;
     }).join('');
   }
 
-  function updateSeason() { renderRankTable('seasonTable', 'score', 'wins', 'losses', 'last'); renderRankTable('seasonDoubleTable', 'dScore', 'dWins', 'dLosses', 'lastD'); renderRankTable('seasonSingleTable', 'sScore', 'sWins', 'sLosses', 'lastS'); }
-  function updateWeekly() { renderRankTable('weeklyTotalTable', 'weekly', 'wWins', 'wLosses', 'last'); renderRankTable('weeklyDoubleTable', 'wdScore', 'wdWins', 'wdLosses', 'lastD'); renderRankTable('weeklySingleTable', 'wsScore', 'wsWins', 'wsLosses', 'lastS'); }
+  function updateSeason() {
+    renderRankTable('seasonTable', 'score', 'wins', 'losses', 'last');
+    renderRankTable('seasonDoubleTable', 'dScore', 'dWins', 'dLosses', 'lastD');
+    renderRankTable('seasonSingleTable', 'sScore', 'sWins', 'sLosses', 'lastS');
+  }
+
+  function updateWeekly() {
+    renderRankTable('weeklyTotalTable', 'weekly', 'wWins', 'wLosses', 'lastW');
+    renderRankTable('weeklyDoubleTable', 'wdScore', 'wdWins', 'wdLosses', 'lastWD');
+    renderRankTable('weeklySingleTable', 'wsScore', 'wsWins', 'wsLosses', 'lastWS');
+  }
+
   function updateChartRange(rangeIdx) {
     document.querySelectorAll('.chart-nav .chart-btn').forEach((b,i) => b.className = i===rangeIdx ? 'chart-btn active' : 'chart-btn');
-    const labels = [['2/4', '2/11', '2/18', '2/25', '3/4', '3/11', '3/18', '3/25'], ['4/1', '4/8', '4/15', '4/22', '4/29', '5/6', '5/13', '5/20', '5/27'], ['6/3', '6/10', '6/17', '6/24', '7/1', '7/8', '7/15', '7/22', '7/29'], ['8/5', '8/12', '8/19', '8/26', '9/2', '9/9', '9/16', '9/23', '9/30'], ['10/7', '10/14', '10/21', '10/28', '11/4', '11/11', '11/18', '11/25'], ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']][rangeIdx];
+
+    const labels = [
+      ['2/4', '2/11', '2/18', '2/25', '3/4', '3/11', '3/18', '3/25'],
+      ['4/1', '4/8', '4/15', '4/22', '4/29', '5/6', '5/13', '5/20', '5/27'],
+      ['6/3', '6/10', '6/17', '6/24', '7/1', '7/8', '7/15', '7/22', '7/29'],
+      ['8/5', '8/12', '8/19', '8/26', '9/2', '9/9', '9/16', '9/23', '9/30'],
+      ['10/7', '10/14', '10/21', '10/28', '11/4', '11/11', '11/18', '11/25'],
+      ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']
+    ][rangeIdx];
+
+    // ✅ v3.2: 차트 색은 기존 유지(하드코딩 있었던 그대로) — 스타일 원칙 유지
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
+
     const sorted = [...players].sort((a,b) => b.score - a.score);
-    const ranks = {}; sorted.forEach((p, i) => ranks[p.name] = i + 1);
-    const datasets = players.map((p, i) => ({ label: p.name, data: labels.map((_, idx) => (rangeIdx === 0 && idx === 0) ? ranks[p.name] : null), borderColor: colors[i % colors.length], backgroundColor: colors[i % colors.length], pointRadius: 5, borderWidth: 2, spanGaps: true, clip: false }));
+    const ranks = {};
+    sorted.forEach((p, i) => ranks[p.name] = i + 1);
+
+    const datasets = players.map((p, i) => ({
+      label: p.name,
+      data: labels.map((_, idx) => (rangeIdx === 0 && idx === 0) ? ranks[p.name] : null),
+      borderColor: colors[i % colors.length],
+      backgroundColor: colors[i % colors.length],
+      pointRadius: 5,
+      borderWidth: 2,
+      spanGaps: true,
+      clip: false
+    }));
+
     if(chart) chart.destroy();
-    chart = new Chart($('seasonChart').getContext('2d'), { type: 'line', data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } }, scales: { y: { reverse: true, min: 1, max: Math.max(players.length + 1, 10), ticks: { stepSize: 1, autoSkip: false, callback: function(val) {return Number.isInteger(val)?val:'';} }, grid: { color: '#eee' } }, x: { grid: { display: false } } }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } } } } });
-  }
-  async function save() {
-    var hs=$('hS').value, as=$('aS').value; if(!hs || !as || hs==as) return alert("점수 확인!");
-    const apply = (ns, isW) => ns.forEach(n => { 
-      var p = players.find(x=>x.name==n); 
-      if(mType === 'double') { if(isW){ p.score+=3.0; p.dScore+=3.0; p.weekly+=3.0; p.wdScore+=3.0; p.wins++; p.dWins++; p.wWins++; p.wdWins++; } else { p.score+=0.3; p.dScore+=0.3; p.weekly+=0.3; p.wdScore+=0.3; p.losses++; p.dLosses++; p.wLosses++; p.wdLosses++; } } 
-      else { if(isW){ p.score+=4.0; p.sScore+=4.0; p.weekly+=4.0; p.wsScore+=4.0; p.wins++; p.sWins++; p.wWins++; p.wsWins++; } else { p.score+=0.5; p.sScore+=0.5; p.weekly+=0.5; p.wsScore+=0.5; p.losses++; p.sLosses++; p.wLosses++; p.wsLosses++; } }
+    chart = new Chart($('seasonChart').getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 50, bottom: 20, left: 10, right: 10 } },
+        scales: {
+          y: { reverse: true, min: 1, max: Math.max(players.length + 1, 10), ticks: { stepSize: 1, autoSkip: false }, grid: { color: '#eee' } },
+          x: { grid: { display: false } }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } } }
+        }
+      }
     });
-    parseInt(hs)>parseInt(as) ? (apply(hT,true), apply(aT,false)) : (apply(aT,true), apply(hT,false));
-    await push(); alert("저장!"); $('hS').value=''; $('aS').value=''; hT=[]; aT=[]; tab(1);
   }
-  function addP(){ var n=$('pI').value.trim(); if(n&&!players.find(p=>p.name==n)){players.push(ensure({name:n})); push(); $('pI').value=''; updatePlayerList(); alert(n+' 등록!'); renderLadderPlayerPool(); initTournament();} }
-  function delP(n){ if(prompt("비번?") === "0707") { if(confirm(n+' 삭제?')){players=players.filter(p=>p.name!=n); push(); updatePlayerList(); renderLadderPlayerPool(); initTournament();} } }
-  function renderPool(){ $('pP').innerHTML=players.map(p=>`<div class="pool-item" onclick="pick('${p.name}')">${p.name}</div>`).join(''); }
-  function pick(n){ var max=mType=='double'?2:1; if(hT.includes(n)||aT.includes(n)) return; if(hT.length<max)hT.push(n); else if(aT.length<max)aT.push(n); $('hN').innerText=hT.join(','); $('aN').innerText=aT.join(','); }
-  function setM(t){ mType=t; $('m_db').className = t=='double'?'type-btn selected':'type-btn'; $('m_sg').className = t=='single'?'type-btn selected':'type-btn'; hT=[]; aT=[]; $('hN').innerText=''; $('aN').innerText=''; }
-  function updatePlayerList(){ document.querySelector('#pL tbody').innerHTML=players.map(p=>`<tr><td style="text-align:left; padding-left:15px; font-weight:800;">${p.name}</td><td style="text-align:right;"><button onclick="delP('${p.name}')" style="background:var(--roland-clay); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:bold;">삭제</button></td></tr>`).join(''); }
-  function resetScoresKeepPlayers(){ if(prompt("비번?")==="0707"){ players.forEach(p=>{ Object.keys(p).forEach(k=>{ if(k!=='name') p[k]=0; }); }); push(); tab(1); }}
-  function resetWeeklyOnly(){ if(prompt("비번?")==="0707"){ players.forEach(p=>{ ['weekly','wdScore','wsScore','wWins','wLosses','wdWins','wdLosses','wsWins','wsLosses','lastW','lastWD','lastWS'].forEach(f=>p[f]=0); }); push(); tab(2); }}
-  function adminResetAll(){ if(prompt("비번?")==="0707"){ players=[]; push(); location.reload(); } }
-  function switchView(v, b) { document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none'); document.getElementById(`view-${v}`).style.display='block'; document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active')); b.classList.add('active'); if(v==='tennis') sync(); if(v==='ladder') renderLadderPlayerPool(); if(v==='tournament') initTournament(); }
-  function toggleTournamentMode() { const btn = $('btnTourMode'); if(tournamentMode === 'practice') { if(prompt("비번?") === "0707") { tournamentMode = 'real'; btn.innerText = "🟥 토너먼트 실전 모드 (결과 반영 O)"; btn.style.background = "#FF3B30"; } } else { tournamentMode = 'practice'; btn.innerText = "🟩 토너먼트 연습 모드 (기록반영 X)"; btn.style.background = "#34C759"; } }
 
-  // [토너먼트/사다리 v2.42 로직 100% 복구]
-  let selected = []; let tMode = 'rank'; let tType = 'single'; let pointsData = {}; let currentBracketSize = 0;
-  function initTournament() { const pDiv = $('pList'); let sortedP = [...players].sort((a,b) => b.score - a.score); pDiv.innerHTML = sortedP.map((p, i) => `<input type="checkbox" id="tp${i}" class="p-chk" value="${p.name}" onchange="upCnt()"><label for="tp${i}" class="p-label">${p.name}<span class="p-rank">${i+1}위</span></label>`).join(''); }
-  function upCnt() { selected = Array.from(document.querySelectorAll('.p-chk:checked')).map(el => { let p = players.find(x => x.name === el.value) || {name: el.value, score: 0}; return { n: p.name, s: p.score }; }); $('cnt').innerText = selected.length; const cutMsg = $('cut-msg'); let limit = (tType === 'single') ? 8 : 16; if(selected.length > limit) { cutMsg.style.display = 'block'; cutMsg.innerHTML = `⚠️ <b>${selected.length}명</b> 선택. 하위 <b>${selected.length - limit}명</b>은 제외됩니다.`; } else if(selected.length < 4) { cutMsg.style.display = 'block'; cutMsg.innerHTML = `⚠️ 최소 4명 이상 선택해주세요.`; } else { cutMsg.style.display = 'none'; } }
-  function setOpt(k, v, el) { if(k==='mode') tMode = v; if(k==='type') tType = v; el.parentNode.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); upCnt(); }
-  
-  // ✅ 수정완료 2: 실시간 랭킹 헤더 설명글 3줄로 복구 (이미지 참조)
-  function initPointsAndRules() { 
-    pointsData = {}; 
-    const rulesDiv = $('rules-display'); 
-    selected.forEach(p => pointsData[p.n] = { score: 1.0, win: 0, loss: 0 }); 
-    if(tType === 'single') { 
-      rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>단식 기준</b>: 참가(+1.0) / 승리(+3.0) / 패배(-0.5)<br>👉 승리 시 <b>+4.0pt</b>, 패배 시 <b>+0.5pt</b> 획득<br>🏆 보너스: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`; 
-    } else { 
-      rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>복식 기준</b>: 참가(+1.0) / 승리(+2.0) / 패배(-0.7)<br>👉 승리 시 <b>+3.0pt</b>, 패배 시 <b>+0.3pt</b> 획득<br>🏆 보너스: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`; 
-    } 
-    updateScoreBoard(); 
+  /* =========================
+     ✅ v3.2: 경기 저장(save)
+     - players 업데이트
+     - MatchLog 1건 생성
+     - GAS: Data 덮어쓰기 + MatchLog appendRow
+     ========================= */
+  function nowISO() {
+    const d = new Date();
+    const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+    return { ts: d.getTime(), ds };
   }
-  
-  function makeBracket() { if(selected.length < 4) return alert("최소 4명이 필요합니다!"); let pool = [...selected]; if(tMode === 'rank') pool.sort((a,b) => b.s - a.s); else pool.sort(() => Math.random() - 0.5); let entities = []; if(tType === 'single') { if(pool.length > 8) pool = pool.slice(0, 8); entities = pool; } else { if(pool.length > 16) pool = pool.slice(0, 16); if(pool.length === 5) { entities.push({ n: `${pool[4].n},BYE`, s: pool[4].s }); entities.push({ n: `${pool[0].n},${pool[1].n}`, s: pool[0].s }); entities.push({ n: `${pool[2].n},${pool[3].n}`, s: pool[2].s }); } else { let count = pool.length; let teamCount = Math.ceil(count / 2); for(let i=0; i<teamCount; i++) { let p1 = pool[i]; let p2 = pool[count - 1 - i]; if (p1 === p2) entities.push({ n: `${p1.n},BYE`, s: p1.s }); else entities.push({ n: `${p1.n},${p2.n}`, s: p1.s }); } } } initPointsAndRules(); currentBracketSize = entities.length <= 4 ? 4 : 8; let byeCount = currentBracketSize - entities.length; let fullList = [...entities]; for(let i=0; i<byeCount; i++) fullList.push({n: 'BYE', s: -999}); let matches = []; if(currentBracketSize === 4) { matches = [{ p1: fullList[0], p2: fullList[3] }, { p1: fullList[1], p2: fullList[2] }]; } else { matches = [ { p1: fullList[0], p2: fullList[7] }, { p1: fullList[3], p2: fullList[4] }, { p1: fullList[1], p2: fullList[6] }, { p1: fullList[2], p2: fullList[5] } ]; } renderWingTree(matches); $('bracket-section').style.display = 'block'; $('bracket-section').scrollIntoView({behavior:'smooth'}); if(tType === 'double') { $('loser-bench').style.display = 'block'; $('loser-list').innerHTML = '<span style="color:#999; font-size:12px;">경기 결과 대기중...</span>'; } else { $('loser-bench').style.display = 'none'; } setTimeout(() => autoResolveByes(currentBracketSize), 100); updateScoreBoard(); }
-  function autoResolveByes(size) { let startR = (size === 4) ? 2 : 1; for(let i=0; i<size/2; i++) { let m = document.querySelector(`#r${startR}-m${i}`); if(!m) continue; let p1 = m.querySelector('.team:first-child'); let p2 = m.querySelector('.team:last-child'); let n1 = p1.innerText.replace(/[0-9]+위/g, '').trim(); let n2 = p2.innerText.replace(/[0-9]+위/g, '').trim(); if(n2 === 'BYE' && !n1.includes('BYE')) p1.click(); else if(n1 === 'BYE' && !n2.includes('BYE')) p2.click(); } }
-  function resetPage() { $('bracket-section').style.display = 'none'; $('champ-display').style.display = 'none'; document.querySelectorAll('.p-chk').forEach(cb => cb.checked = false); selected = []; $('cnt').innerText = '0'; $('setup-area').scrollIntoView({behavior:'smooth'}); $('loser-bench').style.display = 'none'; }
-  function renderWingTree(matches) { const root = $('tree-root'); root.innerHTML = ''; if(matches.length === 2) { let l = `<div class="column col-left">${getMatchBoxHtml(0, matches[0], 2)}</div>`; let f = `<div class="column col-center"><div id="final-wrapper" style="width:100%; display:flex; flex-direction:column; align-items:center;"><div id="champ-display" class="champ-wrapper"><div class="champ-badge"><span class="material-symbols-outlined gold-trophy">emoji_events</span> <span id="champ-name"></span> 우승!</div></div>${getEmptyBoxHtml(0, 3, true)}</div></div>`; let r = `<div class="column col-right">${getMatchBoxHtml(1, matches[1], 2)}</div>`; root.innerHTML = l + f + r; } else { let l = `<div class="column col-left">${getMatchBoxHtml(0, matches[0], 1)}${getMatchBoxHtml(1, matches[1], 1)}</div>`; let sl = `<div class="column col-semi-left">${getEmptyBoxHtml(0, 2)}</div>`; let f = `<div class="column col-center"><div id="final-wrapper" style="width:100%; display:flex; flex-direction:column; align-items:center;"><div id="champ-display" class="champ-wrapper"><div class="champ-badge"><span class="material-symbols-outlined gold-trophy">emoji_events</span> <span id="champ-name"></span> 우승!</div></div>${getEmptyBoxHtml(0, 3, true)}</div></div>`; let sr = `<div class="column col-semi-right">${getEmptyBoxHtml(1, 2)}</div>`; let r = `<div class="column col-right">${getMatchBoxHtml(2, matches[2], 1)}${getMatchBoxHtml(3, matches[3], 1)}</div>`; root.innerHTML = l + sl + f + sr + r; } }
-  function getMatchBoxHtml(idx, m, round, isFinal = false) { const fc = isFinal ? 'final-stage' : ''; const ac = round > 1 ? 'no-rank' : ''; return `<div class="match-box ${fc}" id="r${round}-m${idx}"> <div class="team ${ac}" onclick="win(${round}, ${idx}, 1, '${m.p1.n}', this)"> <span>${m.p1.n}</span> </div> <div class="team ${ac}" onclick="win(${round}, ${idx}, 2, '${m.p2.n}', this)"> <span>${m.p2.n}</span> </div> </div>`; }
-  function getEmptyBoxHtml(idx, round, isFinal = false) { const fc = isFinal ? 'final-stage' : ''; return `<div class="match-box ${fc}" id="r${round}-m${idx}"> <div class="team no-rank" id="r${round}-m${idx}-t1" style="color:#ccc;">?</div> <div class="team no-rank" id="r${round}-m${idx}-t2" style="color:#ccc;">?</div> </div>`; }
-  function registerLosers(teamName) { if(tType !== 'double') return; let listDiv = $('loser-list'); if(listDiv.innerHTML.includes('대기중')) listDiv.innerHTML = ''; teamName.split(',').forEach(n => { if(n === 'BYE') return; let chip = document.createElement('span'); chip.className = 'loser-chip'; chip.innerText = n; chip.onclick = function() { injectPartner(n, this); }; listDiv.appendChild(chip); }); }
-  function injectPartner(name, chipElement) { let teams = document.querySelectorAll('.team'); let found = false; for(let t of teams) { let txt = t.innerText; if(txt.includes(',') && (txt.includes('BYE') || txt.includes('?'))) { let newName = txt.replace('BYE', name).replace('?', name).trim(); t.innerHTML = `<span>${newName}</span>`; let pId = t.parentNode.id; let rd = parseInt(pId.split('-')[0].replace('r','')), mi = parseInt(pId.split('-')[1].replace('m','')); let ti = (t === t.parentNode.firstElementChild) ? 1 : 2; t.onclick = function() { win(rd, mi, ti, newName, this); }; chipElement.remove(); found = true; setTimeout(() => autoResolveByes(currentBracketSize), 50); break; } } if(!found) alert("파트너를 기다리는 팀이 없습니다."); }
-  window.win = function(round, matchIdx, teamIdx, name, el) { if(name.includes('BYE')) return; const p = el.parentNode; if(p.querySelector('.winner')) return; p.querySelectorAll('.team').forEach(t => t.classList.add('loser')); el.classList.remove('loser'); el.classList.add('winner'); let ln = ''; p.querySelectorAll('.team').forEach(t => { if(t !== el) ln = t.innerText.trim(); }); if(!ln.includes('BYE')) registerLosers(ln); const wb = (tType === 'single') ? 3.0 : 2.0; const ld = (tType === 'single') ? 0.5 : 0.7; function updateLocal(n, isW) { n.split(',').forEach(pName => { if(pointsData[pName]) { if(isW) { pointsData[pName].score += wb; pointsData[pName].win++; } else { pointsData[pName].score -= ld; pointsData[pName].loss++; } } }); } if(!ln.includes('BYE')) { updateLocal(name, true); updateLocal(ln, false); } updateScoreBoard(); if(tournamentMode === 'real' && !ln.includes('BYE')) { name.split(',').forEach(pName => { let p = players.find(x => x.name === pName); if(p) { if(tType === 'double') { p.score+=wb; p.dScore+=wb; p.weekly+=wb; p.wdScore+=wb; p.wins++; p.dWins++; p.wWins++; p.wdWins++; } else { p.score+=4.0; p.sScore+=4.0; p.weekly+=4.0; p.wsScore+=4.0; p.wins++; p.sWins++; p.wWins++; p.wsWins++; } } }); ln.split(',').forEach(pName => { let p = players.find(x => x.name === pName); if(p) { if(tType === 'double') { p.score+=0.3; p.dScore+=0.3; p.weekly+=0.3; p.wdScore+=0.3; p.losses++; p.dLosses++; p.wLosses++; p.wdLosses++; } else { p.score+=0.5; p.sScore+=0.5; p.weekly+=0.5; p.wsScore+=0.5; p.losses++; p.sLosses++; p.wLosses++; p.wsLosses++; } } }); push(); } if(round === 3) { $('champ-display').style.display = 'inline-flex'; $('champ-name').innerText = name; name.split(',').forEach(p => { if(pointsData[p]) pointsData[p].score += 3.0; }); ln.split(',').forEach(p => { if(pointsData[p]) pointsData[p].score += 2.0; }); updateScoreBoard(); return; } let nr = round + 1, nmi, ntp; if(round === 1) { nmi = (matchIdx < 2) ? 0 : 1; ntp = (matchIdx % 2 === 0) ? 1 : 2; } else { nmi = 0; ntp = (matchIdx === 0) ? 1 : 2; } const target = document.getElementById(`r${nr}-m${nmi}-t${ntp}`); if(target) { target.innerText = name; target.style.color = 'var(--dark)'; target.onclick = function() { win(nr, nmi, ntp, name, this); }; } }
-  function updateScoreBoard() { const tbody = $('score-tbody'); const sorted = Object.entries(pointsData).filter(([n]) => n !== 'BYE').sort((a, b) => b[1].score - a[1].score); tbody.innerHTML = sorted.map(([n, d], i) => `<tr><td>${i===0?'<span class="material-symbols-outlined rank-1-icon">emoji_events</span>':i+1}</td><td style="text-align:left; padding-left:20px;">${n}</td><td>${d.win}승 ${d.loss}패</td><td><strong style="color:var(--wimbledon-sage)">${d.score.toFixed(1)}</strong></td></tr>`).join(''); }
 
-  // [사다리 v1.43 로직 그대로 복원]
-  var ldP = []; var ladderLines = []; var winHistory = []; var finalMapping = []; var ladderGap = 0;
-  function renderLadderPlayerPool() { const pool = $('ladder-player-pool'); if(!pool) return; pool.innerHTML = players.map(p => `<div class="pool-item ${ldP.includes(p.name)?'selected':''}" onclick="tkL('${p.name}')">${p.name}</div>`).join(''); $('ladder-punish-list').innerHTML = ldP.map((_, i) => `<input type="text" class="w-input l-punish" placeholder="벌칙 ${i+1} (미입력 시 패스)">`).join(''); }
-  function tkL(n) { ldP.includes(n) ? ldP = ldP.filter(x=>x!==n) : ldP.push(n); renderLadderPlayerPool(); }
-  function initLadderGame() { if(ldP.length < 2) return alert("선수를 선택해줘!"); finalMapping = Array.from(document.querySelectorAll('.l-punish')).map(i => i.value.trim() || "패스").sort(() => Math.random() - 0.5); winHistory = []; $('ladder-final-msg').style.display = 'none'; $('ladder-setup-view').style.display = 'none'; $('ladder-game-view').style.display = 'block'; const cvs = $('ladderCanvas'); const ctx = cvs.getContext('2d'); cvs.width = 600; cvs.height = 550; ladderGap = (cvs.width - 80) / (ldP.length - 1); ladderLines = []; for(let r=0; r<12; r++) { for(let i=0; i<ldP.length-1; i++) { if(Math.random() > 0.45) { ladderLines.push({ x: 40 + (i * ladderGap), y: 130 + (r * 30) + (Math.random() * 5), from: i, to: i+1 }); i++; } } } drawLadderBase(ctx, cvs); cvs.onclick = (e) => { const rect = cvs.getBoundingClientRect(); const x = (e.clientX - rect.left) * (cvs.width / rect.width); const y = (e.clientY - rect.top) * (cvs.height / rect.height); if(y < 110) { let idx = Math.round((x - 40) / ladderGap); if(idx >= 0 && idx < ldP.length && !winHistory.some(w => w.name === ldP[idx])) stL(ctx, idx); } }; }
-  function drawLadderBase(ctx, cvs) { ctx.clearRect(0, 0, cvs.width, cvs.height); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 3; ldP.forEach((name, i) => { const x = 40 + (i * ladderGap); ctx.beginPath(); ctx.moveTo(x, 80); ctx.lineTo(x, 480); ctx.stroke(); ctx.fillStyle = '#1c1c1e'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(name.substring(0,3), x, 65); ctx.fillStyle = finalMapping[i] === "패스" ? "#8e8e93" : "#FF3B30"; ctx.fillText(finalMapping[i], x, 510); }); ctx.beginPath(); ladderLines.forEach(l => { ctx.moveTo(l.x, l.y); ctx.lineTo(l.x + ladderGap, l.y); }); ctx.stroke(); }
-  function stL(ctx, sIdx) { let cX = sIdx, cY = 80; ctx.strokeStyle = 'red'; ctx.lineWidth = 6; const sL = [...ladderLines].sort((a,b) => a.y - b.y); const tm = setInterval(() => { const absX = 40 + (cX * ladderGap); if(cY >= 480) { clearInterval(tm); const res = finalMapping[cX]; winHistory.push({ name: ldP[sIdx], result: res }); if(res !== "패스") { $('ladder-final-msg').style.display = 'block'; $('congrats-content').innerHTML = winHistory.filter(w => w.result !== "패스").map(w => `축하해요! <b>${w.name}</b>, <b>${w.result}</b> 감사합니다! 🎉`).join('<br>'); } alert(`${ldP[sIdx]} 결과: ${res}`); return; } let nY = cY + 6, mv = false; for(let l of sL) { if(l.y > cY && l.y < nY + 2) { if(l.from === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX + ladderGap, l.y); ctx.stroke(); cX++; cY = l.y + 1; mv = true; break; } else if(l.to === cX) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, l.y); ctx.lineTo(absX - ladderGap, l.y); ctx.stroke(); cX--; cY = l.y + 1; mv = true; break; } } } if(!mv) { ctx.beginPath(); ctx.moveTo(absX, cY); ctx.lineTo(absX, nY); ctx.stroke(); cY = nY; } }, 15); }
-  function resetLadderGame() { ldP = []; winHistory = []; $('ladder-setup-view').style.display='block'; $('ladder-game-view').style.display='none'; renderLadderPlayerPool(); }
+  function calcDeltas(type, isWin) {
+    // UI에 표기된 규칙 그대로
+    if (type === "double") {
+      // 참여 +1 + 승리 +2 = 3, 패배는 0.3(=1-0.7)로 이미 반영돼 있는 구조라 기존 로직 유지
+      return isWin ? { total: 3.0, d: 3.0, s: 0.0 } : { total: 0.3, d: 0.3, s: 0.0 };
+    } else {
+      return isWin ? { total: 4.0, d: 0.0, s: 4.0 } : { total: 0.5, d: 0.0, s: 0.5 };
+    }
+  }
 
-  // [날씨 로직 복구 및 버튼 활성화 로직 수정]
+  async function save() {
+    var hs=$('hS').value, as=$('aS').value;
+    if(!hs || !as || hs==as) return alert("점수 확인!");
+
+    // 팀 구성 체크
+    const max = (mType === 'double') ? 2 : 1;
+    if (hT.length !== max || aT.length !== max) return alert("팀 선택 먼저!");
+
+    const homeScore = parseInt(hs, 10);
+    const awayScore = parseInt(as, 10);
+    const homeWin = homeScore > awayScore;
+
+    const { ts, ds } = nowISO();
+    const logEntry = {
+      id: `${ts}-${Math.floor(Math.random()*100000)}`,
+      ts,
+      date: ds,
+      type: mType,
+      home: [...hT],
+      away: [...aT],
+      hs: homeScore,
+      as: awayScore,
+      winner: homeWin ? "home" : "away"
+    };
+
+    const apply = (ns, isW) => ns.forEach(n => {
+      var p = players.find(x=>x.name==n);
+      if(!p) return;
+      const d = calcDeltas(mType, isW);
+
+      // 시즌
+      p.score += d.total;
+      p.wins += isW ? 1 : 0;
+      p.losses += isW ? 0 : 1;
+
+      // 종목
+      if (mType === "double") {
+        p.dScore += d.d;
+        p.dWins += isW ? 1 : 0;
+        p.dLosses += isW ? 0 : 1;
+      } else {
+        p.sScore += d.s;
+        p.sWins += isW ? 1 : 0;
+        p.sLosses += isW ? 0 : 1;
+      }
+
+      // 주간(기존 구조 그대로)
+      p.weekly += d.total;
+      p.wWins += isW ? 1 : 0;
+      p.wLosses += isW ? 0 : 1;
+
+      if (mType === "double") {
+        p.wdScore += d.d;
+        p.wdWins += isW ? 1 : 0;
+        p.wdLosses += isW ? 0 : 1;
+      } else {
+        p.wsScore += d.s;
+        p.wsWins += isW ? 1 : 0;
+        p.wsLosses += isW ? 0 : 1;
+      }
+    });
+
+    if(homeWin) { apply(hT,true); apply(aT,false); }
+    else { apply(aT,true); apply(hT,false); }
+
+    // ✅ 로컬에도 즉시 반영(통계가 바로 바뀌게)
+    matchLog.unshift(logEntry);
+
+    // ✅ 서버: Data 덮어쓰기 + MatchLog appendRow
+    const ok = await pushWithMatchLogAppend(logEntry);
+    if(ok) alert("저장!");
+
+    $('hS').value='';
+    $('aS').value='';
+    hT=[];
+    aT=[];
+    $('hN').innerText='';
+    $('aN').innerText='';
+    tab(1);
+    renderStatsPlayerList();
+  }
+
+  function addP(){
+    var n=$('pI').value.trim();
+    if(n && !players.find(p=>p.name==n)){
+      players.push(ensure({name:n}));
+      pushDataOnly();
+      $('pI').value='';
+      updatePlayerList();
+      alert(n+' 등록!');
+      renderLadderPlayerPool();
+      initTournament();
+      renderStatsPlayerList();
+    }
+  }
+
+  function delP(n){
+    if(prompt("비번?") === ADMIN_PIN) {
+      if(confirm(n+' 삭제?')){
+        players=players.filter(p=>p.name!=n);
+        pushDataOnly();
+        updatePlayerList();
+        renderLadderPlayerPool();
+        initTournament();
+        renderStatsPlayerList();
+      }
+    }
+  }
+
+  function renderPool(){
+    $('pP').innerHTML = players.map(p=>`<div class="pool-item" onclick="pick('${escapeHtml(p.name).replace(/'/g,"&#39;")}')">${escapeHtml(p.name)}</div>`).join('');
+  }
+
+  function pick(n){
+    var max = mType=='double'?2:1;
+    if(hT.includes(n)||aT.includes(n)) return;
+    if(hT.length<max) hT.push(n);
+    else if(aT.length<max) aT.push(n);
+    $('hN').innerText = hT.map(displayName).join(',');
+    $('aN').innerText = aT.map(displayName).join(',');
+  }
+
+  function setM(t){
+    mType=t;
+    $('m_db').className = t=='double'?'type-btn selected':'type-btn';
+    $('m_sg').className = t=='single'?'type-btn selected':'type-btn';
+    hT=[]; aT=[];
+    $('hN').innerText='';
+    $('aN').innerText='';
+  }
+
+  function updatePlayerList(){
+    document.querySelector('#pL tbody').innerHTML = players.map(p=>`<tr>
+      <td style="text-align:left; padding-left:15px; font-weight:400;">${escapeHtml(p.name)}</td>
+      <td style="text-align:right;">
+        <button onclick="delP('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:var(--roland-clay); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">삭제</button>
+      </td>
+    </tr>`).join('');
+  }
+
+  function resetScoresKeepPlayers(){
+    if(prompt("비번?")===ADMIN_PIN){
+      players.forEach(p=>{ Object.keys(p).forEach(k=>{ if(k!=='name') p[k]=0; }); });
+      pushDataOnly();
+      tab(1);
+    }
+  }
+
+  function resetWeeklyOnly(){
+    if(prompt("비번?")===ADMIN_PIN){
+      players.forEach(p=>{
+        ['weekly','wdScore','wsScore','wWins','wLosses','wdWins','wdLosses','wsWins','wsLosses','lastW','lastWD','lastWS'].forEach(f=>p[f]=0);
+      });
+      pushDataOnly();
+      tab(2);
+    }
+  }
+
+  function adminResetAll(){
+    if(prompt("비번?")===ADMIN_PIN){
+      players=[];
+      matchLog=[];
+      pushPayload({ action: "adminResetAll" });
+      location.reload();
+    }
+  }
+
+  function switchView(v, b) {
+    document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none');
+    document.getElementById(`view-${v}`).style.display='block';
+    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+    b.classList.add('active');
+
+    if(v==='tennis') sync();
+    if(v==='ladder') renderLadderPlayerPool();
+    if(v==='tournament') initTournament();
+    if(v==='stats') renderStatsPlayerList();
+  }
+
+  function toggleTournamentMode() {
+    const btn = $('btnTourMode');
+    if(tournamentMode === 'practice') {
+      if(prompt("비번?") === ADMIN_PIN) {
+        tournamentMode = 'real';
+        btn.innerText = "🟥 토너먼트 실전 모드 (결과 반영 O)";
+        btn.style.background = "#FF3B30";
+      }
+    } else {
+      tournamentMode = 'practice';
+      btn.innerText = "🟩 토너먼트 연습 모드 (기록반영 X)";
+      btn.style.background = "#34C759";
+    }
+  }
+
+  /* =========================
+     ✅ 토너먼트 (v2.65 그대로 유지)
+     ========================= */
+  let selected = [];
+  let tMode = 'rank';
+  let tType = 'single';
+  let pointsData = {};
+  let currentBracketSize = 0;
+
+  function initTournament() {
+    const pDiv = $('pList');
+    if(!pDiv) return;
+    let sortedP = [...players].sort((a,b) => b.score - a.score);
+    pDiv.innerHTML = sortedP.map((p, i) => `
+      <input type="checkbox" id="tp${i}" class="p-chk" value="${escapeHtml(p.name)}" onchange="upCnt()">
+      <label for="tp${i}" class="p-label">${escapeHtml(p.name)}<span class="p-rank">${i+1}위</span></label>
+    `).join('');
+  }
+
+  function upCnt() {
+    selected = Array.from(document.querySelectorAll('.p-chk:checked')).map(el => ({ n: el.value }));
+    $('cnt').innerText = selected.length;
+  }
+
+  function setOpt(k, v, el) {
+    if(k==='mode') tMode = v;
+    if(k==='type') tType = v;
+    el.parentNode.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    upCnt();
+  }
+
+  function initPointsAndRules() {
+    pointsData = {};
+    const rulesDiv = $('rules-display');
+    selected.forEach(p => pointsData[p.n] = { score: 1.0, win: 0, loss: 0, finalBonus: 0 });
+    if(tType === 'single')
+      rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>단식 점수 (실제 경기 기준)</b><br>- 참가: <b>+1.0</b> (토너먼트당 1회)<br>- 승리: <b>+3.0</b><br>- 패배: <b>-0.5</b><br>🏆 <b>진출 보너스</b>: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`;
+    else
+      rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>복식 점수 (실제 경기 기준)</b><br>- 참가: <b>+1.0</b> (토너먼트당 1회)<br>- 승리: <b>+2.0</b><br>- 패배: <b>-0.5</b><br>🏆 <b>진출 보너스</b>: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`;
+    updateScoreBoard();
+  }
+
+  function makeBracket() {
+    if(tType === 'single' && selected.length < 3) return alert("최소 3명 필요!");
+    if(tType === 'double' && selected.length < 4) return alert("최소 4명 필요!");
+
+    let pool = [...selected];
+
+    if(tMode === 'rank') {
+      let names = pool.map(x=>x.n);
+      pool = players
+        .filter(p=>names.includes(p.name))
+        .sort((a,b)=>b.score-a.score)
+        .map(p=>({n:p.name}));
+    } else pool.sort(()=>Math.random()-0.5);
+
+    let entities = [];
+
+    if(tType === 'single') {
+      entities = pool.slice(0, 8);
+    } else {
+      // ✅ 복식: 5명 같은 홀수도 버그 덜 나게(기존 구조 유지 + loser bench로 BYE 채움)
+      let teamCount = Math.ceil(pool.length / 2);
+      for(let i=0; i<teamCount; i++){
+        let p1 = pool[i];
+        let p2 = pool[pool.length-1-i];
+        entities.push({ n: (p1===p2) ? `${p1.n},BYE` : `${p1.n},${p2.n}` });
+      }
+      entities.sort((a, b) => (b.n.includes('BYE') ? 1 : 0) - (a.n.includes('BYE') ? 1 : 0));
+    }
+
+    initPointsAndRules();
+
+    currentBracketSize = entities.length <= 4 ? 4 : 8;
+    let fullList = [...entities];
+    while(fullList.length < currentBracketSize) fullList.push({n: 'BYE'});
+
+    let matches =
+      currentBracketSize === 4
+      ? [{ p1: fullList[0], p2: fullList[3] }, { p1: fullList[1], p2: fullList[2] }]
+      : [
+          { p1: fullList[0], p2: fullList[7] },
+          { p1: fullList[3], p2: fullList[4] },
+          { p1: fullList[1], p2: fullList[6] },
+          { p1: fullList[2], p2: fullList[5] }
+        ];
+
+    renderWingTree(matches);
+    $('bracket-section').style.display = 'block';
+    $('bracket-section').scrollIntoView({behavior:'smooth'});
+
+    if(tType === 'double') {
+      $('loser-bench').style.display = 'block';
+      $('loser-list').innerHTML = '<span style="color:#999; font-size:12px;">경기 결과 대기중...</span>';
+    } else {
+      $('loser-bench').style.display = 'none';
+    }
+
+    setTimeout(() => autoResolveByes(currentBracketSize), 100);
+  }
+
+  function autoResolveByes(size) {
+    let startR = (size === 4) ? 2 : 1;
+    for(let i=0; i<size/2; i++) {
+      let m = document.querySelector(`#r${startR}-m${i}`);
+      if(!m) continue;
+      let p1 = m.querySelector('.team:first-child');
+      let p2 = m.querySelector('.team:last-child');
+      if(p2.innerText === 'BYE') p1.click();
+      else if(p1.innerText === 'BYE') p2.click();
+    }
+  }
+
+  function renderWingTree(matches) {
+    const root = $('tree-root');
+    root.innerHTML = '';
+    if(matches.length === 2) {
+      root.innerHTML = `
+        <div class="column col-left">${getMatchBoxHtml(0, matches[0], 2)}</div>
+        <div class="column col-center">
+          <div id="final-wrapper" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <div id="champ-display" class="champ-wrapper"><div class="champ-badge">🏆 <span id="champ-name"></span> 우승!</div></div>
+            ${getEmptyBoxHtml(0, 3, true)}
+          </div>
+        </div>
+        <div class="column col-right">${getMatchBoxHtml(1, matches[1], 2)}</div>
+      `;
+    } else {
+      root.innerHTML = `
+        <div class="column col-left">
+          ${getMatchBoxHtml(0, matches[0], 1)}${getMatchBoxHtml(1, matches[1], 1)}
+        </div>
+        <div class="column col-semi-left">${getEmptyBoxHtml(0, 2)}</div>
+        <div class="column col-center">
+          <div id="final-wrapper" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <div id="champ-display" class="champ-wrapper"><div class="champ-badge">🏆 <span id="champ-name"></span> 우승!</div></div>
+            ${getEmptyBoxHtml(0, 3, true)}
+          </div>
+        </div>
+        <div class="column col-semi-right">${getEmptyBoxHtml(1, 2)}</div>
+        <div class="column col-right">
+          ${getMatchBoxHtml(2, matches[2], 1)}${getMatchBoxHtml(3, matches[3], 1)}
+        </div>
+      `;
+    }
+  }
+
+  function getMatchBoxHtml(idx, m, round, isFinal = false) {
+    const p1 = escapeHtml(m.p1.n), p2 = escapeHtml(m.p2.n);
+    return `<div class="match-box ${isFinal?'final-stage':''}" id="r${round}-m${idx}">
+      <div class="team" onclick="win(${round}, ${idx}, 1, '${p1.replace(/'/g,"&#39;")}', this)">${p1}</div>
+      <div class="team" onclick="win(${round}, ${idx}, 2, '${p2.replace(/'/g,"&#39;")}', this)">${p2}</div>
+    </div>`;
+  }
+
+  function getEmptyBoxHtml(idx, round, isFinal = false) {
+    return `<div class="match-box ${isFinal?'final-stage':''}" id="r${round}-m${idx}">
+      <div class="team no-rank" id="r${round}-m${idx}-t1" style="color:#ccc;">?</div>
+      <div class="team no-rank" id="r${round}-m${idx}-t2" style="color:#ccc;">?</div>
+    </div>`;
+  }
+
+  window.win = function(round, matchIdx, teamIdx, name, el) {
+    if(name.includes('BYE')) return;
+    const p = el.parentNode;
+    if(p.querySelector('.winner')) return;
+
+    p.querySelectorAll('.team').forEach(t => t.classList.add('loser'));
+    el.classList.remove('loser');
+    el.classList.add('winner');
+
+    let ln = '';
+    p.querySelectorAll('.team').forEach(t => { if(t !== el) ln = t.innerText.trim(); });
+
+    if(tType==='double' && !ln.includes('BYE')) registerLosers(ln);
+
+    const winEarn = (tType === 'single') ? 3.0 : 2.0;
+    const lossEarn = -0.5;
+
+    name.split(',').forEach(pn => {
+      if(pointsData[pn]) { pointsData[pn].score += winEarn; pointsData[pn].win++; }
+    });
+
+    if(!ln.includes('BYE')) ln.split(',').forEach(pn => {
+      if(pointsData[pn]) { pointsData[pn].score += lossEarn; pointsData[pn].loss++; }
+    });
+
+    if(currentBracketSize === 8) {
+      if(round === 1) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 0.5; });
+      else if(round === 2) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
+    } else if(currentBracketSize === 4) {
+      if(round === 2) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
+    }
+
+    if(p.classList.contains('final-stage') || round === 3) {
+      $('champ-display').style.display = 'inline-flex';
+      $('champ-name').innerText = name;
+      name.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 3.0; });
+      ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 2.0; });
+      updateScoreBoard();
+      return;
+    }
+
+    let nr = round + 1, nmi, ntp;
+    if(round === 1) {
+      nmi = (matchIdx < 2) ? 0 : 1;
+      ntp = (matchIdx % 2 === 0) ? 1 : 2;
+    } else {
+      nmi = 0;
+      ntp = (matchIdx === 0) ? 1 : 2;
+    }
+
+    const target = $(`r${nr}-m${nmi}-t${ntp}`);
+    if(target) {
+      target.innerText = name;
+      target.style.color = '#1C1C1E';
+      target.onclick = function() { win(nr, nmi, ntp, name, this); };
+    }
+
+    updateScoreBoard();
+  }
+
+  function updateScoreBoard() {
+    const sorted = Object.entries(pointsData)
+      .filter(([n]) => n !== 'BYE')
+      .sort((a, b) => (b[1].score + b[1].finalBonus) - (a[1].score + a[1].finalBonus));
+    $('score-tbody').innerHTML = sorted.map(([n, d], i) => `
+      <tr><td>${i+1}</td><td>${escapeHtml(n)}</td><td>${d.win}승 ${d.loss}패</td><td>${(d.score + d.finalBonus).toFixed(1)}</td></tr>
+    `).join('');
+  }
+
+  function registerLosers(teamName) {
+    if(tType !== 'double') return;
+    let listDiv = $('loser-list');
+    if(listDiv.innerHTML.includes('대기중')) listDiv.innerHTML = '';
+    teamName.split(',').forEach(n => {
+      if(n === 'BYE') return;
+      let chip = document.createElement('span');
+      chip.className = 'loser-chip';
+      chip.innerText = n;
+      chip.onclick = function() { injectPartner(n, this); };
+      listDiv.appendChild(chip);
+    });
+  }
+
+  function injectPartner(name, chipElement) {
+    let teams = document.querySelectorAll('.team');
+    let found = false;
+    for(let t of teams) {
+      let txt = t.innerText;
+      if(txt.includes(',') && (txt.includes('BYE') || txt.includes('?'))) {
+        let newName = txt.replace('BYE', name).replace('?', name).trim();
+        t.innerHTML = `<span>${escapeHtml(newName)}</span>`;
+        let pId = t.parentNode.id;
+        let rd = parseInt(pId.split('-')[0].replace('r','')), mi = parseInt(pId.split('-')[1].replace('m',''));
+        let ti = (t === t.parentNode.firstElementChild) ? 1 : 2;
+        t.onclick = function() { win(rd, mi, ti, newName, this); };
+        chipElement.remove();
+        found = true;
+        setTimeout(() => autoResolveByes(currentBracketSize), 50);
+        break;
+      }
+    }
+    if(!found) alert("파트너를 기다리는 팀이 없습니다.");
+  }
+
+  function resetPage() {
+    selected = [];
+    pointsData = {};
+    document.querySelectorAll('.p-chk').forEach(c => c.checked = false);
+    $('cnt').innerText = "0";
+    $('bracket-section').style.display = 'none';
+    $('setup-area').style.display = 'block';
+    $('tree-root').innerHTML = '';
+    $('loser-list').innerHTML = '';
+    $('champ-display').style.display = 'none';
+    $('score-tbody').innerHTML = '';
+    const v = document.getElementById('view-tournament');
+    if(v) v.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* =========================
+     ✅ 사다리 (v2.65 그대로 유지)
+     ========================= */
+  var ldP = [];
+  var ladderLines = [];
+  var winHistory = [];
+  var finalMapping = [];
+  var ladderGap = 0;
+
+  function renderLadderPlayerPool() {
+    const pool = $('ladder-player-pool');
+    if(!pool) return;
+    pool.innerHTML = players.map(p => `
+      <div class="pool-item ${ldP.includes(p.name)?'selected':''}" onclick="tkL('${escapeHtml(p.name).replace(/'/g,"&#39;")}')">${escapeHtml(p.name)}</div>
+    `).join('');
+    $('ladder-punish-list').innerHTML = ldP.map((_, i) => `<input type="text" class="w-input l-punish" placeholder="벌칙 ${i+1} (미입력 시 패스)">`).join('');
+  }
+
+  function tkL(n) {
+    ldP.includes(n) ? ldP = ldP.filter(x=>x!==n) : ldP.push(n);
+    renderLadderPlayerPool();
+  }
+
+  function initLadderGame() {
+    if(ldP.length < 2) return alert("선수를 선택해줘!");
+    finalMapping = Array.from(document.querySelectorAll('.l-punish')).map(i => i.value.trim() || "패스").sort(() => Math.random() - 0.5);
+    winHistory = [];
+    $('ladder-final-msg').style.display = 'none';
+    $('ladder-setup-view').style.display = 'none';
+    $('ladder-game-view').style.display = 'block';
+
+    const cvs = $('ladderCanvas');
+    const ctx = cvs.getContext('2d');
+    cvs.width = 600;
+    cvs.height = 550;
+
+    ladderGap = (cvs.width - 80) / (ldP.length - 1);
+    ladderLines = [];
+
+    for(let r=0; r<12; r++) {
+      for(let i=0; i<ldP.length-1; i++) {
+        if(Math.random() > 0.45) {
+          ladderLines.push({ x: 40 + (i * ladderGap), y: 130 + (r * 30) + (Math.random() * 5), from: i, to: i+1 });
+          i++;
+        }
+      }
+    }
+
+    drawLadderBase(ctx, cvs);
+
+    cvs.onclick = (e) => {
+      const rect = cvs.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (cvs.width / rect.width);
+      const y = (e.clientY - rect.top) * (cvs.height / rect.height);
+      if(y < 110) {
+        let idx = Math.round((x - 40) / ladderGap);
+        if(idx >= 0 && idx < ldP.length && !winHistory.some(w => w.name === ldP[idx])) stL(ctx, idx);
+      }
+    };
+  }
+
+  function drawLadderBase(ctx, cvs) {
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 3;
+
+    ldP.forEach((name, i) => {
+      const x = 40 + (i * ladderGap);
+      ctx.beginPath();
+      ctx.moveTo(x, 80);
+      ctx.lineTo(x, 480);
+      ctx.stroke();
+
+      ctx.fillStyle = '#1c1c1e';
+      ctx.font = '400 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(name.substring(0,3), x, 65);
+
+      ctx.fillStyle = finalMapping[i] === "패스" ? "#8e8e93" : "#FF3B30";
+      ctx.fillText(finalMapping[i], x, 510);
+    });
+
+    ctx.beginPath();
+    ladderLines.forEach(l => {
+      ctx.moveTo(l.x, l.y);
+      ctx.lineTo(l.x + ladderGap, l.y);
+    });
+    ctx.stroke();
+  }
+
+  function stL(ctx, sIdx) {
+    let cX = sIdx, cY = 80;
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 6;
+    const sL = [...ladderLines].sort((a,b) => a.y - b.y);
+
+    const tm = setInterval(() => {
+      const absX = 40 + (cX * ladderGap);
+      if(cY >= 480) {
+        clearInterval(tm);
+        const res = finalMapping[cX];
+        winHistory.push({ name: ldP[sIdx], result: res });
+
+        if(res !== "패스") {
+          $('ladder-final-msg').style.display = 'block';
+          $('congrats-content').innerHTML = winHistory
+            .filter(w => w.result !== "패스")
+            .map(w => `축하해요! <b>${escapeHtml(w.name)}</b>, <b>${escapeHtml(w.result)}</b> 감사합니다! 🎉`)
+            .join('<br>');
+        }
+        alert(`${ldP[sIdx]} 결과: ${res}`);
+        return;
+      }
+
+      let nY = cY + 6, mv = false;
+      for(let l of sL) {
+        if(l.y > cY && l.y < nY + 2) {
+          if(l.from === cX) {
+            ctx.beginPath();
+            ctx.moveTo(absX, cY);
+            ctx.lineTo(absX, l.y);
+            ctx.lineTo(absX + ladderGap, l.y);
+            ctx.stroke();
+            cX++; cY = l.y + 1; mv = true; break;
+          } else if(l.to === cX) {
+            ctx.beginPath();
+            ctx.moveTo(absX, cY);
+            ctx.lineTo(absX, l.y);
+            ctx.lineTo(absX - ladderGap, l.y);
+            ctx.stroke();
+            cX--; cY = l.y + 1; mv = true; break;
+          }
+        }
+      }
+      if(!mv) {
+        ctx.beginPath();
+        ctx.moveTo(absX, cY);
+        ctx.lineTo(absX, nY);
+        ctx.stroke();
+        cY = nY;
+      }
+    }, 15);
+  }
+
+  function resetLadderGame() {
+    ldP = [];
+    winHistory = [];
+    $('ladder-setup-view').style.display='block';
+    $('ladder-game-view').style.display='none';
+    renderLadderPlayerPool();
+  }
+
+  /* =========================
+     ✅ 날씨 (v2.65 그대로)
+     ========================= */
   async function loadWeather(d) {
     const isNextWeek = (d.getTime() > getWed(0).getTime());
     if($('btnRefresh')) $('btnRefresh').classList.toggle('active', !isNextWeek);
     if($('btnNext')) $('btnNext').classList.toggle('active', isNextWeek);
+
+    $('tbl').style.display = "none";
+    $('dynamicTip').style.display = "none";
+    $("tbody").innerHTML = "";
+    setStatus(`<div style="color:#888; font-size:12px; margin-bottom:10px;">날씨 불러오는 중...</div>`);
+
     const ds = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
     $('dateDisplay').innerText = `${ds} ${['일','월','화','수','목','금','토'][d.getDay()]}요일`;
     $('dateDisplay').style.display = "block";
+
     try {
       const api = `https://api.open-meteo.com/v1/forecast?latitude=37.48&longitude=126.86&hourly=temperature_2m,weather_code,precipitation,wind_speed_10m&timezone=Asia/Seoul&start_date=${ds}&end_date=${ds}`;
-      const r = await fetch(api); const j = await r.json();
-      $("tbody").innerHTML = ""; let tR = 0, mW = 0, aT = 0;
-      for (let i=5; i<=12; i++) {
-        const t = j.hourly.temperature_2m[i], c = j.hourly.weather_code[i], rn = j.hourly.precipitation[i], w = j.hourly.wind_speed_10m[i];
-        tR += rn; mW = Math.max(mW, w); aT += t;
-        const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
-        const icon = (rn > 0) ? "🌦️" : (WX[c] || "☁️");
-        $("tbody").innerHTML += `<tr><td>${i}시</td><td>${icon}</td><td>${t.toFixed(1)}°</td><td>${rn.toFixed(1)}</td><td>${w.toFixed(1)}</td></tr>`;
+      const r = await fetchWithTimeout(api, {}, 12000);
+      if(!r.ok) throw new Error("Weather API 실패: " + r.status);
+      const j = await r.json();
+      if(!j || !j.hourly || !Array.isArray(j.hourly.time)) throw new Error("Weather 데이터 형식 이상");
+
+      const WX = { 0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 61: "🌦️", 63: "🌧️", 71: "❄️", 80: "🚿" };
+      const wanted = [];
+      for (let i=0; i<j.hourly.time.length; i++) {
+        const tStr = j.hourly.time[i];
+        if(!tStr || typeof tStr !== "string") continue;
+        const hhmm = tStr.split("T")[1];
+        if(!hhmm) continue;
+        const hh = parseInt(hhmm.slice(0,2), 10);
+        if(hh >= 5 && hh <= 12) wanted.push(i);
       }
-      aT /= 8;
-      let tip = (tR > 0) ? "💡 비 소식! 실내 코트 추천! ☔" : (mW >= 5) ? "💡 바람이 세요! 💨" : (aT <= 5) ? `💡 현재 ${aT.toFixed(1)}도! 추워요. 따뜻한 커피 챙겨요☕` : "💡 테니스 치기 딱 좋은 날씨! 🎾";
-      $("tipContent").innerText = tip; $("dynamicTip").style.display="block"; $("tbl").style.display="table";
-    } catch(e) {}
+      if(wanted.length === 0) throw new Error("05~12시 데이터 없음");
+
+      let tR = 0, mW = 0, aT = 0;
+
+      wanted.forEach((i) => {
+        const timeStr = j.hourly.time[i];
+        const hh = timeStr.split("T")[1].slice(0,2);
+        const t = j.hourly.temperature_2m?.[i];
+        const c = j.hourly.weather_code?.[i];
+        const rn = j.hourly.precipitation?.[i];
+        const w = j.hourly.wind_speed_10m?.[i];
+        if([t,c,rn,w].some(v => v === undefined || v === null)) return;
+
+        tR += rn;
+        mW = Math.max(mW, w);
+        aT += t;
+
+        const icon = (rn > 0) ? "🌦️" : (WX[c] || "☁️");
+        $("tbody").innerHTML += `<tr><td>${hh}시</td><td>${icon}</td><td>${t.toFixed(1)}°</td><td>${rn.toFixed(1)}</td><td>${w.toFixed(1)}</td></tr>`;
+      });
+
+      const count = $("tbody").querySelectorAll("tr").length;
+      if(count === 0) throw new Error("표에 표시할 데이터가 없음");
+      aT /= count;
+
+      $("tipContent").innerText =
+        (tR > 0) ? "💡 비 소식! 실내 코트 추천! ☔"
+        : (mW >= 5) ? "💡 바람이 세요! 바람막이 준비하세요!💨"
+        : (aT <= 5) ? `💡 현재 ${aT.toFixed(1)}도! 추워요. 뜨끈 커피 챙기세요☕`
+        : "💡 테니스 치기 딱 좋은 날씨! 🎾";
+
+      $("dynamicTip").style.display="block";
+      $("tbl").style.display="table";
+      setStatus('');
+    } catch(e) {
+      setStatus(`<div style="color:#ff3b30; font-size:12px; margin-bottom:10px;">날씨 로드 실패 😵‍💫</div>`);
+    }
   }
 
-  function getWed(o) { const d = new Date(); d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + o); return d; }
-  window.addEventListener("load",()=>{ setTimeout(()=>{$('splash').classList.add("hide"); setTimeout(()=>{$('splash').style.display="none"},700)},900); sync(); loadWeather(getWed(0)); });
+  function getWed(o) {
+    const d = new Date();
+    d.setDate(d.getDate() + (3 - d.getDay() + 7) % 7 + o);
+    return d;
+  }
+
+  /* =========================
+     ✅ v3.2 개인통계 (MatchLog 기반)
+     ========================= */
+  function renderStatsPlayerList() {
+    const pDiv = $('stats-pList');
+    if(!pDiv) return;
+    const sorted = [...players].sort((a,b)=>b.score-a.score);
+    pDiv.innerHTML = sorted.map((p, i) => `
+      <div class="p-label" onclick="viewStats('${escapeHtml(p.name).replace(/'/g,"&#39;")}')">
+        ${escapeHtml(displayName(p.name))}
+        <span class="p-rank">${i+1}위</span>
+      </div>
+    `).join('');
+  }
+
+  function isInTeam(teamArr, name) {
+    return Array.isArray(teamArr) && teamArr.includes(name);
+  }
+
+  function getOpponentNames(log, name) {
+    const homeHas = isInTeam(log.home, name);
+    const awayHas = isInTeam(log.away, name);
+    if (!homeHas && !awayHas) return [];
+    return homeHas ? (log.away || []) : (log.home || []);
+  }
+
+  function getPartnerNames(log, name) {
+    if (log.type !== "double") return [];
+    const homeHas = isInTeam(log.home, name);
+    const awayHas = isInTeam(log.away, name);
+    if (!homeHas && !awayHas) return [];
+    const team = homeHas ? (log.home || []) : (log.away || []);
+    return team.filter(n => n !== name);
+  }
+
+  function didPlayerWin(log, name) {
+    const homeHas = isInTeam(log.home, name);
+    const awayHas = isInTeam(log.away, name);
+    if (!homeHas && !awayHas) return null;
+    if (log.winner === "home") return homeHas;
+    if (log.winner === "away") return awayHas;
+    // winner unknown -> score로 추론
+    const hs = Number(log.hs ?? 0), as = Number(log.as ?? 0);
+    if (hs === as) return null;
+    const homeWin = hs > as;
+    return homeWin ? homeHas : awayHas;
+  }
+
+  function rateText(w,l) {
+    const t = w+l;
+    return t>0 ? ((w/t)*100).toFixed(1) : "0.0";
+  }
+
+  function pickBestByRule(map, preferHigh=true) {
+    // map[name] = {w,l,sw,sl,dw,dl,totalGames}
+    const entries = Object.entries(map);
+    if (entries.length === 0) return null;
+    entries.sort((a,b)=>{
+      const A=a[1], B=b[1];
+      const Ar = (A.w+A.l)>0 ? A.w/(A.w+A.l) : 0;
+      const Br = (B.w+B.l)>0 ? B.w/(B.w+B.l) : 0;
+      // preferHigh: 승률 높은 순(파트너), false: 승률 낮은 순(천적)
+      if (preferHigh) {
+        if (Br !== Ar) return Br - Ar;
+        if (B.w !== A.w) return B.w - A.w;
+        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames;
+      } else {
+        if (Ar !== Br) return Ar - Br;
+        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames;
+        if (B.w !== A.w) return B.w - A.w;
+      }
+      return a[0].localeCompare(b[0]);
+    });
+    return { name: entries[0][0], stat: entries[0][1] };
+  }
+
+  function viewStats(name) {
+    const p = players.find(x => x.name === name);
+    if(!p) return;
+
+    $('welcome-msg').style.display = 'none';
+    const report = $('stats-report');
+    report.style.display = 'block';
+    $('target-name').innerText = `${displayName(name)} 분석 리포트`;
+
+    // 해당 선수 관련 로그만
+    const logs = normalizeMatchLog(matchLog)
+      .filter(l => isInTeam(l.home, name) || isInTeam(l.away, name))
+      .sort((a,b)=>(b.ts||0)-(a.ts||0));
+
+    const recent = logs.slice(0,10);
+    const recentResults = recent.map(l => !!didPlayerWin(l, name)).filter(v => v===true || v===false);
+
+    $('form-dots').innerHTML =
+      (recentResults.length ? recentResults : Array.from({length:10},()=>false))
+      .slice(0,10)
+      .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
+      .join('');
+
+    // 스트릭
+    let streak = 0;
+    let lastResult = recentResults.length ? recentResults[0] : null;
+    if (lastResult !== null) {
+      for (let i=0; i<recentResults.length; i++) {
+        if (recentResults[i] === lastResult) streak++;
+        else break;
+      }
+    }
+
+    const adviceBox = $('advice-box');
+    const adviceText = $('res-advice');
+
+    if (lastResult === true && streak >= 2) {
+      adviceBox.style.background = "var(--wimbledon-sage)";
+      adviceText.innerHTML = `🔥 최근 ${streak}연승 스타트! 지금 폼 좋은데? <br>리턴 한 번만 더 붙이면 그냥 게임 끝.`;
+    } else if (lastResult === false && streak >= 2) {
+      adviceBox.style.background = "var(--up-red)";
+      adviceText.innerHTML = `😰 최근 ${streak}연패… 근데 이럴 때 한 번만 끊으면 바로 반등함. <br>첫 2게임은 ‘실수 최소’ 모드로 가자.`;
+    } else {
+      adviceBox.style.background = "var(--aussie-blue)";
+      adviceText.innerHTML = `🎾 최근 폼은 출렁출렁. <br>서브/리턴 중 하나만 안정시키면 연승각 잡힌다.`;
+    }
+
+    // 기본 전적/포인트(Players Data 기반 표는 유지)
+    const sPt = (p.sScore || 0);
+    const dPt = (p.dScore || 0);
+    const totalPt = (Number(sPt) + Number(dPt)).toFixed(1);
+
+    $('res-table').innerHTML = `
+      <tr><td>단식 전적</td><td>${rateText(p.sWins, p.sLosses)}%</td><td>${p.sWins}승 ${p.sLosses}패</td><td>${Number(sPt).toFixed(1)}</td></tr>
+      <tr><td>복식 전적</td><td>${rateText(p.dWins, p.dLosses)}%</td><td>${p.dWins}승 ${p.dLosses}패</td><td>${Number(dPt).toFixed(1)}</td></tr>
+    `;
+    $('res-foot').innerHTML = `
+      <tr style="background:#f9f9f9; font-weight: bold; border-top: 2px solid var(--wimbledon-sage);">
+        <td>종합 전적</td><td>${rateText(p.wins, p.losses)}%</td><td>${p.wins}승 ${p.losses}패</td>
+        <td style="color:var(--wimbledon-sage);">${totalPt} pt</td>
+      </tr>
+    `;
+
+    // ✅ 파트너/천적 (MatchLog 기반)
+    const partnerMap = {};
+    const enemyMap = {};
+
+    logs.forEach(l => {
+      const win = didPlayerWin(l, name);
+      if (win === null) return;
+
+      // 복식 파트너
+      if (l.type === "double") {
+        const partners = getPartnerNames(l, name);
+        partners.forEach(pt => {
+          if(!partnerMap[pt]) partnerMap[pt] = { w:0, l:0, sw:0, sl:0, dw:0, dl:0, totalGames:0 };
+          if(win) partnerMap[pt].w++; else partnerMap[pt].l++;
+          partnerMap[pt].dw += win ? 1 : 0;
+          partnerMap[pt].dl += win ? 0 : 1;
+          partnerMap[pt].totalGames++;
+        });
+      }
+
+      // 상대(단/복 모두)
+      const opps = getOpponentNames(l, name);
+      opps.forEach(op => {
+        if(!enemyMap[op]) enemyMap[op] = { w:0, l:0, sw:0, sl:0, dw:0, dl:0, totalGames:0 };
+        // enemyMap에서 w/l은 "내가 그 사람 상대로 이긴/진" 기준
+        if(win) enemyMap[op].w++; else enemyMap[op].l++;
+        if (l.type === "single") {
+          enemyMap[op].sw += win ? 1 : 0;
+          enemyMap[op].sl += win ? 0 : 1;
+        } else {
+          enemyMap[op].dw += win ? 1 : 0;
+          enemyMap[op].dl += win ? 0 : 1;
+        }
+        enemyMap[op].totalGames++;
+      });
+    });
+
+    const bestPartner = pickBestByRule(partnerMap, true);
+    const bestEnemy = pickBestByRule(enemyMap, false);
+
+    if (bestPartner) {
+      $('res-partner').innerText = displayName(bestPartner.name);
+      const st = bestPartner.stat;
+      $('res-partner-sub').innerText =
+        `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+    } else {
+      $('res-partner').innerText = "-";
+      $('res-partner-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
+    }
+
+    if (bestEnemy) {
+      $('res-enemy').innerText = displayName(bestEnemy.name);
+      const st = bestEnemy.stat;
+      $('res-enemy-sub').innerText =
+        `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+    } else {
+      $('res-enemy').innerText = "-";
+      $('res-enemy-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
+    }
+
+    report.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* =========================
+     ✅ 앱 부팅
+     ========================= */
+  window.addEventListener("load",()=>{
+    setTimeout(()=>{
+      $('splash').classList.add("hide");
+      setTimeout(()=>{ $('splash').style.display="none" },700);
+    },900);
+
+    refreshOmitNimBtn();
+    sync();
+    loadWeather(getWed(0));
+  });
+
+  window.addEventListener("resize", () => {
+    updateSeason();
+    updateWeekly();
+  });
 </script>
 </body>
 </html>
