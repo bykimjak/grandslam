@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.41</title>
+  <title>GrandSlam Ultimate v3.43</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -94,9 +94,9 @@
       margin-top: 15px;
       cursor: pointer;
       position: relative;        /* ✅ v3.4 */
-      z-index: 5;                /* ✅ v3.4: 네비/겹침 상황에서도 버튼 클릭 우선 */
+      z-index: 5;                /* ✅ v3.4 */
       pointer-events: auto;      /* ✅ v3.4 */
-      touch-action: manipulation;/* ✅ v3.4: 모바일 탭 안정 */
+      touch-action: manipulation;/* ✅ v3.4 */
     }
     .btn-sub { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 400; color: #fff; margin-top: 10px; font-size: 13px; cursor: pointer; }
     .btn-sub.sky { background: var(--aussie-blue); }
@@ -218,7 +218,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.41</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.43</div>
   </div>
 </div>
 
@@ -270,7 +270,7 @@
 
     <button class="btn-main" onclick="save()">결과 저장</button>
 
-    <div class="pool" id="pP"></div>
+    <div class="pool differ" id="pP"></div>
 
     <div class="rule-box">
       <div class="r-tt"><span class="material-symbols-outlined">info</span>점수 획득 기준</div>
@@ -312,6 +312,8 @@
       <div class="r-line r-mini">- 토너먼트 <b>실전 모드</b>: 진행 중 버퍼 → 우승 확정 순간에만 커밋</div>
       <div class="r-line r-mini">- ✅ v3.4: 토너먼트 버튼 클릭 버그(하단 네비 겹침) 픽스</div>
       <div class="r-line r-mini">- ✅ v3.41: 단식 9명 출전 시 최하위 증발 버그 픽스(예선/대기석 방식)</div>
+      <div class="r-line r-mini">- ✅ v3.42: 시즌/주간 + 종목별 테이블 전부 ▲▼ 변동 표시 + (-위) 버그 픽스</div>
+      <div class="r-line r-mini">- ✅ v3.43: 개인통계 선택 버튼 활성화 + 최근폼/멘트 불일치 픽스</div>
     </div>
   </div>
 </div>
@@ -364,7 +366,7 @@
         <div class="r-tt"><span class="material-symbols-outlined">receipt_long</span>MatchLog 기반 계산</div>
         <div class="r-mini">- 최근 폼: 해당 선수의 MatchLog 최신 10경기(W/L)</div>
         <div class="r-mini">- 파트너: <b>복식에서 같은 편</b>으로 뛴 사람 중 승률/승수 우선</div>
-        <div class="r-mini">- 천적: <b>상대편</b>으로 만난 사람 중 승률(=내가 진 비율) 우선</div>
+        <div class="r-mini">- 천적: <b>상대편</b>으로 만난 사람 중 (내 승률 낮음/표본) 우선</div>
       </div>
     </div>
 
@@ -394,7 +396,6 @@
         <button class="opt-btn" onclick="setOpt('type', 'double', this)">복식 (2vs2)</button>
       </div>
 
-      <!-- ✅ v3.4: 버튼 클릭 버그 픽스 적용된 btn-main -->
       <button class="btn-main" onclick="makeBracket()">대진표 생성하기</button>
 
       <div class="rule-box" style="margin-top:14px;">
@@ -402,6 +403,7 @@
         <div class="r-mini">- 하단 네비 겹침/터치 씹힘 방지: 화면 padding-bottom 확장</div>
         <div class="r-mini">- 버튼 클릭 안정: z-index / pointer-events / touch-action 보강</div>
         <div class="r-line r-mini">✅ v3.41: 단식 9명 이상 → 예선(8위 vs 9위) 승자가 8강 진입</div>
+        <div class="r-line r-mini">✅ v3.42: 토너 실전 커밋 시 “지난순위 스냅샷” 저장 → 전 테이블 ▲▼ 정상 표시</div>
       </div>
     </div>
 
@@ -633,13 +635,57 @@
     if(n==4) { updatePlayerList(); refreshOmitNimBtn(); }
   }
 
-  function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
-    const calcRate = (p) => {
-      const t = p[winK] + p[lossK];
-      return t > 0 ? (p[winK] / t) : 0;
+  /* =========================
+     ✅ v3.42 핵심: "지난순위" 스냅샷 저장
+     ========================= */
+  function calcRateByKeys(p, winK, lossK){
+    const t = (p[winK]||0) + (p[lossK]||0);
+    return t > 0 ? ((p[winK]||0) / t) : 0;
+  }
+
+  function computeRanksByScoreOnly(scoreK, winK, lossK){
+    const sorted = [...players].sort((a,b) => (b[scoreK]||0) - (a[scoreK]||0) || calcRateByKeys(b,winK,lossK) - calcRateByKeys(a,winK,lossK));
+    const ranks = {};
+    let currentRank = 1;
+    sorted.forEach((p, i) => {
+      if(i > 0){
+        const prev = sorted[i-1];
+        if((p[scoreK]||0) !== (prev[scoreK]||0)) currentRank = i + 1;
+      }
+      ranks[p.name] = currentRank;
+    });
+    return ranks;
+  }
+
+  function snapshotLastRanks(){
+    if(!Array.isArray(players) || players.length === 0) return;
+
+    const maps = {
+      last:   computeRanksByScoreOnly('score',  'wins',  'losses'),
+      lastD:  computeRanksByScoreOnly('dScore', 'dWins', 'dLosses'),
+      lastS:  computeRanksByScoreOnly('sScore', 'sWins', 'sLosses'),
+      lastW:  computeRanksByScoreOnly('weekly', 'wWins', 'wLosses'),
+      lastWD: computeRanksByScoreOnly('wdScore','wdWins','wdLosses'),
+      lastWS: computeRanksByScoreOnly('wsScore','wsWins','wsLosses')
     };
 
-    const wrSorted = [...players].sort((a,b) => calcRate(b) - calcRate(a) || b[winK] - a[winK]);
+    players.forEach(p=>{
+      p.last   = maps.last[p.name]   || p.last   || 0;
+      p.lastD  = maps.lastD[p.name]  || p.lastD  || 0;
+      p.lastS  = maps.lastS[p.name]  || p.lastS  || 0;
+      p.lastW  = maps.lastW[p.name]  || p.lastW  || 0;
+      p.lastWD = maps.lastWD[p.name] || p.lastWD || 0;
+      p.lastWS = maps.lastWS[p.name] || p.lastWS || 0;
+    });
+  }
+
+  function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
+    const calcRate = (p) => {
+      const t = (p[winK]||0) + (p[lossK]||0);
+      return t > 0 ? ((p[winK]||0) / t) : 0;
+    };
+
+    const wrSorted = [...players].sort((a,b) => calcRate(b) - calcRate(a) || (b[winK]||0) - (a[winK]||0));
     const wrRanks = {};
     let currentWrRank = 1;
     wrSorted.forEach((p, i) => {
@@ -650,7 +696,7 @@
       wrRanks[p.name] = currentWrRank;
     });
 
-    const sorted = [...players].sort((a,b) => b[scoreK] - a[scoreK] || calcRate(b) - calcRate(a));
+    const sorted = [...players].sort((a,b) => (b[scoreK]||0) - (a[scoreK]||0) || calcRate(b) - calcRate(a));
     const table = $(tableId);
     table.innerHTML = `<thead><tr><th style="width:12%;">순위</th><th style="width:44%;">이름</th><th style="width:20%;">승률</th><th style="width:12%;">승/패</th><th style="width:12%;">포인트</th></tr></thead><tbody></tbody>`;
 
@@ -658,11 +704,15 @@
     table.querySelector('tbody').innerHTML = sorted.map((p, i) => {
       if (i > 0) {
         const prev = sorted[i-1];
-        if (p[scoreK] !== prev[scoreK]) currentRank = i + 1;
+        if ((p[scoreK]||0) !== (prev[scoreK]||0)) currentRank = i + 1;
       }
+
       const rankIcon = (currentRank === 1) ? '<span class="material-symbols-outlined rank-1-icon">emoji_events</span>' : currentRank;
-      let df = (p[lastK] > 0 && p[lastK] !== currentRank)
-        ? (p[lastK] > currentRank ? `<span style="color:var(--up-red)">▲${p[lastK] - currentRank}</span>` : `<span style="color:var(--down-blue)">▼${currentRank - p[lastK]}</span>`)
+      const lastShown = (p[lastK] && Number(p[lastK]) > 0) ? Number(p[lastK]) : currentRank;
+
+      let df =
+        (p[lastK] && Number(p[lastK]) > 0 && lastShown !== currentRank)
+        ? (lastShown > currentRank ? `<span style="color:var(--up-red)">▲${lastShown - currentRank}</span>` : `<span style="color:var(--down-blue)">▼${currentRank - lastShown}</span>`)
         : '-';
 
       const shownName = displayName(p.name);
@@ -670,11 +720,11 @@
         <td>${rankIcon}</td>
         <td style="text-align:left; padding-left:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
           <span style="font-weight:400;">${escapeHtml(shownName)}</span>
-          <span class="sub-info" style="margin-left:4px; white-space:nowrap;">(${p[lastK]||'-'}위)${df}</span>
+          <span class="sub-info" style="margin-left:4px; white-space:nowrap;">(${lastShown}위)${df}</span>
         </td>
         <td class="sub-info" style="white-space:nowrap;">${(calcRate(p)*100).toFixed(1)}% (${wrRanks[p.name]}위)</td>
-        <td style="font-size:11px; white-space:nowrap;">${p[winK]}/${p[lossK]}</td>
-        <td class="point-text">${Number(p[scoreK]).toFixed(1)}</td>
+        <td style="font-size:11px; white-space:nowrap;">${(p[winK]||0)}/${(p[lossK]||0)}</td>
+        <td class="point-text">${Number(p[scoreK]||0).toFixed(1)}</td>
       </tr>`;
     }).join('');
   }
@@ -705,7 +755,7 @@
 
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
 
-    const sorted = [...players].sort((a,b) => b.score - a.score);
+    const sorted = [...players].sort((a,b) => (b.score||0) - (a.score||0));
     const ranks = {};
     sorted.forEach((p, i) => ranks[p.name] = i + 1);
 
@@ -740,7 +790,7 @@
   }
 
   /* =========================
-     ✅ 경기 저장(save) — v3.3 유지
+     ✅ 경기 저장(save) — v3.3 유지 + v3.42 스냅샷
      ========================= */
   function nowISO() {
     const d = new Date();
@@ -799,6 +849,8 @@
 
     const max = (mType === 'double') ? 2 : 1;
     if (hT.length !== max || aT.length !== max) return alert("팀 선택 먼저!");
+
+    snapshotLastRanks();
 
     const homeScore = parseInt(hs, 10);
     const awayScore = parseInt(as, 10);
@@ -947,7 +999,7 @@
   }
 
   /* =========================
-     ✅ 토너먼트 v3.3 유지 + v3.41(단식 9명 예선 픽스)
+     ✅ 토너먼트 (원본 유지)
      ========================= */
   let selected = [];
   let tMode = 'rank';
@@ -958,14 +1010,13 @@
   let tourBuffer = [];
   let tourCommitted = false;
 
-  // ✅ v3.41: 단식 9명 이상일 때 "예선(8위 vs 9위)" 처리
-  let singlePrelim = null;    // { a:'이름', b:'이름', done:false }
-  let pendingSingles = null;  // { base7:[...], a:'', b:'' }
+  let singlePrelim = null;
+  let pendingSingles = null;
 
   function initTournament() {
     const pDiv = $('pList');
     if(!pDiv) return;
-    let sortedP = [...players].sort((a,b) => b.score - a.score);
+    let sortedP = [...players].sort((a,b) => (b.score||0) - (a.score||0));
     pDiv.innerHTML = sortedP.map((p, i) => `
       <input type="checkbox" id="tp${i}" class="p-chk" value="${escapeHtml(p.name)}" onchange="upCnt()">
       <label for="tp${i}" class="p-label">${escapeHtml(p.name)}<span class="p-rank">${i+1}위</span></label>
@@ -1004,8 +1055,6 @@
 
     tourBuffer = [];
     tourCommitted = false;
-
-    // ✅ v3.41: 예선 상태 초기화
     singlePrelim = null;
     pendingSingles = null;
 
@@ -1015,37 +1064,30 @@
       let names = pool.map(x=>x.n);
       pool = players
         .filter(p=>names.includes(p.name))
-        .sort((a,b)=>b.score-a.score)
+        .sort((a,b)=>(b.score||0)-(a.score||0))
         .map(p=>({n:p.name}));
     } else pool.sort(()=>Math.random()-0.5);
 
     let entities = [];
 
     if(tType === 'single') {
-
-      // ✅ 9명 이상이면: 8위 vs 9위 예선 → 승자가 8강 마지막 슬롯 진입
       if (pool.length > 8) {
-        const main7 = pool.slice(0, 7);     // 본선 확정 7명
-        const playInA = pool[7];            // 8위
-        const playInB = pool[8];            // 9위
+        const main7 = pool.slice(0, 7);
+        const playInA = pool[7];
+        const playInB = pool[8];
 
         singlePrelim = { a: playInA.n, b: playInB.n, done: false };
 
-        // 본선 8강은 마지막 자리를 "?"로 비워두고 먼저 렌더 (예선 승자 들어갈 자리)
         entities = [...main7, { n: "?" }];
 
-        // 예선 끝나면 8강 재생성용 캐시
         pendingSingles = {
           base7: main7.map(x => x.n),
           a: playInA.n,
           b: playInB.n
         };
-
       } else {
-        // 기존대로 8명 이하 → 그냥 진행
         entities = pool.slice(0, 8);
       }
-
     } else {
       let teamCount = Math.ceil(pool.length / 2);
       for(let i=0; i<teamCount; i++){
@@ -1076,7 +1118,6 @@
     $('bracket-section').style.display = 'block';
     $('bracket-section').scrollIntoView({behavior:'smooth'});
 
-    // ✅ 단식 예선(9명 이상) UI 표시 / 복식은 기존 대기석
     if (tType === 'single' && singlePrelim && !singlePrelim.done) {
       showSinglePrelimUI(singlePrelim.a, singlePrelim.b);
     } else if (tType === 'double') {
@@ -1198,6 +1239,8 @@
     if (tourCommitted) return;
     if (!tourBuffer.length) return;
 
+    snapshotLastRanks();
+
     tourBuffer.forEach(le => {
       applyMatchToPlayers(le.type, le.home, le.away, le.winner);
       matchLog.unshift(le);
@@ -1215,7 +1258,6 @@
     }
   }
 
-  // ✅ v3.41: 단식 예선 UI + 승자 확정
   function showSinglePrelimUI(a, b) {
     const bench = $('loser-bench');
     const list = $('loser-list');
@@ -1240,22 +1282,19 @@
     const b = singlePrelim.b;
     const loserName = (winnerName === a) ? b : a;
 
-    // pointsData 반영 (단식 승 +3 / 패 -0.5)
     if (pointsData[winnerName]) { pointsData[winnerName].score += 3.0; pointsData[winnerName].win++; }
     if (pointsData[loserName])  { pointsData[loserName].score += -0.5; pointsData[loserName].loss++; }
 
-    // 실전모드용 버퍼 기록
     bufferTournamentMatch('single', a, b, winnerName);
 
     singlePrelim.done = true;
 
-    // 8강 마지막 슬롯 '?'에 승자 넣어서 브라켓 재생성
     if (pendingSingles) {
       const mainNames = [...pendingSingles.base7, winnerName].map(n => ({ n }));
       currentBracketSize = 8;
 
       let fullList = [...mainNames];
-      while (fullList.length < currentBracketSize) fullList.push({ n: 'BYE' });
+      while(fullList.length < currentBracketSize) fullList.push({ n: 'BYE' });
 
       const matches = [
         { p1: fullList[0], p2: fullList[7] },
@@ -1266,7 +1305,6 @@
 
       renderWingTree(matches);
 
-      // 예선 UI 닫기
       $('loser-bench').style.display = 'none';
       $('loser-list').innerHTML = '';
     }
@@ -1395,7 +1433,6 @@
     tourBuffer = [];
     tourCommitted = false;
 
-    // ✅ v3.41: 예선 상태 초기화
     singlePrelim = null;
     pendingSingles = null;
 
@@ -1644,17 +1681,21 @@
   }
 
   /* =========================
-     ✅ 개인통계 (v3.3 유지 / MatchLog 기반)
+     ✅ 개인통계 (MatchLog 기반) — v3.43 FIX
      ========================= */
+
+  // ✅ (1) 참가 선수 선택: radio + label 로 바꿔서 "호주색 활성화" 자동 적용
   function renderStatsPlayerList() {
     const pDiv = $('stats-pList');
     if(!pDiv) return;
-    const sorted = [...players].sort((a,b)=>b.score-a.score);
+
+    const sorted = [...players].sort((a,b)=>(b.score||0)-(a.score||0));
     pDiv.innerHTML = sorted.map((p, i) => `
-      <div class="p-label" onclick="viewStats('${escapeHtml(p.name).replace(/'/g,"&#39;")}')">
+      <input type="radio" name="statsPick" id="sp${i}" class="p-chk" value="${escapeHtml(p.name)}" onchange="viewStats('${escapeHtml(p.name).replace(/'/g,"&#39;")}')">
+      <label for="sp${i}" class="p-label">
         ${escapeHtml(displayName(p.name))}
         <span class="p-rank">${i+1}위</span>
-      </div>
+      </label>
     `).join('');
   }
 
@@ -1691,28 +1732,32 @@
   }
 
   function rateText(w,l) {
-    const t = w+l;
-    return t>0 ? ((w/t)*100).toFixed(1) : "0.0";
+    const t = (w||0)+(l||0);
+    return t>0 ? (((w||0)/t)*100).toFixed(1) : "0.0";
   }
 
+  // ✅ (2) 천적 선정 로직 보정: "내 승률 낮음" + "표본 큰" + "내 패배 많은" 우선
   function pickBestByRule(map, preferHigh=true) {
     const entries = Object.entries(map);
     if (entries.length === 0) return null;
+
     entries.sort((a,b)=>{
       const A=a[1], B=b[1];
-      const Ar = (A.w+A.l)>0 ? A.w/(A.w+A.l) : 0;
+      const Ar = (A.w+A.l)>0 ? A.w/(A.w+A.l) : 0; // 내 승률
       const Br = (B.w+B.l)>0 ? B.w/(B.w+B.l) : 0;
+
       if (preferHigh) {
-        if (Br !== Ar) return Br - Ar;
-        if (B.w !== A.w) return B.w - A.w;
-        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames;
+        if (Br !== Ar) return Br - Ar;                 // 승률 높은 순
+        if (B.w !== A.w) return B.w - A.w;             // 승 수 많은 순
+        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames; // 표본 큰 순
       } else {
-        if (Ar !== Br) return Ar - Br;
-        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames;
-        if (B.w !== A.w) return B.w - A.w;
+        if (Ar !== Br) return Ar - Br;                 // 내 승률 낮은 순(=천적)
+        if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames; // 표본 큰 순
+        if (B.l !== A.l) return B.l - A.l;             // 내가 더 많이 진 상대 우선
       }
       return a[0].localeCompare(b[0]);
     });
+
     return { name: entries[0][0], stat: entries[0][1] };
   }
 
@@ -1729,20 +1774,29 @@
       .filter(l => isInTeam(l.home, name) || isInTeam(l.away, name))
       .sort((a,b)=>(b.ts||0)-(a.ts||0));
 
-    const recent = logs.slice(0,10);
-    const recentResults = recent.map(l => !!didPlayerWin(l, name)).filter(v => v===true || v===false);
+const recent = logs.slice(0,10);
 
-    $('form-dots').innerHTML =
-      (recentResults.length ? recentResults : Array.from({length:10},()=>false))
-      .slice(0,10)
-      .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
-      .join('');
+const recentResults = recent
+  .map(l => didPlayerWin(l, name))
+  .filter(v => v === true || v === false);
 
-    let streak = 0;
-    let lastResult = recentResults.length ? recentResults[0] : null;
-    if (lastResult !== null) {
-      for (let i=0; i<recentResults.length; i++) {
-        if (recentResults[i] === lastResult) streak++;
+// ✅ 표시용: 오래된→최근 순으로 바꿔서 "오른쪽이 최신"
+const displayResults = recentResults.slice().reverse();
+
+// ✅ 점 표시: 왼쪽=과거, 오른쪽=최근
+$('form-dots').innerHTML =
+  (displayResults.length ? displayResults : Array.from({length:10},()=>false))
+  .slice(0,10)
+  .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
+  .join('');
+
+// ✅ 연승/연패 판정도 "오른쪽(최신)" 기준으로
+let streak = 0;
+let lastResult = displayResults.length ? displayResults[displayResults.length - 1] : null;
+
+if (lastResult !== null) {
+  for (let i = displayResults.length - 1; i >= 0; i--) {
+    if (displayResults[i] === lastResult) streak++;
         else break;
       }
     }
@@ -1750,15 +1804,16 @@
     const adviceBox = $('advice-box');
     const adviceText = $('res-advice');
 
+    // ✅ (3) FIX: 반말 → 존댓말
     if (lastResult === true && streak >= 2) {
       adviceBox.style.background = "var(--wimbledon-sage)";
-      adviceText.innerHTML = `🔥 최근 ${streak}연승 스타트! 지금 폼 좋은데? <br>리턴 한 번만 더 붙이면 그냥 게임 끝.`;
+      adviceText.innerHTML = `🔥 최근 ${streak}연승 스타트! 지금 폼이 좋습니다. <br>리턴 한 번만 더 붙이면 거의 끝입니다.`;
     } else if (lastResult === false && streak >= 2) {
       adviceBox.style.background = "var(--up-red)";
-      adviceText.innerHTML = `😰 최근 ${streak}연패… 근데 이럴 때 한 번만 끊으면 바로 반등함. <br>첫 2게임은 ‘실수 최소’ 모드로 가자.`;
+      adviceText.innerHTML = `😰 최근 ${streak}연패… 하지만 이럴 때 한 번만 끊으면 바로 반등합니다. <br>첫 2게임은 ‘실수 최소’ 모드로 가는 게 좋습니다.`;
     } else {
       adviceBox.style.background = "var(--aussie-blue)";
-      adviceText.innerHTML = `🎾 최근 폼은 출렁출렁. <br>서브/리턴 중 하나만 안정시키면 연승각 잡힌다.`;
+      adviceText.innerHTML = `🎾 최근 폼이 조금 출렁입니다. <br>서브/리턴 중 하나만 안정시키면 연승 흐름이 잡힙니다.`;
     }
 
     const sPt = (p.sScore || 0);
