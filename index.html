@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.2</title>
+  <title>GrandSlam Ultimate v3.41</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -12,7 +12,17 @@
   <style>
     /* [절대원칙] v2.57 스타일 100% 유지 (토너먼트 중앙정렬 포함) */
     :root { --bg-gray: #F2F2F7; --text-dark: #1C1C1E; --text-gray: #8E8E93; --wimbledon-sage: #5D9C76; --aussie-blue: #669DB3; --roland-clay: #D98C73; --up-red: #FF3B30; --down-blue: #007AFF; }
-    body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg-gray); margin: 0; padding: 0; padding-bottom: 90px; font-weight: 400; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg-gray);
+      margin: 0;
+      padding: 0;
+      padding-bottom: 120px; /* ✅ v3.4: 하단 네비 겹침 방지 여유 확장 */
+      font-weight: 400;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; align-items: center; justify-content: center; z-index: 20000; }
     #splash img { width: 140px; height: 140px; border-radius: 24px; transition: transform 0.7s ease, opacity 0.6s ease; }
     #splash.hide img { transform: scale(5); opacity: 0; }
@@ -23,7 +33,7 @@
     .material-symbols-outlined { font-size: 28px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
     .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 300; }
 
-    .app-screen { display: none; padding: 15px; max-width: 600px; margin: 0 auto; }
+    .app-screen { display: none; padding: 15px; max-width: 600px; margin: 0 auto; padding-bottom: 120px; /* ✅ v3.4: 화면 단위로도 여백 확보 */ }
     .app-screen.active { display: block; }
 
     .header-banner { background: var(--wimbledon-sage); color: white; margin: 0 0 20px 0; padding: 20px; text-align: center; border-radius: 16px; box-shadow: 0 4px 15px rgba(93, 156, 118, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 20px; font-weight: 400; letter-spacing: -0.5px; }
@@ -72,7 +82,22 @@
     .pool-item { padding: 10px 15px; background: white; border: 1px solid #D1D1D6; border-radius: 20px; font-size: 14px; cursor: pointer; color: var(--text-dark); font-weight: 400; }
     .pool-item.selected { border-color: var(--aussie-blue) !important; background: var(--aussie-blue) !important; color: white !important; font-weight: 400; box-shadow: 0 0 8px rgba(102, 157, 179, 0.5); }
 
-    .btn-main { width: 100%; padding: 20px; background: var(--wimbledon-sage); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 400; margin-top: 15px; }
+    .btn-main {
+      width: 100%;
+      padding: 20px;
+      background: var(--wimbledon-sage);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: 400;
+      margin-top: 15px;
+      cursor: pointer;
+      position: relative;        /* ✅ v3.4 */
+      z-index: 5;                /* ✅ v3.4: 네비/겹침 상황에서도 버튼 클릭 우선 */
+      pointer-events: auto;      /* ✅ v3.4 */
+      touch-action: manipulation;/* ✅ v3.4: 모바일 탭 안정 */
+    }
     .btn-sub { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 400; color: #fff; margin-top: 10px; font-size: 13px; cursor: pointer; }
     .btn-sub.sky { background: var(--aussie-blue); }
     .btn-sub.royal { background: var(--roland-clay); }
@@ -152,6 +177,10 @@
     .rule-box .r-mini{ font-size: 9px; color:#777; }
     .rule-box .r-line{ margin-top:6px; }
 
+    /* ✅ v3.4: 토너먼트 화면에서 버튼이 네비에 가려지는 케이스 방지 */
+    #view-tournament .section-card { padding-bottom: 130px; }
+    #view-tournament #setup-area { position: relative; z-index: 2; }
+
     @media (max-width: 420px){
       .tennis-table th:nth-child(1), .tennis-table td:nth-child(1){ width: 12%; white-space: nowrap; }
       .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 44%; white-space: nowrap; }
@@ -170,7 +199,7 @@
 
 <div id="view-weather" class="app-screen active">
   <div class="weather-card">
-    <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>토브클럽 광명날씨</div>
+    <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>광명시 날씨</div>
     <div class="search-row">
       <input id="city" class="w-input" value="Gwangmyeong" />
       <button id="btnSearch" class="w-btn" onclick="loadWeather(getWed(0))">검색</button>
@@ -189,7 +218,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.2</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.41</div>
   </div>
 </div>
 
@@ -272,13 +301,17 @@
     <hr>
 
     <button id="btnOmitNim" class="btn-sub sky" onclick="toggleOmitNim()">모바일 이름 '님' 생략: ON</button>
+
     <button id="btnTourMode" class="btn-sub" style="background:#34C759;" onclick="toggleTournamentMode()">🟩 토너먼트 연습 모드 (기록반영 X)</button>
 
     <div class="rule-box" style="margin-top:16px;">
-      <div class="r-tt"><span class="material-symbols-outlined">database</span>v3.2 저장 구조</div>
+      <div class="r-tt"><span class="material-symbols-outlined">database</span>v3.4 저장 구조</div>
       <div class="r-mini">- <b>Data</b>: 전체 덮어쓰기</div>
       <div class="r-mini">- <b>MatchLog</b>: appendRow로 누적</div>
       <div class="r-line r-mini">- 개인통계(파트너/천적/최근폼)는 <b>MatchLog 기반</b>으로 계산</div>
+      <div class="r-line r-mini">- 토너먼트 <b>실전 모드</b>: 진행 중 버퍼 → 우승 확정 순간에만 커밋</div>
+      <div class="r-line r-mini">- ✅ v3.4: 토너먼트 버튼 클릭 버그(하단 네비 겹침) 픽스</div>
+      <div class="r-line r-mini">- ✅ v3.41: 단식 9명 출전 시 최하위 증발 버그 픽스(예선/대기석 방식)</div>
     </div>
   </div>
 </div>
@@ -361,7 +394,15 @@
         <button class="opt-btn" onclick="setOpt('type', 'double', this)">복식 (2vs2)</button>
       </div>
 
+      <!-- ✅ v3.4: 버튼 클릭 버그 픽스 적용된 btn-main -->
       <button class="btn-main" onclick="makeBracket()">대진표 생성하기</button>
+
+      <div class="rule-box" style="margin-top:14px;">
+        <div class="r-tt"><span class="material-symbols-outlined">bug_report</span>v3.4 토너 버튼 픽스</div>
+        <div class="r-mini">- 하단 네비 겹침/터치 씹힘 방지: 화면 padding-bottom 확장</div>
+        <div class="r-mini">- 버튼 클릭 안정: z-index / pointer-events / touch-action 보강</div>
+        <div class="r-line r-mini">✅ v3.41: 단식 9명 이상 → 예선(8위 vs 9위) 승자가 8강 진입</div>
+      </div>
     </div>
 
     <div id="bracket-section">
@@ -416,18 +457,21 @@
 </nav>
 
 <script>
-  /* ✅ v3.2 GAS_URL 반영 */
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbzEVEAYpQa4GRl2BwIZ2R47BABHV7LsQfnxlv-ibQz7AhF3daKWgfolVykQF4iMrr8ukw/exec";
+  /* ✅ v3.4 GAS_URL 반영 */
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwaTBlyZRh6UbxupMkFWDvJtgtU-CeAXipk7cwKzZpyoi23Ua8x_1WkY_lyLXDN2dwytg/exec";
   const ADMIN_PIN = "0707";
 
   var players = [];
-  var matchLog = []; // ✅ v3.2: MatchLog 누적(appendRow) 기반 통계
+  var matchLog = []; // ✅ MatchLog 누적(appendRow) 기반 통계
   var mType = 'double';
   var hT = [];
   var aT = [];
   var chart = null;
   var tabNow = 1;
+
+  // ✅ v3.4: 토너먼트 모드 (실전이면 실제로 반영)
   var tournamentMode = 'practice';
+
   let adminUnlocked = false;
   let omitNimOnMobile = (localStorage.getItem("omitNimOnMobile") ?? "1") === "1";
 
@@ -478,12 +522,8 @@
   }
 
   /* =========================
-     ✅ v3.2 GAS 통신 포맷 (유연 처리)
-     - GET: [players] 또는 { data:[players], matchLog:[...] }
-     - POST: { action:"save", data:[players], matchLogAppend:[log] }
-     - POST: { action:"saveDataOnly", data:[players] }
+     ✅ v3.4 GAS 통신 포맷
      ========================= */
-
   function normalizeMatchLog(arr) {
     if (!Array.isArray(arr)) return [];
     return arr
@@ -510,7 +550,6 @@
       if (!r.ok) throw new Error("GAS GET 실패: " + r.status);
       const data = await r.json();
 
-      // ✅ 구버전/신버전 모두 처리
       if (Array.isArray(data)) {
         players = (data || []).map(ensure);
         matchLog = matchLog || [];
@@ -545,7 +584,6 @@
       }, 15000);
       if (!r.ok) throw new Error("GAS POST 실패: " + r.status);
 
-      // GAS가 응답으로 최신 matchLog를 보내주는 케이스도 대비
       let resp = null;
       try { resp = await r.json(); } catch(_) {}
       if (resp && typeof resp === "object") {
@@ -566,8 +604,9 @@
     return await pushPayload({ action: "saveDataOnly", data: players });
   }
 
-  async function pushWithMatchLogAppend(logEntry) {
-    return await pushPayload({ action: "save", data: players, matchLogAppend: [logEntry] });
+  async function pushWithMatchLogAppend(logEntries) {
+    const arr = Array.isArray(logEntries) ? logEntries : [logEntries];
+    return await pushPayload({ action: "save", data: players, matchLogAppend: arr });
   }
 
   function ensure(p) {
@@ -664,7 +703,6 @@
       ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']
     ][rangeIdx];
 
-    // ✅ v3.2: 차트 색은 기존 유지(하드코딩 있었던 그대로) — 스타일 원칙 유지
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
 
     const sorted = [...players].sort((a,b) => b.score - a.score);
@@ -702,10 +740,7 @@
   }
 
   /* =========================
-     ✅ v3.2: 경기 저장(save)
-     - players 업데이트
-     - MatchLog 1건 생성
-     - GAS: Data 덮어쓰기 + MatchLog appendRow
+     ✅ 경기 저장(save) — v3.3 유지
      ========================= */
   function nowISO() {
     const d = new Date();
@@ -714,20 +749,54 @@
   }
 
   function calcDeltas(type, isWin) {
-    // UI에 표기된 규칙 그대로
-    if (type === "double") {
-      // 참여 +1 + 승리 +2 = 3, 패배는 0.3(=1-0.7)로 이미 반영돼 있는 구조라 기존 로직 유지
-      return isWin ? { total: 3.0, d: 3.0, s: 0.0 } : { total: 0.3, d: 0.3, s: 0.0 };
-    } else {
-      return isWin ? { total: 4.0, d: 0.0, s: 4.0 } : { total: 0.5, d: 0.0, s: 0.5 };
-    }
+    if (type === "double") return isWin ? { total: 3.0, d: 3.0, s: 0.0 } : { total: 0.3, d: 0.3, s: 0.0 };
+    return isWin ? { total: 4.0, d: 0.0, s: 4.0 } : { total: 0.5, d: 0.0, s: 0.5 };
+  }
+
+  function applyMatchToPlayers(type, homeArr, awayArr, winnerSide) {
+    const homeWin = winnerSide === "home";
+    const apply = (ns, isW) => ns.forEach(n => {
+      var p = players.find(x=>x.name==n);
+      if(!p) return;
+      const d = calcDeltas(type, isW);
+
+      p.score += d.total;
+      p.wins += isW ? 1 : 0;
+      p.losses += isW ? 0 : 1;
+
+      if (type === "double") {
+        p.dScore += d.d;
+        p.dWins += isW ? 1 : 0;
+        p.dLosses += isW ? 0 : 1;
+      } else {
+        p.sScore += d.s;
+        p.sWins += isW ? 1 : 0;
+        p.sLosses += isW ? 0 : 1;
+      }
+
+      p.weekly += d.total;
+      p.wWins += isW ? 1 : 0;
+      p.wLosses += isW ? 0 : 1;
+
+      if (type === "double") {
+        p.wdScore += d.d;
+        p.wdWins += isW ? 1 : 0;
+        p.wdLosses += isW ? 0 : 1;
+      } else {
+        p.wsScore += d.s;
+        p.wsWins += isW ? 1 : 0;
+        p.wsLosses += isW ? 0 : 1;
+      }
+    });
+
+    if(homeWin) { apply(homeArr,true); apply(awayArr,false); }
+    else { apply(awayArr,true); apply(homeArr,false); }
   }
 
   async function save() {
     var hs=$('hS').value, as=$('aS').value;
     if(!hs || !as || hs==as) return alert("점수 확인!");
 
-    // 팀 구성 체크
     const max = (mType === 'double') ? 2 : 1;
     if (hT.length !== max || aT.length !== max) return alert("팀 선택 먼저!");
 
@@ -748,57 +817,15 @@
       winner: homeWin ? "home" : "away"
     };
 
-    const apply = (ns, isW) => ns.forEach(n => {
-      var p = players.find(x=>x.name==n);
-      if(!p) return;
-      const d = calcDeltas(mType, isW);
+    applyMatchToPlayers(mType, [...hT], [...aT], logEntry.winner);
 
-      // 시즌
-      p.score += d.total;
-      p.wins += isW ? 1 : 0;
-      p.losses += isW ? 0 : 1;
-
-      // 종목
-      if (mType === "double") {
-        p.dScore += d.d;
-        p.dWins += isW ? 1 : 0;
-        p.dLosses += isW ? 0 : 1;
-      } else {
-        p.sScore += d.s;
-        p.sWins += isW ? 1 : 0;
-        p.sLosses += isW ? 0 : 1;
-      }
-
-      // 주간(기존 구조 그대로)
-      p.weekly += d.total;
-      p.wWins += isW ? 1 : 0;
-      p.wLosses += isW ? 0 : 1;
-
-      if (mType === "double") {
-        p.wdScore += d.d;
-        p.wdWins += isW ? 1 : 0;
-        p.wdLosses += isW ? 0 : 1;
-      } else {
-        p.wsScore += d.s;
-        p.wsWins += isW ? 1 : 0;
-        p.wsLosses += isW ? 0 : 1;
-      }
-    });
-
-    if(homeWin) { apply(hT,true); apply(aT,false); }
-    else { apply(aT,true); apply(hT,false); }
-
-    // ✅ 로컬에도 즉시 반영(통계가 바로 바뀌게)
     matchLog.unshift(logEntry);
-
-    // ✅ 서버: Data 덮어쓰기 + MatchLog appendRow
     const ok = await pushWithMatchLogAppend(logEntry);
     if(ok) alert("저장!");
 
     $('hS').value='';
     $('aS').value='';
-    hT=[];
-    aT=[];
+    hT=[]; aT=[];
     $('hN').innerText='';
     $('aN').innerText='';
     tab(1);
@@ -909,22 +936,31 @@
         tournamentMode = 'real';
         btn.innerText = "🟥 토너먼트 실전 모드 (결과 반영 O)";
         btn.style.background = "#FF3B30";
+        alert("토너먼트 실전 모드 ON ✅\n우승 확정 순간에만 기록이 반영돼!");
       }
     } else {
       tournamentMode = 'practice';
       btn.innerText = "🟩 토너먼트 연습 모드 (기록반영 X)";
       btn.style.background = "#34C759";
+      alert("토너먼트 연습 모드 ON ✅\n아무 기록도 반영 안 돼!");
     }
   }
 
   /* =========================
-     ✅ 토너먼트 (v2.65 그대로 유지)
+     ✅ 토너먼트 v3.3 유지 + v3.41(단식 9명 예선 픽스)
      ========================= */
   let selected = [];
   let tMode = 'rank';
   let tType = 'single';
   let pointsData = {};
   let currentBracketSize = 0;
+
+  let tourBuffer = [];
+  let tourCommitted = false;
+
+  // ✅ v3.41: 단식 9명 이상일 때 "예선(8위 vs 9위)" 처리
+  let singlePrelim = null;    // { a:'이름', b:'이름', done:false }
+  let pendingSingles = null;  // { base7:[...], a:'', b:'' }
 
   function initTournament() {
     const pDiv = $('pList');
@@ -953,16 +989,25 @@
     pointsData = {};
     const rulesDiv = $('rules-display');
     selected.forEach(p => pointsData[p.n] = { score: 1.0, win: 0, loss: 0, finalBonus: 0 });
+
     if(tType === 'single')
       rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>단식 점수 (실제 경기 기준)</b><br>- 참가: <b>+1.0</b> (토너먼트당 1회)<br>- 승리: <b>+3.0</b><br>- 패배: <b>-0.5</b><br>🏆 <b>진출 보너스</b>: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`;
     else
       rulesDiv.innerHTML = `<div style="font-size: 9px; line-height: 1.5; color: #666;">🎾 <b>복식 점수 (실제 경기 기준)</b><br>- 참가: <b>+1.0</b> (토너먼트당 1회)<br>- 승리: <b>+2.0</b><br>- 패배: <b>-0.5</b><br>🏆 <b>진출 보너스</b>: 우승(+3), 준우승(+2), 4강(+1), 8강(+0.5)</div>`;
+
     updateScoreBoard();
   }
 
   function makeBracket() {
     if(tType === 'single' && selected.length < 3) return alert("최소 3명 필요!");
     if(tType === 'double' && selected.length < 4) return alert("최소 4명 필요!");
+
+    tourBuffer = [];
+    tourCommitted = false;
+
+    // ✅ v3.41: 예선 상태 초기화
+    singlePrelim = null;
+    pendingSingles = null;
 
     let pool = [...selected];
 
@@ -977,9 +1022,31 @@
     let entities = [];
 
     if(tType === 'single') {
-      entities = pool.slice(0, 8);
+
+      // ✅ 9명 이상이면: 8위 vs 9위 예선 → 승자가 8강 마지막 슬롯 진입
+      if (pool.length > 8) {
+        const main7 = pool.slice(0, 7);     // 본선 확정 7명
+        const playInA = pool[7];            // 8위
+        const playInB = pool[8];            // 9위
+
+        singlePrelim = { a: playInA.n, b: playInB.n, done: false };
+
+        // 본선 8강은 마지막 자리를 "?"로 비워두고 먼저 렌더 (예선 승자 들어갈 자리)
+        entities = [...main7, { n: "?" }];
+
+        // 예선 끝나면 8강 재생성용 캐시
+        pendingSingles = {
+          base7: main7.map(x => x.n),
+          a: playInA.n,
+          b: playInB.n
+        };
+
+      } else {
+        // 기존대로 8명 이하 → 그냥 진행
+        entities = pool.slice(0, 8);
+      }
+
     } else {
-      // ✅ 복식: 5명 같은 홀수도 버그 덜 나게(기존 구조 유지 + loser bench로 BYE 채움)
       let teamCount = Math.ceil(pool.length / 2);
       for(let i=0; i<teamCount; i++){
         let p1 = pool[i];
@@ -1009,25 +1076,40 @@
     $('bracket-section').style.display = 'block';
     $('bracket-section').scrollIntoView({behavior:'smooth'});
 
-    if(tType === 'double') {
+    // ✅ 단식 예선(9명 이상) UI 표시 / 복식은 기존 대기석
+    if (tType === 'single' && singlePrelim && !singlePrelim.done) {
+      showSinglePrelimUI(singlePrelim.a, singlePrelim.b);
+    } else if (tType === 'double') {
       $('loser-bench').style.display = 'block';
+      $('loser-bench').querySelector('h4').innerText = '🏃 패자 대기석 (클릭하여 대기팀에 투입)';
       $('loser-list').innerHTML = '<span style="color:#999; font-size:12px;">경기 결과 대기중...</span>';
     } else {
       $('loser-bench').style.display = 'none';
     }
 
-    setTimeout(() => autoResolveByes(currentBracketSize), 100);
+    setTimeout(() => autoResolveByes_FirstRoundOnly(currentBracketSize), 100);
   }
 
-  function autoResolveByes(size) {
-    let startR = (size === 4) ? 2 : 1;
-    for(let i=0; i<size/2; i++) {
-      let m = document.querySelector(`#r${startR}-m${i}`);
+  function autoResolveByes_FirstRoundOnly(size) {
+    const startR = (size === 4) ? 2 : 1;
+    const matchCount = size / 2;
+
+    for(let i=0; i<matchCount; i++) {
+      const m = document.querySelector(`#r${startR}-m${i}`);
       if(!m) continue;
-      let p1 = m.querySelector('.team:first-child');
-      let p2 = m.querySelector('.team:last-child');
-      if(p2.innerText === 'BYE') p1.click();
-      else if(p1.innerText === 'BYE') p2.click();
+      if(m.classList.contains('final-stage')) continue;
+
+      const t1 = m.querySelector('.team:first-child');
+      const t2 = m.querySelector('.team:last-child');
+      if(!t1 || !t2) continue;
+
+      const a = (t1.innerText || "").trim();
+      const b = (t2.innerText || "").trim();
+
+      if(a.includes('?') || b.includes('?')) continue;
+
+      if(b === 'BYE' && a !== 'BYE') t1.click();
+      else if(a === 'BYE' && b !== 'BYE') t2.click();
     }
   }
 
@@ -1080,19 +1162,137 @@
     </div>`;
   }
 
-  window.win = function(round, matchIdx, teamIdx, name, el) {
+  function parseTeamToPlayers(teamName) {
+    const t = String(teamName||"").trim();
+    if(!t || t==='BYE' || t.includes('?')) return [];
+    return t.split(',').map(s=>s.trim()).filter(x => x && x !== 'BYE' && x !== '?');
+  }
+
+  function bufferTournamentMatch(type, teamA, teamB, winnerTeamName) {
+    if(teamA === 'BYE' || teamB === 'BYE') return;
+    if(teamA.includes('?') || teamB.includes('?')) return;
+
+    const homeArr = parseTeamToPlayers(teamA);
+    const awayArr = parseTeamToPlayers(teamB);
+    if(homeArr.length === 0 || awayArr.length === 0) return;
+
+    const { ts, ds } = nowISO();
+    const winnerSide = (winnerTeamName === teamA) ? "home" : "away";
+
+    tourBuffer.push({
+      id: `${ts}-${Math.floor(Math.random()*100000)}`,
+      ts,
+      date: ds,
+      type,
+      home: homeArr,
+      away: awayArr,
+      hs: 0,
+      as: 0,
+      winner: winnerSide,
+      memo: "tournament"
+    });
+  }
+
+  async function commitTournamentIfNeeded() {
+    if (tournamentMode !== 'real') return;
+    if (tourCommitted) return;
+    if (!tourBuffer.length) return;
+
+    tourBuffer.forEach(le => {
+      applyMatchToPlayers(le.type, le.home, le.away, le.winner);
+      matchLog.unshift(le);
+    });
+
+    const ok = await pushWithMatchLogAppend(tourBuffer);
+    tourCommitted = ok;
+
+    if(ok){
+      alert(`토너먼트 결과 반영 완료 ✅\n(경기 ${tourBuffer.length}건 MatchLog 누적됨)`);
+      updateSeason(); updateWeekly();
+      renderStatsPlayerList();
+    } else {
+      alert("토너먼트 결과 반영 실패 😵‍💫\n(네트워크/GAS 상태 확인 필요)");
+    }
+  }
+
+  // ✅ v3.41: 단식 예선 UI + 승자 확정
+  function showSinglePrelimUI(a, b) {
+    const bench = $('loser-bench');
+    const list = $('loser-list');
+    if (!bench || !list) return;
+
+    bench.style.display = 'block';
+    bench.querySelector('h4').innerText = '🎾 단식 예선 (8위 vs 9위) — 승자를 클릭하면 8강 진입';
+    list.innerHTML = '';
+
+    [a, b].forEach(n => {
+      const chip = document.createElement('span');
+      chip.className = 'loser-chip';
+      chip.innerText = n;
+      chip.onclick = function() { resolveSinglePrelim(n); };
+      list.appendChild(chip);
+    });
+  }
+
+  function resolveSinglePrelim(winnerName) {
+    if (!singlePrelim || singlePrelim.done) return;
+    const a = singlePrelim.a;
+    const b = singlePrelim.b;
+    const loserName = (winnerName === a) ? b : a;
+
+    // pointsData 반영 (단식 승 +3 / 패 -0.5)
+    if (pointsData[winnerName]) { pointsData[winnerName].score += 3.0; pointsData[winnerName].win++; }
+    if (pointsData[loserName])  { pointsData[loserName].score += -0.5; pointsData[loserName].loss++; }
+
+    // 실전모드용 버퍼 기록
+    bufferTournamentMatch('single', a, b, winnerName);
+
+    singlePrelim.done = true;
+
+    // 8강 마지막 슬롯 '?'에 승자 넣어서 브라켓 재생성
+    if (pendingSingles) {
+      const mainNames = [...pendingSingles.base7, winnerName].map(n => ({ n }));
+      currentBracketSize = 8;
+
+      let fullList = [...mainNames];
+      while (fullList.length < currentBracketSize) fullList.push({ n: 'BYE' });
+
+      const matches = [
+        { p1: fullList[0], p2: fullList[7] },
+        { p1: fullList[3], p2: fullList[4] },
+        { p1: fullList[1], p2: fullList[6] },
+        { p1: fullList[2], p2: fullList[5] }
+      ];
+
+      renderWingTree(matches);
+
+      // 예선 UI 닫기
+      $('loser-bench').style.display = 'none';
+      $('loser-list').innerHTML = '';
+    }
+
+    updateScoreBoard();
+  }
+
+  window.win = async function(round, matchIdx, teamIdx, name, el) {
     if(name.includes('BYE')) return;
+
     const p = el.parentNode;
     if(p.querySelector('.winner')) return;
+
+    const t1El = p.querySelector('.team:first-child');
+    const t2El = p.querySelector('.team:last-child');
+    const teamA = (t1El?.innerText || "").trim();
+    const teamB = (t2El?.innerText || "").trim();
 
     p.querySelectorAll('.team').forEach(t => t.classList.add('loser'));
     el.classList.remove('loser');
     el.classList.add('winner');
 
-    let ln = '';
-    p.querySelectorAll('.team').forEach(t => { if(t !== el) ln = t.innerText.trim(); });
+    let loserName = '';
+    p.querySelectorAll('.team').forEach(t => { if(t !== el) loserName = (t.innerText || "").trim(); });
 
-    if(tType==='double' && !ln.includes('BYE')) registerLosers(ln);
+    if(tType==='double' && !loserName.includes('BYE') && loserName !== 'BYE') registerLosers(loserName);
 
     const winEarn = (tType === 'single') ? 3.0 : 2.0;
     const lossEarn = -0.5;
@@ -1101,23 +1301,26 @@
       if(pointsData[pn]) { pointsData[pn].score += winEarn; pointsData[pn].win++; }
     });
 
-    if(!ln.includes('BYE')) ln.split(',').forEach(pn => {
+    if(!loserName.includes('BYE') && loserName !== 'BYE') loserName.split(',').forEach(pn => {
       if(pointsData[pn]) { pointsData[pn].score += lossEarn; pointsData[pn].loss++; }
     });
 
     if(currentBracketSize === 8) {
-      if(round === 1) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 0.5; });
-      else if(round === 2) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
+      if(round === 1) loserName.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 0.5; });
+      else if(round === 2) loserName.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
     } else if(currentBracketSize === 4) {
-      if(round === 2) ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
+      if(round === 2) loserName.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 1.0; });
     }
+
+    bufferTournamentMatch(tType, teamA, teamB, name);
 
     if(p.classList.contains('final-stage') || round === 3) {
       $('champ-display').style.display = 'inline-flex';
       $('champ-name').innerText = name;
       name.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 3.0; });
-      ln.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 2.0; });
+      loserName.split(',').forEach(pn => { if(pointsData[pn]) pointsData[pn].finalBonus = 2.0; });
       updateScoreBoard();
+      await commitTournamentIfNeeded();
       return;
     }
 
@@ -1166,8 +1369,9 @@
   function injectPartner(name, chipElement) {
     let teams = document.querySelectorAll('.team');
     let found = false;
+
     for(let t of teams) {
-      let txt = t.innerText;
+      let txt = (t.innerText || "").trim();
       if(txt.includes(',') && (txt.includes('BYE') || txt.includes('?'))) {
         let newName = txt.replace('BYE', name).replace('?', name).trim();
         t.innerHTML = `<span>${escapeHtml(newName)}</span>`;
@@ -1177,7 +1381,8 @@
         t.onclick = function() { win(rd, mi, ti, newName, this); };
         chipElement.remove();
         found = true;
-        setTimeout(() => autoResolveByes(currentBracketSize), 50);
+
+        setTimeout(() => autoResolveByes_FirstRoundOnly(currentBracketSize), 50);
         break;
       }
     }
@@ -1187,12 +1392,20 @@
   function resetPage() {
     selected = [];
     pointsData = {};
+    tourBuffer = [];
+    tourCommitted = false;
+
+    // ✅ v3.41: 예선 상태 초기화
+    singlePrelim = null;
+    pendingSingles = null;
+
     document.querySelectorAll('.p-chk').forEach(c => c.checked = false);
     $('cnt').innerText = "0";
     $('bracket-section').style.display = 'none';
     $('setup-area').style.display = 'block';
     $('tree-root').innerHTML = '';
     $('loser-list').innerHTML = '';
+    $('loser-bench').style.display = 'none';
     $('champ-display').style.display = 'none';
     $('score-tbody').innerHTML = '';
     const v = document.getElementById('view-tournament');
@@ -1200,7 +1413,7 @@
   }
 
   /* =========================
-     ✅ 사다리 (v2.65 그대로 유지)
+     ✅ 사다리 (v3.3 유지)
      ========================= */
   var ldP = [];
   var ladderLines = [];
@@ -1352,7 +1565,7 @@
   }
 
   /* =========================
-     ✅ 날씨 (v2.65 그대로)
+     ✅ 날씨 (v3.3 유지)
      ========================= */
   async function loadWeather(d) {
     const isNextWeek = (d.getTime() > getWed(0).getTime());
@@ -1431,7 +1644,7 @@
   }
 
   /* =========================
-     ✅ v3.2 개인통계 (MatchLog 기반)
+     ✅ 개인통계 (v3.3 유지 / MatchLog 기반)
      ========================= */
   function renderStatsPlayerList() {
     const pDiv = $('stats-pList');
@@ -1471,7 +1684,6 @@
     if (!homeHas && !awayHas) return null;
     if (log.winner === "home") return homeHas;
     if (log.winner === "away") return awayHas;
-    // winner unknown -> score로 추론
     const hs = Number(log.hs ?? 0), as = Number(log.as ?? 0);
     if (hs === as) return null;
     const homeWin = hs > as;
@@ -1484,14 +1696,12 @@
   }
 
   function pickBestByRule(map, preferHigh=true) {
-    // map[name] = {w,l,sw,sl,dw,dl,totalGames}
     const entries = Object.entries(map);
     if (entries.length === 0) return null;
     entries.sort((a,b)=>{
       const A=a[1], B=b[1];
       const Ar = (A.w+A.l)>0 ? A.w/(A.w+A.l) : 0;
       const Br = (B.w+B.l)>0 ? B.w/(B.w+B.l) : 0;
-      // preferHigh: 승률 높은 순(파트너), false: 승률 낮은 순(천적)
       if (preferHigh) {
         if (Br !== Ar) return Br - Ar;
         if (B.w !== A.w) return B.w - A.w;
@@ -1515,7 +1725,6 @@
     report.style.display = 'block';
     $('target-name').innerText = `${displayName(name)} 분석 리포트`;
 
-    // 해당 선수 관련 로그만
     const logs = normalizeMatchLog(matchLog)
       .filter(l => isInTeam(l.home, name) || isInTeam(l.away, name))
       .sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -1529,7 +1738,6 @@
       .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
       .join('');
 
-    // 스트릭
     let streak = 0;
     let lastResult = recentResults.length ? recentResults[0] : null;
     if (lastResult !== null) {
@@ -1553,7 +1761,6 @@
       adviceText.innerHTML = `🎾 최근 폼은 출렁출렁. <br>서브/리턴 중 하나만 안정시키면 연승각 잡힌다.`;
     }
 
-    // 기본 전적/포인트(Players Data 기반 표는 유지)
     const sPt = (p.sScore || 0);
     const dPt = (p.dScore || 0);
     const totalPt = (Number(sPt) + Number(dPt)).toFixed(1);
@@ -1569,7 +1776,6 @@
       </tr>
     `;
 
-    // ✅ 파트너/천적 (MatchLog 기반)
     const partnerMap = {};
     const enemyMap = {};
 
@@ -1577,7 +1783,6 @@
       const win = didPlayerWin(l, name);
       if (win === null) return;
 
-      // 복식 파트너
       if (l.type === "double") {
         const partners = getPartnerNames(l, name);
         partners.forEach(pt => {
@@ -1589,11 +1794,9 @@
         });
       }
 
-      // 상대(단/복 모두)
       const opps = getOpponentNames(l, name);
       opps.forEach(op => {
         if(!enemyMap[op]) enemyMap[op] = { w:0, l:0, sw:0, sl:0, dw:0, dl:0, totalGames:0 };
-        // enemyMap에서 w/l은 "내가 그 사람 상대로 이긴/진" 기준
         if(win) enemyMap[op].w++; else enemyMap[op].l++;
         if (l.type === "single") {
           enemyMap[op].sw += win ? 1 : 0;
@@ -1612,8 +1815,7 @@
     if (bestPartner) {
       $('res-partner').innerText = displayName(bestPartner.name);
       const st = bestPartner.stat;
-      $('res-partner-sub').innerText =
-        `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+      $('res-partner-sub').innerText = `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
     } else {
       $('res-partner').innerText = "-";
       $('res-partner-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
@@ -1622,8 +1824,7 @@
     if (bestEnemy) {
       $('res-enemy').innerText = displayName(bestEnemy.name);
       const st = bestEnemy.stat;
-      $('res-enemy-sub').innerText =
-        `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+      $('res-enemy-sub').innerText = `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
     } else {
       $('res-enemy').innerText = "-";
       $('res-enemy-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
