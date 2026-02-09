@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.43</title>
+  <title>GrandSlam Ultimate v3.44</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -181,12 +181,13 @@
     #view-tournament .section-card { padding-bottom: 130px; }
     #view-tournament #setup-area { position: relative; z-index: 2; }
 
+    /* ✅ v3.44: 갤럭시23+ 등에서 승률 "(순위)" 잘림 방지 — 승률 칸 넓힘 */
     @media (max-width: 420px){
-      .tennis-table th:nth-child(1), .tennis-table td:nth-child(1){ width: 12%; white-space: nowrap; }
-      .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 44%; white-space: nowrap; }
-      .tennis-table th:nth-child(3), .tennis-table td:nth-child(3){ width: 20%; white-space: nowrap; }
-      .tennis-table th:nth-child(4), .tennis-table td:nth-child(4){ width: 12%; white-space: nowrap; }
-      .tennis-table th:nth-child(5), .tennis-table td:nth-child(5){ width: 12%; white-space: nowrap; }
+      .tennis-table th:nth-child(1), .tennis-table td:nth-child(1){ width: 12% !important; white-space: nowrap; }
+      .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 40% !important; white-space: nowrap; }
+      .tennis-table th:nth-child(3), .tennis-table td:nth-child(3){ width: 26% !important; white-space: nowrap; }
+      .tennis-table th:nth-child(4), .tennis-table td:nth-child(4){ width: 12% !important; white-space: nowrap; }
+      .tennis-table th:nth-child(5), .tennis-table td:nth-child(5){ width: 10% !important; white-space: nowrap; }
       .tennis-table td{ padding: 11px 6px; }
       .tennis-table th{ padding: 8px 6px; }
     }
@@ -218,7 +219,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.43</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.44</div>
   </div>
 </div>
 
@@ -314,6 +315,7 @@
       <div class="r-line r-mini">- ✅ v3.41: 단식 9명 출전 시 최하위 증발 버그 픽스(예선/대기석 방식)</div>
       <div class="r-line r-mini">- ✅ v3.42: 시즌/주간 + 종목별 테이블 전부 ▲▼ 변동 표시 + (-위) 버그 픽스</div>
       <div class="r-line r-mini">- ✅ v3.43: 개인통계 선택 버튼 활성화 + 최근폼/멘트 불일치 픽스</div>
+      <div class="r-line r-mini">- ✅ v3.44: 랭킹 승률 칸 확대 + 개인통계(단/복 분리) 개선</div>
     </div>
   </div>
 </div>
@@ -339,16 +341,30 @@
       </div>
       <div id="form-dots" style="display:flex; gap:6px; justify-content:center; margin-bottom:20px;"></div>
 
-      <div style="display:flex; gap:10px;">
-        <div class="team-box" style="flex:1; border:1px solid var(--aussie-blue); background:rgba(102, 157, 179, 0.05);">
-          <div style="font-size:11px; color:var(--aussie-blue); font-weight:bold;">최고의 파트너</div>
-          <div id="res-partner" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-partner-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">단식 0승 0패 / 복식 0승 0패</div>
+      <!-- ✅ v3.44: 단식/복식 분리 카드 2x2 -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="team-box" style="border:1px solid var(--aussie-blue); background:rgba(102, 157, 179, 0.05);">
+          <div style="font-size:11px; color:var(--aussie-blue); font-weight:bold;">단식 최고 승률 상대</div>
+          <div id="res-s-best" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-s-best-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">0승 0패</div>
         </div>
-        <div class="team-box" style="flex:1; border:1px solid var(--up-red); background:rgba(255, 59, 48, 0.05);">
-          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">최고의 천적</div>
-          <div id="res-enemy" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-enemy-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">단식 0승 0패 / 복식 0승 0패</div>
+
+        <div class="team-box" style="border:1px solid var(--up-red); background:rgba(255, 59, 48, 0.05);">
+          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">단식 최저 승률 상대</div>
+          <div id="res-s-worst" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-s-worst-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">0승 0패</div>
+        </div>
+
+        <div class="team-box" style="border:1px solid var(--wimbledon-sage); background:rgba(93, 156, 118, 0.06);">
+          <div style="font-size:11px; color:var(--wimbledon-sage); font-weight:bold;">복식 최고 승률 파트너</div>
+          <div id="res-d-partner" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-d-partner-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">복식 0승 0패</div>
+        </div>
+
+        <div class="team-box" style="border:1px solid var(--roland-clay); background:rgba(217, 140, 115, 0.10);">
+          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최저 승률 상대(천적)</div>
+          <div id="res-d-enemy" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
+          <div id="res-d-enemy-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">복식 0승 0패</div>
         </div>
       </div>
 
@@ -365,8 +381,9 @@
       <div class="rule-box" style="margin-top:14px;">
         <div class="r-tt"><span class="material-symbols-outlined">receipt_long</span>MatchLog 기반 계산</div>
         <div class="r-mini">- 최근 폼: 해당 선수의 MatchLog 최신 10경기(W/L)</div>
-        <div class="r-mini">- 파트너: <b>복식에서 같은 편</b>으로 뛴 사람 중 승률/승수 우선</div>
-        <div class="r-mini">- 천적: <b>상대편</b>으로 만난 사람 중 (내 승률 낮음/표본) 우선</div>
+        <div class="r-mini">- 단식 최고/최저: <b>단식 상대</b> 중 내 승률 기준</div>
+        <div class="r-mini">- 복식 파트너: <b>같은 편</b>으로 뛴 사람 중 내 승률/승수 우선</div>
+        <div class="r-mini">- 복식 천적: <b>상대편</b>으로 만난 사람 중 내 승률 낮음/표본 우선</div>
       </div>
     </div>
 
@@ -679,6 +696,7 @@
     });
   }
 
+  /* ✅ v3.44: 헤더 width 자체 조정 (승률 칸 확대) */
   function renderRankTable(tableId, scoreK, winK, lossK, lastK) {
     const calcRate = (p) => {
       const t = (p[winK]||0) + (p[lossK]||0);
@@ -698,7 +716,14 @@
 
     const sorted = [...players].sort((a,b) => (b[scoreK]||0) - (a[scoreK]||0) || calcRate(b) - calcRate(a));
     const table = $(tableId);
-    table.innerHTML = `<thead><tr><th style="width:12%;">순위</th><th style="width:44%;">이름</th><th style="width:20%;">승률</th><th style="width:12%;">승/패</th><th style="width:12%;">포인트</th></tr></thead><tbody></tbody>`;
+
+    table.innerHTML = `<thead><tr>
+      <th style="width:12%;">순위</th>
+      <th style="width:40%;">이름</th>
+      <th style="width:26%;">승률</th>
+      <th style="width:12%;">승/패</th>
+      <th style="width:10%;">포인트</th>
+    </tr></thead><tbody></tbody>`;
 
     let currentRank = 1;
     table.querySelector('tbody').innerHTML = sorted.map((p, i) => {
@@ -724,7 +749,7 @@
         </td>
         <td class="sub-info" style="white-space:nowrap;">${(calcRate(p)*100).toFixed(1)}% (${wrRanks[p.name]}위)</td>
         <td style="font-size:11px; white-space:nowrap;">${(p[winK]||0)}/${(p[lossK]||0)}</td>
-        <td class="point-text">${Number(p[scoreK]||0).toFixed(1)}</td>
+        <td class="point-text" style="white-space:nowrap;">${Number(p[scoreK]||0).toFixed(1)}</td>
       </tr>`;
     }).join('');
   }
@@ -1681,10 +1706,9 @@
   }
 
   /* =========================
-     ✅ 개인통계 (MatchLog 기반) — v3.43 FIX
+     ✅ 개인통계 (MatchLog 기반) — v3.44: 단/복 분리
      ========================= */
 
-  // ✅ (1) 참가 선수 선택: radio + label 로 바꿔서 "호주색 활성화" 자동 적용
   function renderStatsPlayerList() {
     const pDiv = $('stats-pList');
     if(!pDiv) return;
@@ -1736,7 +1760,6 @@
     return t>0 ? (((w||0)/t)*100).toFixed(1) : "0.0";
   }
 
-  // ✅ (2) 천적 선정 로직 보정: "내 승률 낮음" + "표본 큰" + "내 패배 많은" 우선
   function pickBestByRule(map, preferHigh=true) {
     const entries = Object.entries(map);
     if (entries.length === 0) return null;
@@ -1751,7 +1774,7 @@
         if (B.w !== A.w) return B.w - A.w;             // 승 수 많은 순
         if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames; // 표본 큰 순
       } else {
-        if (Ar !== Br) return Ar - Br;                 // 내 승률 낮은 순(=천적)
+        if (Ar !== Br) return Ar - Br;                 // 내 승률 낮은 순
         if (B.totalGames !== A.totalGames) return B.totalGames - A.totalGames; // 표본 큰 순
         if (B.l !== A.l) return B.l - A.l;             // 내가 더 많이 진 상대 우선
       }
@@ -1774,29 +1797,26 @@
       .filter(l => isInTeam(l.home, name) || isInTeam(l.away, name))
       .sort((a,b)=>(b.ts||0)-(a.ts||0));
 
-const recent = logs.slice(0,10);
+    const recent = logs.slice(0,10);
 
-const recentResults = recent
-  .map(l => didPlayerWin(l, name))
-  .filter(v => v === true || v === false);
+    const recentResults = recent
+      .map(l => didPlayerWin(l, name))
+      .filter(v => v === true || v === false);
 
-// ✅ 표시용: 오래된→최근 순으로 바꿔서 "오른쪽이 최신"
-const displayResults = recentResults.slice().reverse();
+    const displayResults = recentResults.slice().reverse();
 
-// ✅ 점 표시: 왼쪽=과거, 오른쪽=최근
-$('form-dots').innerHTML =
-  (displayResults.length ? displayResults : Array.from({length:10},()=>false))
-  .slice(0,10)
-  .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
-  .join('');
+    $('form-dots').innerHTML =
+      (displayResults.length ? displayResults : Array.from({length:10},()=>false))
+      .slice(0,10)
+      .map(win => `<div class="form-dot ${win?'win-dot':'loss-dot'}"></div>`)
+      .join('');
 
-// ✅ 연승/연패 판정도 "오른쪽(최신)" 기준으로
-let streak = 0;
-let lastResult = displayResults.length ? displayResults[displayResults.length - 1] : null;
+    let streak = 0;
+    let lastResult = displayResults.length ? displayResults[displayResults.length - 1] : null;
 
-if (lastResult !== null) {
-  for (let i = displayResults.length - 1; i >= 0; i--) {
-    if (displayResults[i] === lastResult) streak++;
+    if (lastResult !== null) {
+      for (let i = displayResults.length - 1; i >= 0; i--) {
+        if (displayResults[i] === lastResult) streak++;
         else break;
       }
     }
@@ -1804,7 +1824,6 @@ if (lastResult !== null) {
     const adviceBox = $('advice-box');
     const adviceText = $('res-advice');
 
-    // ✅ (3) FIX: 반말 → 존댓말
     if (lastResult === true && streak >= 2) {
       adviceBox.style.background = "var(--wimbledon-sage)";
       adviceText.innerHTML = `🔥 최근 ${streak}연승 스타트! 지금 폼이 좋습니다. <br>리턴 한 번만 더 붙이면 거의 끝입니다.`;
@@ -1831,58 +1850,76 @@ if (lastResult !== null) {
       </tr>
     `;
 
+    // ✅ v3.44: 단식 상대맵 / 복식 파트너맵 / 복식 상대맵(천적)
+    const singleOppMap = {};
     const partnerMap = {};
-    const enemyMap = {};
+    const doubleEnemyMap = {};
 
     logs.forEach(l => {
       const win = didPlayerWin(l, name);
       if (win === null) return;
 
-      if (l.type === "double") {
-        const partners = getPartnerNames(l, name);
-        partners.forEach(pt => {
-          if(!partnerMap[pt]) partnerMap[pt] = { w:0, l:0, sw:0, sl:0, dw:0, dl:0, totalGames:0 };
-          if(win) partnerMap[pt].w++; else partnerMap[pt].l++;
-          partnerMap[pt].dw += win ? 1 : 0;
-          partnerMap[pt].dl += win ? 0 : 1;
-          partnerMap[pt].totalGames++;
+      if (l.type === "single") {
+        const opps = getOpponentNames(l, name);
+        opps.forEach(op => {
+          if(!singleOppMap[op]) singleOppMap[op] = { w:0, l:0, totalGames:0 };
+          if(win) singleOppMap[op].w++; else singleOppMap[op].l++;
+          singleOppMap[op].totalGames++;
         });
       }
 
-      const opps = getOpponentNames(l, name);
-      opps.forEach(op => {
-        if(!enemyMap[op]) enemyMap[op] = { w:0, l:0, sw:0, sl:0, dw:0, dl:0, totalGames:0 };
-        if(win) enemyMap[op].w++; else enemyMap[op].l++;
-        if (l.type === "single") {
-          enemyMap[op].sw += win ? 1 : 0;
-          enemyMap[op].sl += win ? 0 : 1;
-        } else {
-          enemyMap[op].dw += win ? 1 : 0;
-          enemyMap[op].dl += win ? 0 : 1;
-        }
-        enemyMap[op].totalGames++;
-      });
+      if (l.type === "double") {
+        const partners = getPartnerNames(l, name);
+        partners.forEach(pt => {
+          if(!partnerMap[pt]) partnerMap[pt] = { w:0, l:0, totalGames:0 };
+          if(win) partnerMap[pt].w++; else partnerMap[pt].l++;
+          partnerMap[pt].totalGames++;
+        });
+
+        const opps = getOpponentNames(l, name);
+        opps.forEach(op => {
+          if(!doubleEnemyMap[op]) doubleEnemyMap[op] = { w:0, l:0, totalGames:0 };
+          if(win) doubleEnemyMap[op].w++; else doubleEnemyMap[op].l++;
+          doubleEnemyMap[op].totalGames++;
+        });
+      }
     });
 
-    const bestPartner = pickBestByRule(partnerMap, true);
-    const bestEnemy = pickBestByRule(enemyMap, false);
+    const sBest = pickBestByRule(singleOppMap, true);
+    const sWorst = pickBestByRule(singleOppMap, false);
+    const dBestPartner = pickBestByRule(partnerMap, true);
+    const dWorstEnemy = pickBestByRule(doubleEnemyMap, false);
 
-    if (bestPartner) {
-      $('res-partner').innerText = displayName(bestPartner.name);
-      const st = bestPartner.stat;
-      $('res-partner-sub').innerText = `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+    if (sBest) {
+      $('res-s-best').innerText = displayName(sBest.name);
+      $('res-s-best-sub').innerText = `${sBest.stat.w||0}승 ${sBest.stat.l||0}패`;
     } else {
-      $('res-partner').innerText = "-";
-      $('res-partner-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
+      $('res-s-best').innerText = "-";
+      $('res-s-best-sub').innerText = "0승 0패";
     }
 
-    if (bestEnemy) {
-      $('res-enemy').innerText = displayName(bestEnemy.name);
-      const st = bestEnemy.stat;
-      $('res-enemy-sub').innerText = `단식 ${st.sw||0}승 ${st.sl||0}패 / 복식 ${st.dw||0}승 ${st.dl||0}패`;
+    if (sWorst) {
+      $('res-s-worst').innerText = displayName(sWorst.name);
+      $('res-s-worst-sub').innerText = `${sWorst.stat.w||0}승 ${sWorst.stat.l||0}패`;
     } else {
-      $('res-enemy').innerText = "-";
-      $('res-enemy-sub').innerText = "단식 0승 0패 / 복식 0승 0패";
+      $('res-s-worst').innerText = "-";
+      $('res-s-worst-sub').innerText = "0승 0패";
+    }
+
+    if (dBestPartner) {
+      $('res-d-partner').innerText = displayName(dBestPartner.name);
+      $('res-d-partner-sub').innerText = `복식 ${dBestPartner.stat.w||0}승 ${dBestPartner.stat.l||0}패`;
+    } else {
+      $('res-d-partner').innerText = "-";
+      $('res-d-partner-sub').innerText = "복식 0승 0패";
+    }
+
+    if (dWorstEnemy) {
+      $('res-d-enemy').innerText = displayName(dWorstEnemy.name);
+      $('res-d-enemy-sub').innerText = `복식 ${dWorstEnemy.stat.w||0}승 ${dWorstEnemy.stat.l||0}패`;
+    } else {
+      $('res-d-enemy').innerText = "-";
+      $('res-d-enemy-sub').innerText = "복식 0승 0패";
     }
 
     report.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
