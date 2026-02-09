@@ -383,7 +383,7 @@
       </div>
 
       <table class="tour-score-table">
-        <thead><tr><th>구분</th><th>승률</th><th>승패</th><th>포인트</th></tr></thead>
+        <thead><tr><th>구분</th><th>승률</th><th>승패</th><th>총점</th></tr></thead>
         <tbody id="res-table"></tbody>
         <tfoot id="res-foot"></tfoot>
       </table>
@@ -451,7 +451,7 @@
         <div class="tour-section-title">실시간 랭킹</div>
         <div id="rules-display"></div>
         <table class="tour-score-table">
-          <thead><tr><th>순위</th><th>이름</th><th>승/패</th><th>포인트</th></tr></thead>
+          <thead><tr><th>순위</th><th>이름</th><th>승/패</th><th>총점</th></tr></thead>
           <tbody id="score-tbody"></tbody>
         </table>
       </div>
@@ -769,10 +769,10 @@
 
     table.innerHTML = `<thead><tr>
       <th style="width:12%;">순위</th>
-      <th style="width:40%;">이름</th>
+      <th style="width:35%;">이름</th>
       <th style="width:26%;">승률</th>
       <th style="width:12%;">승/패</th>
-      <th style="width:10%;">포인트</th>
+      <th style="width:15%;">총점</th>
     </tr></thead><tbody></tbody>`;
 
     let currentRank = 1;
