@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.47</title>
+  <title>GrandSlam Ultimate v3.48</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -65,7 +65,7 @@
     .tennis-table th { color: var(--wimbledon-sage); border-bottom: 2px solid var(--wimbledon-sage); padding: 8px; text-align: center; font-weight: 400; background: rgba(93, 156, 118, 0.1); }
     .tennis-table td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: 400; color: var(--text-dark); overflow: hidden; text-overflow: ellipsis; }
 
-    .point-text { color: var(--wimbledon-sage); font-weight: 400; }
+    .point-text { color: var(--wimbledon-sage); font-weight: 400; font-size: 11px; }
     .sub-info { font-size: 10px; color: #8E8E93; font-weight: 400; }
     .sub-rank-title { font-size: 15px; font-weight: 400; color: var(--text-dark); margin: 30px 0 10px 0; display: flex; align-items: center; gap: 5px; }
     .sub-rank-title .material-symbols-outlined { font-size: 18px; color: var(--wimbledon-sage); }
@@ -197,10 +197,10 @@
     
     @media (max-width: 420px){
       .tennis-table th:nth-child(1), .tennis-table td:nth-child(1){ width: 12% !important; white-space: nowrap; }
-      .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 40% !important; }
+      .tennis-table th:nth-child(2), .tennis-table td:nth-child(2){ width: 32% !important; }
       .tennis-table th:nth-child(3), .tennis-table td:nth-child(3){ width: 26% !important; }
       .tennis-table th:nth-child(4), .tennis-table td:nth-child(4){ width: 12% !important; white-space: nowrap; }
-      .tennis-table th:nth-child(5), .tennis-table td:nth-child(5){ width: 10% !important; white-space: nowrap; }
+      .tennis-table th:nth-child(5), .tennis-table td:nth-child(5){ width: 19% !important; white-space: nowrap; }
       .tennis-table td{ padding: 11px 6px; }
       .tennis-table th{ padding: 8px 6px; }
     }
@@ -232,7 +232,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.47</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.48</div>
   </div>
 </div>
 
@@ -329,7 +329,7 @@
       <div class="r-line r-mini">- ✅ v3.42: 시즌/주간 + 종목별 테이블 전부 ▲▼ 변동 표시 + (-위) 버그 픽스</div>
       <div class="r-line r-mini">- ✅ v3.43: 개인통계 선택 버튼 활성화 + 최근폼/멘트 불일치 픽스</div>
       <div class="r-line r-mini">- ✅ v3.44: 랭킹 승률 칸 확대 + 개인통계(단/복 분리) 개선</div>
-      <div class="r-line r-mini">- ✅ v3.47: 표에서 말줄임(...) 발생 시 자동 2줄 표시(autofit)</div>
+      <div class="r-line r-mini">- ✅ v3.48: 표에서 말줄임(...) 발생 시 자동 2줄 표시(autofit)</div>
     </div>
   </div>
 </div>
@@ -756,10 +756,10 @@
 
     table.innerHTML = `<thead><tr>
       <th style="width:12%;">순위</th>
-      <th style="width:35%;">이름</th>
+      <th style="width:32%;">이름</th>
       <th style="width:25%;">승률</th>
       <th style="width:12%;">승/패</th>
-      <th style="width:16%;">총점</th>
+      <th style="width:19%;">총점</th>
     </tr></thead><tbody></tbody>`;
 
     let currentRank = 1;
