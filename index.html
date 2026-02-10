@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.48</title>
+  <title>GrandSlam Ultimate v3.52 Stable Stable</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -23,11 +23,14 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; align-items: center; justify-content: center; z-index: 20000; }
+    #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; align-items: center; justify-content: center; z-index: 30000; }
     #splash img { width: 140px; height: 140px; border-radius: 24px; transition: transform 0.7s ease, opacity 0.6s ease; }
     #splash.hide img { transform: scale(5); opacity: 0; }
 
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-top: 1px solid #d1d1d6; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
+    
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(255,255,255,0.98); border-top: 1px solid #d1d1d6; display: flex !important; justify-content: space-around; align-items: center; z-index: 21000 !important; }
+    .app-screen { padding-bottom: 100px; } /* Ensure content doesn't hide behind nav */
+
     .nav-item { flex: 1; text-align: center; color: #C7C7CC; font-size: 10px; font-weight: 400; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; transition: color 0.2s; }
     .nav-item.active { color: var(--wimbledon-sage); }
     .material-symbols-outlined { font-size: 28px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
@@ -232,17 +235,22 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.48</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.52 Stable</div>
   </div>
 </div>
 
 <div id="view-tennis" class="app-screen">
   <div class="header-banner" onclick="location.reload()"><span class="material-symbols-outlined">emoji_events</span>GrandSlam Ranking</div>
-  <div class="tab-menu">
-    <button id="t1" class="tab-btn active" onclick="tab(1)">시즌랭킹</button>
-    <button id="t2" class="tab-btn" onclick="tab(2)">주간랭킹</button>
-    <button id="t3" class="tab-btn" onclick="tab(3)">경기기록</button>
-    <button id="t4" class="tab-btn" onclick="tab(4)">선수관리</button>
+    <div class="tab-menu">
+    <button id="t1" class="tab-btn active" onclick="tab(1)" style="display:flex; align-items:center; justify-content:center; gap:4px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">leaderboard</span>시즌랭킹
+    </button>
+    <button id="t2" class="tab-btn" onclick="tab(2)" style="display:flex; align-items:center; justify-content:center; gap:4px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">calendar_month</span>주간랭킹
+    </button>
+    <button id="t3" class="tab-btn" onclick="tab(3)" style="display:flex; align-items:center; justify-content:center; gap:4px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">diversity_3</span>교류전랭킹
+    </button>
   </div>
 
   <div id="s1" class="section-card active">
@@ -267,7 +275,17 @@
     <div class="sub-rank-title">👤 주간 단식 순위</div><table id="weeklySingleTable" class="tennis-table"></table>
   </div>
 
-  <div id="s3" class="section-card">
+  
+
+  
+</div>
+
+
+<!-- 경기기록 View -->
+<div id="view-record" class="app-screen" style="display:none;">
+  <div class="header-banner"><span class="material-symbols-outlined">sports_tennis</span>경기기록</div>
+  <div class="section-card active" style="display:block;">
+    
     <div style="display:flex; gap:8px;">
       <button id="m_db" class="type-btn selected" onclick="setM('double')">복식</button>
       <button id="m_sg" class="type-btn" onclick="setM('single')">단식</button>
@@ -297,9 +315,18 @@
       <div class="r-mini">- 패배: <b>-0.5</b> (총점 0.5점) / L+1</div>
       <div class="r-line r-mini">🏆 <b>순위</b>: 점수 &gt; 승률 &gt; 승수 &gt; 경기참여수</div>
     </div>
+  
   </div>
+  <div style="padding: 0 15px;">
+    <button class="btn-main" onclick="showView('game')" style="background:var(--text-gray); margin-top:20px;">뒤로가기</button>
+  </div>
+</div>
 
-  <div id="s4" class="section-card">
+<!-- 선수관리 View -->
+<div id="view-player-mgmt" class="app-screen" style="display:none;">
+  <div class="header-banner"><span class="material-symbols-outlined">person_search</span>선수 관리</div>
+  <div class="section-card active" style="display:block;">
+    
     <h3>👥 선수 등록</h3>
     <div class="search-row" style="margin-bottom:20px;">
       <input type="text" id="pI" class="w-input" style="width:75%;" placeholder="성함">
@@ -308,15 +335,15 @@
 
     <table id="pL" class="tennis-table"><tbody></tbody></table>
 
-    <hr>
-    <button class="btn-sub sky" onclick="resetScoresKeepPlayers()">점수 초기화</button>
-    <button class="btn-sub royal" onclick="resetWeeklyOnly()">주간 리셋</button>
-    <button class="btn-sub navy" onclick="adminResetAll()">전체 삭제</button>
-    <hr>
+    
+    
+    
+    
+    
 
-    <button id="btnOmitNim" class="btn-sub sky" onclick="toggleOmitNim()">모바일 이름 '님' 생략: ON</button>
+    
 
-    <button id="btnTourMode" class="btn-sub" style="background:#34C759;" onclick="toggleTournamentMode()">🟩 토너먼트 연습 모드 (기록반영 X)</button>
+    
 
     <div class="rule-box" style="margin-top:16px;">
       <div class="r-tt"><span class="material-symbols-outlined">database</span>v3.4 저장 구조</div>
@@ -329,8 +356,21 @@
       <div class="r-line r-mini">- ✅ v3.42: 시즌/주간 + 종목별 테이블 전부 ▲▼ 변동 표시 + (-위) 버그 픽스</div>
       <div class="r-line r-mini">- ✅ v3.43: 개인통계 선택 버튼 활성화 + 최근폼/멘트 불일치 픽스</div>
       <div class="r-line r-mini">- ✅ v3.44: 랭킹 승률 칸 확대 + 개인통계(단/복 분리) 개선</div>
-      <div class="r-line r-mini">- ✅ v3.48: 표에서 말줄임(...) 발생 시 자동 2줄 표시(autofit)</div>
+      <div class="r-line r-mini">- ✅ v3.52 Stable: 표에서 말줄임(...) 발생 시 자동 2줄 표시(autofit)</div>
     </div>
+  
+    
+    <hr>
+    <button class="btn-sub sky" onclick="resetScoresKeepPlayers()">점수 초기화 (선수유지)</button>
+    <button class="btn-sub royal" onclick="resetWeeklyOnly()">주간 리셋</button>
+    <button class="btn-sub navy" onclick="adminResetAll()">전체 삭제 (초기화)</button>
+    <hr>
+    <button id="btnOmitNim" class="btn-sub sky" onclick="toggleOmitNim()">모바일 이름 '님' 생략: ON</button>
+    <button id="btnTourMode" class="btn-sub" style="background:#34C759;" onclick="toggleTournamentMode()">🟩 토너먼트 연습 모드 (기록반영 X)</button>
+
+  </div>
+  <div style="padding: 0 15px;">
+    <button class="btn-main" onclick="showView('admin')" style="background:var(--text-gray); margin-top:20px;">뒤로가기</button>
   </div>
 </div>
 
@@ -345,8 +385,8 @@
     <div class="player-grid" id="stats-pList"></div>
 
     <div id="stats-report" style="display:none;">
-      <div style="text-align:center; margin-bottom:20px;">
-        <h2 id="target-name" style="margin:0; font-weight:400; font-size: 22px;">선수 리포트</h2>
+      <div style="text-align:center; margin-bottom:20px; background:var(--aussie-blue); padding:15px; border-radius:16px;">
+        <h2 id="target-name" style="margin:0; font-weight:400; font-size: 20px; color:white;">선수 리포트</h2>
         <div style="width:40px; height:3px; background:var(--roland-clay); margin:8px auto;"></div>
       </div>
 
@@ -356,33 +396,38 @@
       <div id="form-dots" style="display:flex; gap:6px; justify-content:center; margin-bottom:20px;"></div>
 
       
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
         <div class="team-box" style="border:1px solid var(--aussie-blue); background:rgba(102, 157, 179, 0.05);">
           <div style="font-size:11px; color:var(--aussie-blue); font-weight:bold;">단식 최고 승률 상대</div>
-          <div id="res-s-best" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-s-best-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">0승 0패</div>
+          <div id="res-s-best" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-s-best-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
-
         <div class="team-box" style="border:1px solid var(--up-red); background:rgba(255, 59, 48, 0.05);">
-          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">단식 최저 승률 상대</div>
-          <div id="res-s-worst" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-s-worst-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">0승 0패</div>
+          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">단식 최저 승률 상대(천적)</div>
+          <div id="res-s-worst" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-s-worst-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
-
         <div class="team-box" style="border:1px solid var(--wimbledon-sage); background:rgba(93, 156, 118, 0.06);">
           <div style="font-size:11px; color:var(--wimbledon-sage); font-weight:bold;">복식 최고 승률 파트너</div>
-          <div id="res-d-partner" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-d-partner-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">복식 0승 0패</div>
+          <div id="res-d-partner" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-d-partner-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
-
+        <div class="team-box" style="border:1px solid #AF52DE; background:rgba(175, 82, 222, 0.05);">
+          <div style="font-size:11px; color:#AF52DE; font-weight:bold;">복식 최저 승률 파트너(천적)</div>
+          <div id="res-d-partner-worst" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-d-partner-worst-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
+        </div>
         <div class="team-box" style="border:1px solid var(--roland-clay); background:rgba(217, 140, 115, 0.10);">
-          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최저 승률 상대(천적)</div>
-          <div id="res-d-enemy" style="font-size:16px; margin-top:5px; color:var(--text-dark);">-</div>
-          <div id="res-d-enemy-sub" style="font-size:10px; margin-top:4px; color:var(--text-gray);">복식 0승 0패</div>
+          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최저 승률 상대1(천적1)</div>
+          <div id="res-d-enemy1" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-d-enemy1-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
-      </div>
-
-      <table class="tour-score-table">
+        <div class="team-box" style="border:1px solid var(--roland-clay); background:rgba(217, 140, 115, 0.10);">
+          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최저 승률 상대2(천적2)</div>
+          <div id="res-d-enemy2" style="font-size:16px; margin-top:5px;">-</div>
+          <div id="res-d-enemy2-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
+        </div>
+      </div><table class="tour-score-table">
         <thead><tr><th>구분</th><th>승률</th><th>승패</th><th>총점</th></tr></thead>
         <tbody id="res-table"></tbody>
         <tfoot id="res-foot"></tfoot>
@@ -481,13 +526,59 @@
   </div>
 </div>
 
-<nav class="bottom-nav">
-  <div class="nav-item active" onclick="switchView('weather', this)"><span class="material-symbols-outlined nav-icon">wb_sunny</span>날씨</div>
-  <div class="nav-item" onclick="switchView('tennis', this)"><span class="material-symbols-outlined nav-icon">emoji_events</span>랭킹</div>
-  <div class="nav-item" onclick="switchView('stats', this)"><span class="material-symbols-outlined nav-icon">monitoring</span>통계</div>
-  <div class="nav-item" onclick="switchView('tournament', this)"><span class="material-symbols-outlined nav-icon">leaderboard</span>토너먼트</div>
-  <div class="nav-item" onclick="switchView('ladder', this)"><span class="material-symbols-outlined nav-icon">stairs</span>사다리</div>
-</nav>
+
+<div id="view-game" class="app-screen" style="display:none;">
+  <div class="header-banner"><span class="material-symbols-outlined">sports_tennis</span>Game Hub</div>
+  <div style="padding:14px;">
+    <div class="section-card active" style="display:block;">
+      <div class="sub-rank-title"><span class="material-symbols-outlined" style="vertical-align:middle; font-size:20px; margin-right:5px;">sports_tennis</span>게임 바로가기</div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+        <button class="btn-purple-main" onclick="showView('record')" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span class="material-symbols-outlined">scoreboard</span> 단일게임 (단/복)
+        </button>
+        <button class="btn-purple-main" onclick="openTournament()" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span class="material-symbols-outlined">tour</span> 토너먼트
+        </button>
+        <button class="btn-purple-main" onclick="openLadder()" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span class="material-symbols-outlined">stairs</span> 사다리 (번외)
+        </button>
+        <button class="btn-purple-main" onclick="comingSoon('라운드')" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--text-gray);">
+          <span class="material-symbols-outlined">cached</span> 라운드 (준비중)
+        </button>
+        <button class="btn-purple-main" onclick="comingSoon('교류전')" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--text-gray);">
+          <span class="material-symbols-outlined">handshake</span> 교류전 (4.0에서 오픈)
+        </button>
+      </div>
+      <p style="margin-top:12px; color:#8E8E93; font-size:12px; line-height:1.4;">
+        ※ v3.5는 구조 정리판. 교류전/클럽 시스템은 v4.0에서 본격 도입.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="view-admin" class="app-screen" style="display:none;">
+  <div class="header-banner"><span class="material-symbols-outlined">settings</span>운영</div>
+  <div style="padding:14px;">
+    <div class="section-card active" style="display:block;">
+      <div class="sub-rank-title"><span class="material-symbols-outlined" style="vertical-align:middle; font-size:20px; margin-right:5px;">list_alt</span>관리 메뉴</div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+        <button class="btn-purple-main" onclick="checkAdminAndShow('player-mgmt')" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span class="material-symbols-outlined">person_search</span> 선수 관리
+        </button>
+        <button class="btn-purple-main" onclick="comingSoon('클럽 관리')" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--text-gray);">
+          <span class="material-symbols-outlined">home_work</span> 클럽 관리 (4.0)
+        </button>
+        <button class="btn-purple-main" onclick="comingSoon('데이터 백업')" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--text-gray);">
+          <span class="material-symbols-outlined">cloud_sync</span> 데이터 백업 (추가 예정)
+        </button>
+      </div>
+      <p style="margin-top:12px; color:#8E8E93; font-size:12px; line-height:1.4;">
+        ※ 선수/회원 관리 기능은 기존 화면의 ‘선수관리’ 탭으로 연결된다.
+      </p>
+    </div>
+  </div>
+</div>
+
 
 <script>
   
@@ -672,22 +763,15 @@
     return p;
   }
 
-  function tab(n) {
-    if(n === 4 && !adminUnlocked){
-      const pw = prompt("선수관리 비번?");
-      if(pw !== ADMIN_PIN) { alert("비번 틀림!"); return; }
-      adminUnlocked = true;
-    }
+    function tab(n) {
+    if(n === 3) { alert('교류전 랭킹은 4.0에서 오픈!'); return; }
     tabNow=n;
-    for(let i=1; i<=4; i++){
+    for(let i=1; i<=2; i++){
       if($('s'+i)) $('s'+i).style.display=(i==n?'block':'none');
       if($('t'+i)) $('t'+i).className=(i==n?'tab-btn active':'tab-btn');
     }
     if(n==1){ updateSeason(); updateChartRange(0); }
     if(n==2) updateWeekly();
-    if(n==3) renderPool();
-    if(n==4) { updatePlayerList(); refreshOmitNimBtn(); }
-
     setTimeout(applyAutofitAllTables, 0);
   }
 
@@ -950,6 +1034,21 @@
     setTimeout(applyAutofitAllTables, 0);
   }
 
+  
+  function editP(oldName){
+    const newName = prompt("이름 수정:", oldName);
+    if(newName && newName.trim() && newName !== oldName){
+      const p = players.find(x => x.name === oldName);
+      if(p) { 
+        p.name = newName.trim(); 
+        matchLog.forEach(l => {
+          if(Array.isArray(l.home)) l.home = l.home.map(n => n === oldName ? p.name : n);
+          if(Array.isArray(l.away)) l.away = l.away.map(n => n === oldName ? p.name : n);
+        });
+        pushDataOnly(); updatePlayerList(); renderStatsPlayerList(); alert("수정 완료!");
+      }
+    }
+  }
   function addP(){
     var n=$('pI').value.trim();
     if(n && !players.find(p=>p.name==n)){
@@ -1001,20 +1100,23 @@
     $('aN').innerText='';
   }
 
-  function updatePlayerList(){
+    function updatePlayerList(){
     document.querySelector('#pL tbody').innerHTML = players.map(p=>`<tr>
       <td style="text-align:left; padding-left:15px; font-weight:400;">${escapeHtml(p.name)}</td>
-      <td style="text-align:right;">
+      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
+        <button onclick="editP('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:var(--aussie-blue); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">수정</button>
         <button onclick="delP('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:var(--roland-clay); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">삭제</button>
       </td>
     </tr>`).join('');
   }
 
-  function resetScoresKeepPlayers(){
+  async function resetScoresKeepPlayers(){
     if(prompt("비번?")===ADMIN_PIN){
       players.forEach(p=>{ Object.keys(p).forEach(k=>{ if(k!=='name') p[k]=0; }); });
-      pushDataOnly();
+      matchLog = [];
+      await pushPayload({ action: "save", data: players, matchLogAppend: [], matchLogReset: true });
       tab(1);
+      renderStatsPlayerList();
       setTimeout(applyAutofitAllTables, 0);
     }
   }
@@ -1030,27 +1132,68 @@
     }
   }
 
-  function adminResetAll(){
+  async function adminResetAll(){
     if(prompt("비번?")===ADMIN_PIN){
-      players=[];
-      matchLog=[];
-      pushPayload({ action: "adminResetAll" });
-      location.reload();
+      if(confirm("정말로 모든 데이터(선수 포함)를 삭제하시겠습니까?")){
+        players=[];
+        matchLog=[];
+        await pushPayload({ action: "adminResetAll" });
+        await pushPayload({ action: "saveDataOnly", data: [] });
+        location.reload();
+      }
     }
   }
 
   function switchView(v, b) {
-    document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none');
-    document.getElementById(`view-${v}`).style.display='block';
     document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-    b.classList.add('active');
+    if(b) b.classList.add('active');
+    showView(v);
+  }
 
+  // ===== v3.5 구조 정리: Game/운영 허브 =====
+  
+function checkAdminAndShow(viewName) {
+    if (viewName === 'player-mgmt' && !adminUnlocked) {
+      if (prompt("관리자 비밀번호?") !== ADMIN_PIN) { alert("비번 틀림!"); return; }
+      adminUnlocked = true;
+    }
+    showView(viewName);
+}
+function showView(v){
+    document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none');
+    const el = document.getElementById(`view-${v}`);
+    if(el) el.style.display='block';
+    // subviews에서도 표는 자동 보정
+    setTimeout(applyAutofitAllTables, 0);
+
+    // 기존 훅 유지
     if(v==='tennis') sync();
+    if(v==='player-mgmt') { updatePlayerList(); refreshOmitNimBtn(); }
+    if(v==='record') renderPool();
     if(v==='ladder') renderLadderPlayerPool();
     if(v==='tournament') initTournament();
     if(v==='stats') renderStatsPlayerList();
+  }
 
-    setTimeout(applyAutofitAllTables, 0);
+  function openSingleGame(){
+    // 랭킹 화면의 '경기기록' 탭(s3)로 바로 이동
+    showView('tennis');
+    tab(3);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function openPlayerManager(){
+    // 랭킹 화면의 '선수관리' 탭(s4)로 바로 이동
+    showView('tennis');
+    tab(4);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function openTournament(){ showView('tournament'); window.scrollTo({top:0, behavior:'smooth'}); }
+  function openLadder(){ showView('ladder'); window.scrollTo({top:0, behavior:'smooth'}); }
+
+  function comingSoon(name){
+    alert(`${name}은(는) 다음 버전에서 오픈!`);
   }
 
   function toggleTournamentMode() {
@@ -1923,42 +2066,37 @@
       }
     });
 
+        
     const sBest = pickBestByRule(singleOppMap, true);
     const sWorst = pickBestByRule(singleOppMap, false);
     const dBestPartner = pickBestByRule(partnerMap, true);
-    const dWorstEnemy = pickBestByRule(doubleEnemyMap, false);
+    const dWorstPartner = pickBestByRule(partnerMap, false);
+    const dEnemies = Object.entries(doubleEnemyMap).sort((a,b)=>{
+      const Ar=(a[1].w+a[1].l)>0?a[1].w/(a[1].w+a[1].l):0, Br=(b[1].w+b[1].l)>0?b[1].w/(b[1].w+b[1].l):0;
+      return Ar-Br || b[1].totalGames-a[1].totalGames;
+    });
+    const dE1 = dEnemies[0], dE2 = dEnemies[1];
 
-    if (sBest) {
-      $('res-s-best').innerText = displayName(sBest.name);
-      $('res-s-best-sub').innerText = `${sBest.stat.w||0}승 ${sBest.stat.l||0}패`;
-    } else {
-      $('res-s-best').innerText = "-";
-      $('res-s-best-sub').innerText = "0승 0패";
-    }
+    // v5.05 핵심 로직: 실제 경기수(w+l)가 0보다 클 때만 이름을 노출
+    const isValid = (obj) => obj && (obj.w + obj.l) > 0;
 
-    if (sWorst) {
-      $('res-s-worst').innerText = displayName(sWorst.name);
-      $('res-s-worst-sub').innerText = `${sWorst.stat.w||0}승 ${sWorst.stat.l||0}패`;
-    } else {
-      $('res-s-worst').innerText = "-";
-      $('res-s-worst-sub').innerText = "0승 0패";
-    }
+    $('res-s-best').innerText = (sBest && isValid(sBest.stat)) ? displayName(sBest.name) : "-";
+    $('res-s-best-sub').innerText = (sBest && isValid(sBest.stat)) ? `${sBest.stat.w}승 ${sBest.stat.l}패` : "0승 0패";
 
-    if (dBestPartner) {
-      $('res-d-partner').innerText = displayName(dBestPartner.name);
-      $('res-d-partner-sub').innerText = `복식 ${dBestPartner.stat.w||0}승 ${dBestPartner.stat.l||0}패`;
-    } else {
-      $('res-d-partner').innerText = "-";
-      $('res-d-partner-sub').innerText = "복식 0승 0패";
-    }
+    $('res-s-worst').innerText = (sWorst && isValid(sWorst.stat)) ? displayName(sWorst.name) : "-";
+    $('res-s-worst-sub').innerText = (sWorst && isValid(sWorst.stat)) ? `${sWorst.stat.w}승 ${sWorst.stat.l}패` : "0승 0패";
 
-    if (dWorstEnemy) {
-      $('res-d-enemy').innerText = displayName(dWorstEnemy.name);
-      $('res-d-enemy-sub').innerText = `복식 ${dWorstEnemy.stat.w||0}승 ${dWorstEnemy.stat.l||0}패`;
-    } else {
-      $('res-d-enemy').innerText = "-";
-      $('res-d-enemy-sub').innerText = "복식 0승 0패";
-    }
+    $('res-d-partner').innerText = (dBestPartner && isValid(dBestPartner.stat)) ? displayName(dBestPartner.name) : "-";
+    $('res-d-partner-sub').innerText = (dBestPartner && isValid(dBestPartner.stat)) ? `${dBestPartner.stat.w}승 ${dBestPartner.stat.l}패` : "0승 0패";
+
+    $('res-d-partner-worst').innerText = (dWorstPartner && isValid(dWorstPartner.stat)) ? displayName(dWorstPartner.name) : "-";
+    $('res-d-partner-worst-sub').innerText = (dWorstPartner && isValid(dWorstPartner.stat)) ? `${dWorstPartner.stat.w}승 ${dWorstPartner.stat.l}패` : "0승 0패";
+
+    $('res-d-enemy1').innerText = (dE1 && isValid(dE1[1])) ? displayName(dE1[0]) : "-";
+    $('res-d-enemy1-sub').innerText = (dE1 && isValid(dE1[1])) ? `${dE1[1].w}승 ${dE1[1].l}패` : "0승 0패";
+
+    $('res-d-enemy2').innerText = (dE2 && isValid(dE2[1])) ? displayName(dE2[0]) : "-";
+    $('res-d-enemy2-sub').innerText = (dE2 && isValid(dE2[1])) ? `${dE2[1].w}승 ${dE2[1].l}패` : "0승 0패";
 
     report.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -1983,5 +2121,12 @@
     setTimeout(applyAutofitAllTables, 0);
   });
 </script>
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="switchView('weather', this)"><span class="material-symbols-outlined nav-icon">wb_sunny</span>날씨</div>
+  <div class="nav-item" onclick="switchView('game', this)"><span class="material-symbols-outlined nav-icon">sports_tennis</span>게임</div>
+  <div class="nav-item" onclick="switchView('tennis', this)"><span class="material-symbols-outlined nav-icon">emoji_events</span>랭킹</div>
+  <div class="nav-item" onclick="switchView('stats', this)"><span class="material-symbols-outlined nav-icon">monitoring</span>통계</div>
+  <div class="nav-item" onclick="switchView('admin', this)"><span class="material-symbols-outlined nav-icon">settings</span>운영</div>
+</nav>
 </body>
 </html>
