@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.63</title>
+  <title>GrandSlam Ultimate v3.65</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -239,7 +239,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.63</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.65</div>
   </div>
 </div>
 
@@ -378,7 +378,7 @@
       <div class="r-line r-mini">- ✅ v3.59: 토너/통계/사다리 Flex 레이아웃 통일 — 단일게임 스타일 적용 (상하분리+큼직버튼)</div>
       <div class="r-line r-mini">- ✅ v3.60: CSS 클래스 충돌 제거 — 순수 인라인 스타일 + !important로 Grid 충돌 완전 해결</div>
       <div class="r-line r-mini">- ✅ v3.61: HTML 부모 컨테이너 클래스 제거 — player-grid/pool-ladder 클래스 삭제로 Grid 완전 차단</div>
-      <div class="r-line r-mini">- ✅ v3.63: UI 통일 완성 — ① 게스트 라벨만 회색 ② 왼쪽정렬 ③ 전체 뒤로가기 버튼 ④ 차트 게스트제외</div>
+      <div class="r-line r-mini">- ✅ v3.65: UI 통일 완성 — ① 게스트 라벨만 회색 ② 왼쪽정렬 ③ 전체 뒤로가기 버튼 ④ 차트 게스트제외</div>
     </div>
   
     
@@ -705,21 +705,52 @@
   
   function normalizeMatchLog(arr) {
     if (!Array.isArray(arr)) return [];
-    return arr
+    const norm = arr
       .filter(Boolean)
-      .map(x => ({
-        id: x.id || x._id || x.ts || String(Date.now()) + Math.random(),
-        ts: x.ts || x.timestamp || x.time || Date.now(),
-        date: x.date || x.ds || "",
-        type: x.type || x.mType || "double",
-        home: Array.isArray(x.home) ? x.home : (typeof x.home === "string" ? x.home.split(",").map(s=>s.trim()).filter(Boolean) : []),
-        away: Array.isArray(x.away) ? x.away : (typeof x.away === "string" ? x.away.split(",").map(s=>s.trim()).filter(Boolean) : []),
-        hs: Number(x.hs ?? x.homeScore ?? x.hS ?? 0),
-        as: Number(x.as ?? x.awayScore ?? x.aS ?? 0),
-        winner: x.winner || "",
-        memo: x.memo || ""
-      }));
+      .map(x => {
+        const home = Array.isArray(x.home) ? x.home
+          : (typeof x.home === "string" ? x.home.split(",").map(s=>s.trim()).filter(Boolean) : []);
+        const away = Array.isArray(x.away) ? x.away
+          : (typeof x.away === "string" ? x.away.split(",").map(s=>s.trim()).filter(Boolean) : []);
+        const type = x.type || x.mType || "double";
+        const hs = Number(x.hs ?? x.homeScore ?? x.hS ?? 0);
+        const as = Number(x.as ?? x.awayScore ?? x.aS ?? 0);
+        const winner = x.winner || "";
+        const ts = Number(x.ts || x.timestamp || x.time || Date.now());
+
+        // ✅ A unique, stable matchId prevents duplicated appends from inflating stats.
+        // Prefer explicit ids if present, otherwise derive a deterministic id from content.
+        let id = x.id || x._id || x.matchId || x.mid || "";
+        if (!id) {
+          const hKey = home.join("|");
+          const aKey = away.join("|");
+          id = `${ts}-${type}-${hKey}__${aKey}-${hs}-${as}-${winner}`;
+        }
+
+        return {
+          id,
+          ts,
+          date: x.date || x.ds || "",
+          type,
+          home,
+          away,
+          hs,
+          as,
+          winner,
+          memo: x.memo || ""
+        };
+      });
+
+    // ✅ Dedupe by id (keep the most recent ts)
+    const byId = new Map();
+    norm.forEach(m => {
+      const prev = byId.get(m.id);
+      if (!prev || Number(m.ts) >= Number(prev.ts)) byId.set(m.id, m);
+    });
+
+    return Array.from(byId.values()).sort((a,b) => Number(b.ts) - Number(a.ts));
   }
+
 
   async function sync() {
     $('loading-overlay').style.display = 'flex';
@@ -855,9 +886,55 @@
   }
 
   
-  function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
+  
+  function aggregateSeasonForNamesFromLog(nameList){
+    const set = new Set(nameList || []);
+    const out = {};
+    (nameList||[]).forEach(n=>{
+      out[n]={score:0,wins:0,losses:0,dScore:0,dWins:0,dLosses:0,sScore:0,sWins:0,sLosses:0};
+    });
+    (matchLog||[]).forEach(m=>{
+      const type = (m.type||"double");
+      const winner = m.winner || "";
+      const home = Array.isArray(m.home) ? m.home : [];
+      const away = Array.isArray(m.away) ? m.away : [];
+
+      const applyOne = (name, isHomeSide) => {
+        if(!set.has(name)) return;
+        const isWin = (winner === (isHomeSide ? "home" : "away"));
+        const d = calcDeltas(type, isWin);
+        const s = out[name];
+
+        s.score += d.total;
+        s.wins += isWin ? 1 : 0;
+        s.losses += isWin ? 0 : 1;
+
+        if(type === "double"){
+          s.dScore += d.d;
+          s.dWins += isWin ? 1 : 0;
+          s.dLosses += isWin ? 0 : 1;
+        } else {
+          s.sScore += d.s;
+          s.sWins += isWin ? 1 : 0;
+          s.sLosses += isWin ? 0 : 1;
+        }
+      };
+
+      home.forEach(n=>applyOne(n,true));
+      away.forEach(n=>applyOne(n,false));
+    });
+    return out;
+  }
+
+function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     const baseList = (() => {
-      if (filterMode === 'guest') return players.filter(p => p.isGuest);
+      if (filterMode === 'guest') {
+        const guests = players.filter(p => p.isGuest);
+        const names = guests.map(p=>p.name);
+        const agg = aggregateSeasonForNamesFromLog(names);
+        // Merge computed season stats into the current player objects (keeps last-rank fields)
+        return guests.map(p => Object.assign({}, p, agg[p.name] || {}));
+      }
       if (filterMode === 'all') return [...players];
       // 기본: 정식 회원(게스트가 아닌 선수)만 랭킹에 포함
       return players.filter(p => !p.isGuest);
@@ -2197,22 +2274,41 @@ function showView(v){
       adviceText.innerHTML = `🎾 최근 폼이 조금 출렁입니다. <br>서브/리턴 중 하나만 안정시키면 연승 흐름이 잡힙니다.`;
     }
 
-    const sPt = (p.sScore || 0);
-    const dPt = (p.dScore || 0);
-    const totalPt = (Number(sPt) + Number(dPt)).toFixed(1);
+    // ✅ v3.65: 통계 하단 전적표는 players 누적치가 아니라 matchLog 기반으로 실시간 재집계
+    let sWins = 0, sLosses = 0, sScore = 0;
+    let dWins = 0, dLosses = 0, dScore = 0;
+
+    logs.forEach(l => {
+      const win = didPlayerWin(l, name);
+      if (win === null) return;
+
+      const t = (l.type === "double") ? "double" : "single";
+      const d = calcDeltas(t, win);
+
+      if (t === "double") {
+        dScore += (d.d || 0);
+        if (win) dWins++; else dLosses++;
+      } else {
+        sScore += (d.s || 0);
+        if (win) sWins++; else sLosses++;
+      }
+    });
+
+    const totalWins = sWins + dWins;
+    const totalLosses = sLosses + dLosses;
+    const totalPt = (Number(sScore) + Number(dScore)).toFixed(1);
 
     $('res-table').innerHTML = `
-      <tr><td>단식 전적</td><td>${rateText(p.sWins, p.sLosses)}%</td><td>${p.sWins}승 ${p.sLosses}패</td><td>${Number(sPt).toFixed(1)}</td></tr>
-      <tr><td>복식 전적</td><td>${rateText(p.dWins, p.dLosses)}%</td><td>${p.dWins}승 ${p.dLosses}패</td><td>${Number(dPt).toFixed(1)}</td></tr>
+      <tr><td>단식 전적</td><td>${rateText(sWins, sLosses)}%</td><td>${sWins}승 ${sLosses}패</td><td>${Number(sScore).toFixed(1)}</td></tr>
+      <tr><td>복식 전적</td><td>${rateText(dWins, dLosses)}%</td><td>${dWins}승 ${dLosses}패</td><td>${Number(dScore).toFixed(1)}</td></tr>
     `;
     $('res-foot').innerHTML = `
       <tr style="background:#f9f9f9; font-weight: bold; border-top: 2px solid var(--wimbledon-sage);">
-        <td>종합 전적</td><td>${rateText(p.wins, p.losses)}%</td><td>${p.wins}승 ${p.losses}패</td>
+        <td>종합 전적</td><td>${rateText(totalWins, totalLosses)}%</td><td>${totalWins}승 ${totalLosses}패</td>
         <td style="color:var(--wimbledon-sage);">${totalPt} pt</td>
       </tr>
     `;
-
-    const singleOppMap = {};
+const singleOppMap = {};
     const partnerMap = {};
     const doubleEnemyMap = {};
 
