@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.78424</title>
+  <title>GrandSlam Ultimate v3.78425</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -411,6 +411,23 @@
       background: #7e7e83;
     }
 
+    /* ========================================
+       모바일 선수 버튼 3개 배치
+       ======================================== */
+    @media (max-width: 420px) {
+      .p-label {
+        min-width: 70px !important;
+        max-width: calc(33.333% - 8px) !important;
+        flex: 0 0 calc(33.333% - 8px) !important;
+        padding: 8px 4px !important;
+        font-size: 13px !important;
+      }
+      
+      .p-rank {
+        font-size: 10px !important;
+      }
+    }
+
 </style>
 </head>
 
@@ -439,7 +456,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.77</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.78425</div>
   </div>
 </div>
 
@@ -499,7 +516,8 @@
   <div class="header-banner"><span class="material-symbols-outlined">sports_tennis</span>단일게임</div>
   <div class="section-card active" style="display:block;">
     
-    <!-- ⭐ 변경: 선수 선택을 맨 위로 이동 -->
+    <!-- ⭐ 추가: 참가 선수 선택 타이틀 -->
+    <div class="tour-section-title"><span class="material-symbols-outlined">group_add</span>참가 선수 선택 (<span id="record-cnt">0</span>명)</div>
     <div class="pool differ" id="pP"></div>
 
     <div style="display:flex; gap:8px; margin-top:20px;">
@@ -932,7 +950,7 @@
     const rankHtml = showRank ? `<span class="p-rank">${escapeHtml(rankText || "")}</span>` : "";
     return `
       <input type="${inputType}" name="${escapeHtml(nameAttr)}" id="${escapeHtml(id)}" class="p-chk" value="${safeValue}" ${checkedAttr} ${onClickAttr}>
-      <label for="${escapeHtml(id)}" class="p-label${guestClass}" style="min-width:80px; flex:0 0 auto;">${labelText}${rankHtml}</label>
+      <label for="${escapeHtml(id)}" class="p-label${guestClass}" style="min-width:75px; flex:0 0 auto;">${labelText}${rankHtml}</label>
     `;
   }
 
@@ -1585,8 +1603,20 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     $('hN').innerText = hT.map(displayName).join(',');
     $('aN').innerText = aT.map(displayName).join(',');
 
+    // ⭐ 선택 카운트 업데이트
+    updateRecordCount();
+
     // 선택 UI 반영
     renderPool();
+  }
+
+  // ⭐ 단일게임 선택 카운트 업데이트 함수
+  function updateRecordCount() {
+    const cnt = $('record-cnt');
+    if(cnt) {
+      const total = hT.length + aT.length;
+      cnt.textContent = total;
+    }
   }
 
 
@@ -1597,6 +1627,9 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     hT=[]; aT=[];
     $('hN').innerText='';
     $('aN').innerText='';
+    
+    // ⭐ 카운트 리셋
+    updateRecordCount();
   }
 
     function updatePlayerList(){
@@ -3032,6 +3065,9 @@ window.addEventListener("resize", () => {
 
     html += '</div>';
     pList.innerHTML = html;
+    
+    // ⭐ 렌더링 후 카운트 자동 업데이트
+    updateRoundCount();
   }
 
   function renderRoundPlayerList() {
@@ -3579,11 +3615,15 @@ window.addEventListener("resize", () => {
     $('round-setup-area').style.display = 'block';
     $('round-match-area').style.display = 'none';
     
-        // ✅ 랭킹판/대진표 영역도 깨끗하게 비우고 다시 그릴 준비
+    // ✅ 랭킹판/대진표 영역도 깨끗하게 비우고 다시 그릴 준비
     const rankTable = $('round-rank-table');
     const matchList = $('round-match-list');
     if(rankTable) rankTable.innerHTML = '';
     if(matchList) matchList.innerHTML = '';
+    
+    // ⭐ 카운트 리셋 추가
+    const cntSpan = $('round-cnt');
+    if(cntSpan) cntSpan.textContent = '0';
 
     renderRoundPlayerList();
   }
