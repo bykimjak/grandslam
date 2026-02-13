@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.71</title>
+  <title>GrandSlam Ultimate v3.78424</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -266,6 +266,151 @@
       font-weight: 700;
     }
 
+    /* ✅ 모바일에서 3개 버튼(회원/게스트/전체 등)이 한 줄에 안정적으로 정렬되도록 축소 */
+    @media (max-width: 420px){
+      .opt-row{ gap:6px !important; }
+      .opt-btn{ padding:10px 6px !important; font-size:12px !important; }
+    }
+
+    /* ========================================
+       모달 스타일
+       ======================================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 25000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--wimbledon-sage);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-participant-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 2px solid #E5E5EA;
+      border-radius: 12px;
+      padding: 15px;
+      background: #f8f8f8;
+    }
+
+    .modal-participant-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-participant-item:hover {
+      background: var(--aussie-blue);
+      color: white;
+    }
+
+    .modal-participant-item.selected {
+      background: var(--wimbledon-sage);
+      color: white;
+    }
+
+    .modal-checkbox {
+      margin-right: 12px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .modal-rank {
+      font-weight: 700;
+      margin-right: 10px;
+      min-width: 50px;
+      color: var(--aussie-blue);
+    }
+
+    .modal-participant-item.selected .modal-rank {
+      color: white;
+    }
+
+    .modal-info {
+      padding: 12px;
+      background: rgba(93, 156, 118, 0.1);
+      border-left: 4px solid var(--wimbledon-sage);
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 13px;
+      color: var(--text-dark);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 400;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .modal-btn-primary {
+      background: var(--wimbledon-sage);
+      color: white;
+    }
+
+    .modal-btn-primary:hover {
+      background: #4d8c66;
+      box-shadow: 0 4px 12px rgba(93, 156, 118, 0.4);
+    }
+
+    .modal-btn-secondary {
+      background: var(--text-gray);
+      color: white;
+    }
+
+    .modal-btn-secondary:hover {
+      background: #7e7e83;
+    }
+
 </style>
 </head>
 
@@ -294,7 +439,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.71</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.77</div>
   </div>
 </div>
 
@@ -354,7 +499,10 @@
   <div class="header-banner"><span class="material-symbols-outlined">sports_tennis</span>단일게임</div>
   <div class="section-card active" style="display:block;">
     
-    <div style="display:flex; gap:8px;">
+    <!-- ⭐ 변경: 선수 선택을 맨 위로 이동 -->
+    <div class="pool differ" id="pP"></div>
+
+    <div style="display:flex; gap:8px; margin-top:20px;">
       <button id="m_db" class="type-btn selected" onclick="setM('double')"><span class="material-symbols-outlined btn-ico">groups</span>복식</button>
       <button id="m_sg" class="type-btn" onclick="setM('single')"><span class="material-symbols-outlined btn-ico">person</span>단식</button>
     </div>
@@ -369,8 +517,6 @@
     </div>
 
     <button class="btn-main" onclick="save()"><span class="material-symbols-outlined title-ico">save</span>결과 저장</button>
-
-    <div class="pool differ" id="pP"></div>
 
     <div class="rule-box">
       <div class="r-tt"><span class="material-symbols-outlined">info</span>점수 획득 기준</div>
@@ -435,6 +581,7 @@
       <div class="r-line r-mini">- ✅ v3.61: HTML 부모 컨테이너 클래스 제거 — player-grid/pool-ladder 클래스 삭제로 Grid 완전 차단</div>
       <div class="r-line r-mini">- ✅ v3.693: UI 통일 완성 — ① 게스트 라벨만 회색 ② 왼쪽정렬 ③ 전체 뒤로가기 버튼 ④ 차트 게스트제외</div>
       <div class="r-line r-mini">- ✅ v3.71: 라운드 모드 추가 — Circle Method 원형 회전 방식, Kimjak Algorithm 순위 산정, 토너먼트 전환</div>
+      <div class="r-line r-mini">- ✅ v3.77: 라운드 완결성 개선 — 조기 종료, 인앱 미니 토너먼트, 컬럼 개선, 버그 수정</div>
     </div>
   
     
@@ -794,6 +941,15 @@
     return escapeHtml(name);
   }
 
+  function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   // ========================================
   // UTILITY FUNCTIONS
   // ========================================
@@ -1019,8 +1175,16 @@
     });
   }
 
-  
-  
+  // round/tournament 등에서 호출하는 공용 재계산 훅 (예전 computeAll() 호환)
+  function computeAll() {
+    // 정의된 함수만 안전하게 실행 (ReferenceError/SyntaxError 방지)
+    if (typeof updateSeason === 'function') updateSeason();
+    if (typeof updateWeekly === 'function') updateWeekly();
+    if (typeof updateRankList === 'function') updateRankList();
+    if (typeof updateChart === 'function') updateChart();
+  }
+
+
   function aggregateSeasonForNamesFromLog(nameList){
     const set = new Set(nameList || []);
     const out = {};
@@ -1514,6 +1678,7 @@ function showView(v){
     if(v==='ladder') renderLadderPlayerPool();
     if(v==='tournament') initTournament();
     if(v==='stats') renderStatsPlayerList();
+  if(v==='round') initRoundPlayerPool();
   }
 
   function openSingleGame(){
@@ -2682,20 +2847,36 @@ function showView(v){
   }
 
   
-  window.addEventListener("load",()=>{
-    setTimeout(()=>{
-      $('splash').classList.add("hide");
-      setTimeout(()=>{ $('splash').style.display="none" },700);
-    },900);
+  
+  // ✅ Splash(인트로) 안전 종료: 네트워크/CDN 지연으로 window.load가 늦어져도 앱이 멈춘 것처럼 보이지 않게
+  function hideSplashSafe() {
+    const sp = $('splash');
+    if (!sp) return;
+    // 이미 숨김 처리된 경우 중복 실행 방지
+    if (sp.dataset.hidden === '1') return;
+    sp.dataset.hidden = '1';
+    sp.classList.add('hide');
+    setTimeout(() => { sp.style.display = 'none'; }, 700);
+  }
 
-    
-    sync();
-    loadWeather(getWed(0));
-
-    setTimeout(applyAutofitAllTables, 0);
+  // DOM이 준비되면 먼저 인트로를 내려준다 (외부 리소스 로딩과 무관)
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(hideSplashSafe, 600);
   });
 
-  window.addEventListener("resize", () => {
+  // 리소스 로딩 완료 후 초기화(에러 나도 인트로는 이미 내려감)
+  window.addEventListener("load", () => {
+    // 혹시 DOMContentLoaded가 안 탔을 경우 대비
+    setTimeout(hideSplashSafe, 0);
+
+    try { sync(); } catch(e) { console.error("sync() error:", e); }
+    try { loadWeather(getWed(0)); } catch(e) { console.error("loadWeather() error:", e); }
+
+    setTimeout(() => { 
+      try { applyAutofitAllTables(); } catch(e) { console.error("applyAutofitAllTables() error:", e); }
+    }, 0);
+  });
+window.addEventListener("resize", () => {
     updateSeason();
     updateWeekly();
     setTimeout(applyAutofitAllTables, 0);
@@ -2706,8 +2887,19 @@ function showView(v){
   // ========================================
 
   function openRound() {
+    // 라운드 화면 진입
     showView('round');
-    renderRoundPlayerList();
+
+    // 랭킹/순위 계산이 깨져도 라운드 선수명단은 무조건 뜨게 (방어)
+    try {
+      snapshotLastRanks();
+      const rankMap = computeRanksByScoreOnly('score', 'wins', 'losses');
+      players.forEach(p => { p.rank = rankMap[p.name] || p.rank || '-'; });
+    } catch (e) {
+      console.warn('[round] rank compute failed:', e);
+    }
+
+    initRoundPlayerPool();
   }
 
   function setRoundOpt(opt) {
@@ -2736,6 +2928,28 @@ function showView(v){
       else btn.classList.remove('active');
     });
     
+    // 단식일 때는 배치 방식 비활성화 (어차피 풀리그)
+    const optBtns = ['round-opt-rank', 'round-opt-random', 'round-opt-manual'];
+    if(mode === 'single') {
+      optBtns.forEach(id => {
+        const btn = $(id);
+        if(btn) {
+          btn.disabled = true;
+          btn.style.opacity = '0.4';
+          btn.style.cursor = 'not-allowed';
+        }
+      });
+    } else {
+      optBtns.forEach(id => {
+        const btn = $(id);
+        if(btn) {
+          btn.disabled = false;
+          btn.style.opacity = '';
+          btn.style.cursor = 'pointer';
+        }
+      });
+    }
+    
     // 지정선택 + 복식이면 팀 미리보기 표시
     if(roundOpt === 'manual' && mode === 'double') {
       updateRoundManualTeamPreview();
@@ -2746,14 +2960,43 @@ function showView(v){
     checkRoundGenButton();
   }
 
-  function renderRoundPlayerList() {
+  function initRoundPlayerPool() {
     const pList = $('round-pList');
-    const members = players.filter(p => !p.isGuest);
+    if(!pList) return;
+
+    // ⭐ 수정: UI 초기화 - 설정 화면만 표시, 랭킹/대진표는 완전히 숨김
+    const setupArea = $('round-setup-area');
+    const matchArea = $('round-match-area');
+    
+    if(setupArea) setupArea.style.display = 'block';
+    if(matchArea) matchArea.style.display = 'none';  // 완전히 숨김
+    
+    // 미니 토너먼트 데이터 초기화
+    miniTournamentMatches = [];
+    miniTournamentRound = 0;
+
+    // 1) 순위 계산(안전) + 멤버 정렬(점수 높은 순)
+    let rankMap = {};
+    try {
+      rankMap = computeRanksByScoreOnly('score', 'wins', 'losses');
+    } catch(e) {
+      console.warn('[round] computeRanksByScoreOnly failed:', e);
+      rankMap = {};
+    }
+
+    const members = players.filter(p => !p.isGuest)
+      .sort((a,b) => ((b?.score)||0) - ((a?.score)||0));
+
+    // rank 필드도 미리 세팅 (다른 곳에서 쓸 수도 있으니까)
+    members.forEach((p, idx) => { p.rank = rankMap[p.name] || p.rank || (idx+1); });
+
     const guests = players.filter(p => p.isGuest);
-    
+
     let html = '<div style="display:flex; flex-wrap:wrap; gap:8px;">';
-    
-    members.forEach(p => {
+
+    // 2) 회원 버튼
+    members.forEach((p, idx) => {
+      const rankStr = `${p.rank || (idx+1)}위`;
       html += createPlayerOption({
         inputType: 'checkbox',
         nameAttr: 'round-player',
@@ -2764,10 +3007,11 @@ function showView(v){
         labelText: displayName(p.name),
         isGuest: false,
         showRank: true,
-        rankText: `#${p.rank || '-'}`
+        rankText: rankStr
       });
     });
-    
+
+    // 3) 게스트 버튼
     if(guests.length > 0) {
       html += '</div><div style="margin: 15px 0 10px 0; font-size:11px; color:#999; border-top:1px solid #ddd; padding-top:12px; font-weight:700;">GUEST LIST</div><div style="display:flex; flex-wrap:wrap; gap:8px;">';
       guests.forEach(p => {
@@ -2778,18 +3022,24 @@ function showView(v){
           value: p.name,
           checked: false,
           onClick: 'updateRoundCount(); checkRoundGenButton();',
-          labelText: `${displayName(p.name)}[G]`,
+          labelText: displayName(p.name),
           isGuest: true,
-          showRank: false
+          showRank: true,
+          rankText: 'G'
         });
       });
     }
-    
+
     html += '</div>';
     pList.innerHTML = html;
-    updateRoundCount();
   }
 
+  function renderRoundPlayerList() {
+    // 기존 호출부 호환용
+    initRoundPlayerPool();
+  }
+
+    
   function updateRoundCount() {
     const checked = document.querySelectorAll('input[name="round-player"]:checked');
     $('round-cnt').innerText = checked.length;
@@ -2840,6 +3090,10 @@ function showView(v){
 
   function generateRoundSchedule() {
     const checked = Array.from(document.querySelectorAll('input[name="round-player"]:checked')).map(c => c.value);
+    
+    // ✅ 라운드 생성 버튼 클릭 시 기존 매치 강제 초기화
+    roundMatches = [];
+    roundResults = [];
     
     if(roundMode === 'single' && checked.length < 3) {
       alert('단식은 최소 3명 이상 필요합니다.');
@@ -2900,41 +3154,43 @@ function showView(v){
   }
 
   function generateRoundRobinMatches(participants) {
-    const n = participants.length;
     let items = [...participants];
-    
-    // 홀수면 BYE 추가
-    if(n % 2 === 1) {
+
+    // 홀수면 BYE 추가(매치 생성 시 BYE는 자동 스킵)
+    if(items.length % 2 === 1) {
       items.push('BYE');
     }
-    
-    const totalRounds = items.length - 1;
-    const matchesPerRound = items.length / 2;
+
     const matches = [];
-    
-    for(let round = 0; round < totalRounds; round++) {
-      for(let match = 0; match < matchesPerRound; match++) {
-        const home = match === 0 ? 0 : round + match;
-        const away = items.length - 1 - match + round;
-        
-        const homeIdx = home % items.length;
-        const awayIdx = away % items.length;
-        
-        if(items[homeIdx] !== 'BYE' && items[awayIdx] !== 'BYE') {
-          matches.push({
-            id: `R${round+1}M${match+1}`,
-            round: round + 1,
-            home: items[homeIdx],
-            away: items[awayIdx],
-            winner: null
-          });
-        }
+    const seen = new Set();
+    const keyOf = (p) => Array.isArray(p) ? p.join('&') : String(p);
+
+    for(let i = 0; i < items.length; i++) {
+      for(let j = i + 1; j < items.length; j++) {
+        const a = items[i];
+        const b = items[j];
+
+        if(a === 'BYE' || b === 'BYE') continue;
+
+        const aKey = keyOf(a);
+        const bKey = keyOf(b);
+
+        // 고유 키(선수이름1-선수이름2)로 중복 안전장치
+        const id = `${aKey}-${bKey}`;
+        const idRev = `${bKey}-${aKey}`;
+        if(seen.has(id) || seen.has(idRev)) continue;
+        seen.add(id);
+
+        matches.push({
+          id,
+          round: 1,
+          home: a,
+          away: b,
+          winner: null
+        });
       }
-      
-      // 원형 회전 (첫 번째는 고정, 나머지 회전)
-      items = [items[0], items[items.length - 1], ...items.slice(1, items.length - 1)];
     }
-    
+
     return matches;
   }
 
@@ -3018,9 +3274,32 @@ function showView(v){
       }
     });
     
-    // 승률 계산
+    // ⭐ 추가: 미니 토너먼트 경기 결과 반영 (승리당 +1점만, 부전승 포함)
+    if(miniTournamentMatches && miniTournamentMatches.length > 0) {
+      miniTournamentMatches.forEach(m => {
+        if(m.winner === null) return;  // 아직 결과 없는 경기만 제외
+        
+        const homeKey = roundMode === 'single' ? m.home : m.home.join('&');
+        const awayKey = m.away ? (roundMode === 'single' ? m.away : m.away.join('&')) : null;
+        
+        // 미니 토너먼트는 승/패 카운트 올리지 않고 점수만 별도 추가
+        if(m.winner === 'home' && standings[homeKey]) {
+          standings[homeKey].miniWins = (standings[homeKey].miniWins || 0) + 1;
+        }
+        if(m.winner === 'away' && awayKey && standings[awayKey]) {
+          standings[awayKey].miniWins = (standings[awayKey].miniWins || 0) + 1;
+        }
+      });
+    }
+    
+    // 승률 및 점수 계산
     Object.values(standings).forEach(s => {
       s.winRate = s.matches > 0 ? s.wins / s.matches : 0;
+      // 총점 계산 (보너스 제외, 순수 경기 획득 점수)
+      const winPoint = roundMode === 'single' ? 3 : 2;
+      const losePoint = roundMode === 'single' ? -0.5 : -0.7;
+      // 라운드 로빈 점수 + 미니 토너먼트 점수(승리당 +1점)
+      s.points = 1 + (s.wins * winPoint) + (s.losses * losePoint) + ((s.miniWins || 0) * 1);
     });
     
     // 정렬 (Kimjak Algorithm)
@@ -3077,9 +3356,9 @@ function showView(v){
           <tr>
             <th>순위</th>
             <th>${roundMode === 'single' ? '선수' : '팀'}</th>
-            <th>승-패</th>
+            <th>승패</th>
             <th>승률</th>
-            <th>경기수</th>
+            <th>총점</th>
           </tr>
         </thead>
         <tbody>
@@ -3093,7 +3372,7 @@ function showView(v){
           <td>${nameDisplay}</td>
           <td>${s.wins}-${s.losses}</td>
           <td>${(s.winRate * 100).toFixed(0)}%</td>
-          <td>${s.matches}</td>
+          <td>${s.points.toFixed(1)}</td>
         </tr>
       `;
     });
@@ -3108,18 +3387,18 @@ function showView(v){
     const saveBtn = $('round-save-btn');
     const tourBtn = $('round-tournament-btn');
     
+    // 조기 종료 허용: 1경기 이상 완료 시 저장 가능
     if(finishedMatches > 0) {
       saveBtn.style.opacity = '1';
       saveBtn.style.background = 'var(--aussie-blue)';
-    } else {
-      saveBtn.style.opacity = '0.6';
-      saveBtn.style.background = 'var(--roland-clay)';
-    }
-    
-    if(finishedMatches === totalMatches) {
+      
+      // 토너먼트 전환도 1경기 이상 완료 시 가능
       tourBtn.style.opacity = '1';
       tourBtn.style.background = 'var(--aussie-blue)';
     } else {
+      saveBtn.style.opacity = '0.6';
+      saveBtn.style.background = 'var(--roland-clay)';
+      
       tourBtn.style.opacity = '0.6';
       tourBtn.style.background = 'var(--roland-clay)';
     }
@@ -3294,33 +3573,42 @@ function showView(v){
     roundParticipants = [];
     roundMatches = [];
     roundResults = [];
+    miniTournamentMatches = [];
+    miniTournamentRound = 0;
     
     $('round-setup-area').style.display = 'block';
     $('round-match-area').style.display = 'none';
     
+        // ✅ 랭킹판/대진표 영역도 깨끗하게 비우고 다시 그릴 준비
+    const rankTable = $('round-rank-table');
+    const matchList = $('round-match-list');
+    if(rankTable) rankTable.innerHTML = '';
+    if(matchList) matchList.innerHTML = '';
+
     renderRoundPlayerList();
   }
 
   function convertRoundToTournament() {
-    const finishedMatches = roundMatches.filter(m => m.winner !== null).length;
+    const finishedMatches = roundMatches.filter(m => m.winner !== null);
     
-    if(finishedMatches !== roundMatches.length) {
-      alert('모든 경기가 완료되어야 토너먼트로 전환할 수 있습니다.');
+    if(finishedMatches.length === 0) {
+      alert('완료된 경기가 없습니다.');
       return;
     }
     
-    if(!confirm('라운드 순위를 기반으로 토너먼트를 생성하시겠습니까?')) {
-      return;
+    // 현재까지의 경기 저장
+    if(isPracticeMode !== 'practice') {
+      saveRoundDataToLog(finishedMatches);
     }
     
     // 순위 계산
     const standings = {};
     roundParticipants.forEach(p => {
       const key = roundMode === 'single' ? p : p.join('&');
-      standings[key] = { name: p, wins: 0, losses: 0, matches: 0 };
+      standings[key] = { name: p, wins: 0, losses: 0, matches: 0, winRate: 0 };
     });
     
-    roundMatches.forEach(m => {
+    finishedMatches.forEach(m => {
       const homeKey = roundMode === 'single' ? m.home : m.home.join('&');
       const awayKey = roundMode === 'single' ? m.away : m.away.join('&');
       
@@ -3347,37 +3635,432 @@ function showView(v){
       return b.matches - a.matches;
     });
     
-    // 토너먼트 화면으로 이동하면서 선수 자동 선택
-    showView('tournament');
+    const rankedParticipants = sorted.map(s => s.name);
     
-    // 선수 선택 초기화
-    document.querySelectorAll('input[name="player"]').forEach(cb => cb.checked = false);
+    // ⭐ 모달 열기
+    openTournamentModal(rankedParticipants);
+  }
+
+  // ========================================
+  // 모달 관련 함수들
+  // ========================================
+  
+  function openTournamentModal(rankedParticipants) {
+    const modal = $('tournament-modal');
+    const list = $('modal-participant-list');
     
-    // 라운드 참가자들 선택 (순위대로)
-    sorted.forEach(s => {
-      if(roundMode === 'single') {
-        const cb = document.querySelector(`input[name="player"][value="${s.name}"]`);
-        if(cb) cb.checked = true;
+    if(!modal || !list) {
+      console.error('Modal elements not found');
+      return;
+    }
+    
+    // 참가자 목록 렌더링
+    let html = '';
+    rankedParticipants.forEach((participant, idx) => {
+      const rank = idx + 1;
+      const displayText = roundMode === 'single' 
+        ? displayName(participant) 
+        : `${displayName(participant[0])} & ${displayName(participant[1])}`;
+      
+      // 기본 선택: 상위 4명/팀
+      const checked = idx < 4 ? 'checked' : '';
+      const selectedClass = idx < 4 ? 'selected' : '';
+      
+      html += `
+        <div class="modal-participant-item ${selectedClass}" onclick="toggleModalParticipant(${idx})">
+          <input type="checkbox" class="modal-checkbox" id="modal-p-${idx}" ${checked} onclick="event.stopPropagation(); toggleModalParticipant(${idx})">
+          <span class="modal-rank">${rank}위</span>
+          <span>${displayText}</span>
+        </div>
+      `;
+    });
+    
+    list.innerHTML = html;
+    
+    // 선택 카운트 업데이트
+    updateModalCount();
+    
+    // 모달 표시
+    modal.classList.add('active');
+  }
+  
+  function toggleModalParticipant(idx) {
+    const checkbox = $(`modal-p-${idx}`);
+    if(!checkbox) return;
+    
+    const item = checkbox.closest('.modal-participant-item');
+    if(!item) return;
+    
+    checkbox.checked = !checkbox.checked;
+    
+    if(checkbox.checked) {
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
+    
+    updateModalCount();
+  }
+  
+  function updateModalCount() {
+    const checkboxes = document.querySelectorAll('#modal-participant-list .modal-checkbox');
+    const count = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const countSpan = $('modal-selected-count');
+    if(countSpan) countSpan.textContent = count;
+  }
+  
+  function closeTournamentModal() {
+    const modal = $('tournament-modal');
+    if(modal) modal.classList.remove('active');
+  }
+  
+  function startTournamentFromModal() {
+    // 선택된 참가자 수집
+    const checkboxes = document.querySelectorAll('#modal-participant-list .modal-checkbox:checked');
+    
+    if(checkboxes.length < 2) {
+      alert('최소 2명/팀을 선택해야 합니다.');
+      return;
+    }
+    
+    const selectedIndices = Array.from(checkboxes).map(cb => {
+      return parseInt(cb.id.replace('modal-p-', ''));
+    }).sort((a, b) => a - b);
+    
+    // 순위 계산 (다시)
+    const finishedMatches = roundMatches.filter(m => m.winner !== null);
+    const standings = {};
+    roundParticipants.forEach(p => {
+      const key = roundMode === 'single' ? p : p.join('&');
+      standings[key] = { name: p, wins: 0, losses: 0, matches: 0, winRate: 0 };
+    });
+    
+    finishedMatches.forEach(m => {
+      const homeKey = roundMode === 'single' ? m.home : m.home.join('&');
+      const awayKey = roundMode === 'single' ? m.away : m.away.join('&');
+      
+      standings[homeKey].matches++;
+      standings[awayKey].matches++;
+      
+      if(m.winner === 'home') {
+        standings[homeKey].wins++;
+        standings[awayKey].losses++;
       } else {
-        s.name.forEach(pname => {
-          const cb = document.querySelector(`input[name="player"][value="${pname}"]`);
-          if(cb) cb.checked = true;
+        standings[awayKey].wins++;
+        standings[homeKey].losses++;
+      }
+    });
+    
+    Object.values(standings).forEach(s => {
+      s.winRate = s.matches > 0 ? s.wins / s.matches : 0;
+    });
+    
+    const sorted = Object.values(standings).sort((a, b) => {
+      if(b.wins !== a.wins) return b.wins - a.wins;
+      if(Math.abs(b.winRate - a.winRate) > 0.001) return b.winRate - a.winRate;
+      if(a.losses !== b.losses) return a.losses - b.losses;
+      return b.matches - a.matches;
+    });
+    
+    const rankedParticipants = sorted.map(s => s.name);
+    
+    // 선택된 인덱스로 참가자 필터링
+    const selectedParticipants = selectedIndices.map(i => rankedParticipants[i]);
+    
+    // 모달 닫기
+    closeTournamentModal();
+    
+    // DOM 요소 확인
+    const setupArea = $('round-setup-area');
+    const matchArea = $('round-match-area');
+    const matchList = $('round-match-list');
+    const rankTable = $('round-rank-table');
+    
+    if(!matchArea || !matchList) {
+      alert('토너먼트 영역을 찾을 수 없습니다.');
+      return;
+    }
+    
+    // setup-area 숨기기
+    if(setupArea) setupArea.style.display = 'none';
+    
+    // match-area 보이기
+    matchArea.style.display = 'block';
+    
+    // 랭킹판 계속 표시
+    if(rankTable) {
+      const rankTitle = rankTable.previousElementSibling;
+      if(rankTitle?.classList?.contains('tour-section-title')) {
+        rankTitle.style.display = 'block';
+      }
+      rankTable.style.display = 'block';
+    }
+    try{ if(typeof updateRoundRanking==='function') updateRoundRanking(); }catch(e){ console.warn('[round] updateRoundRanking failed:', e); }
+    
+    // match-list 초기화
+    matchList.innerHTML = '';
+    
+    // 토너먼트 시작
+    setTimeout(() => startRoundMiniTournament(selectedParticipants), 100);
+  }
+
+  // 라운드 데이터 저장 헬퍼 함수
+  function saveRoundDataToLog(finishedMatches) {
+    finishedMatches.forEach(m => {
+      const winner = m.winner === 'home' ? m.home : m.away;
+      const loser = m.winner === 'home' ? m.away : m.home;
+      
+      const log = {
+        date: new Date().toISOString().split('T')[0],
+        type: roundMode,
+        winner: roundMode === 'single' ? [winner] : winner,
+        loser: roundMode === 'single' ? [loser] : loser
+      };
+      
+      matchLog.push(log);
+      
+      // 점수 반영
+      if(roundMode === 'single') {
+        const wp = players.find(p => p.name === winner);
+        const lp = players.find(p => p.name === loser);
+        
+        if(wp) {
+          wp.sWins = (wp.sWins || 0) + 1;
+          wp.sScore = (wp.sScore || 0) + 4;
+        }
+        if(lp) {
+          lp.sLosses = (lp.sLosses || 0) + 1;
+          lp.sScore = (lp.sScore || 0) + 0.5;
+        }
+      } else {
+        winner.forEach(name => {
+          const p = players.find(pl => pl.name === name);
+          if(p) {
+            p.dWins = (p.dWins || 0) + 1;
+            p.dScore = (p.dScore || 0) + 3;
+          }
+        });
+        loser.forEach(name => {
+          const p = players.find(pl => pl.name === name);
+          if(p) {
+            p.dLosses = (p.dLosses || 0) + 1;
+            p.dScore = (p.dScore || 0) + 0.3;
+          }
         });
       }
     });
     
-    updateCount();
-    
-    // 토너먼트 옵션 설정
-    if(roundMode === 'single') {
-      setMode('single');
-    } else {
-      setMode('double');
+    computeAll();
+    sync();
+  }
+
+  // 미니 토너먼트 상태
+  var miniTournamentMatches = [];
+  var miniTournamentRound = 0;
+  
+  function startRoundMiniTournament(rankedParticipants) {
+    if(!rankedParticipants || rankedParticipants.length === 0) {
+      alert('토너먼트를 시작할 수 없습니다. 참가자 데이터가 없습니다.');
+      return;
     }
     
-    setOpt('rank'); // 순위순으로 설정
+    const n = rankedParticipants.length;
     
-    alert('라운드 순위를 기반으로 토너먼트 선수가 선택되었습니다. 대진표를 생성하세요!');
+    // 2의 거듭제곱 계산
+    let bracketSize = 2;
+    while(bracketSize < n) bracketSize *= 2;
+    
+    // 부전승 수 계산
+    const byeCount = bracketSize - n;
+    
+    // 첫 라운드 매치 생성 (부전승 시스템 적용)
+    miniTournamentMatches = [];
+    let matchCount = 0;
+    
+    for(let i = 0; i < bracketSize / 2; i++) {
+      const highIdx = i;
+      const lowIdx = bracketSize - 1 - i;
+      
+      const high = highIdx < n ? rankedParticipants[highIdx] : null;
+      const low = lowIdx < n ? rankedParticipants[lowIdx] : null;
+      
+      // 둘 다 있으면 매치 생성
+      if(high !== null && low !== null) {
+        matchCount++;
+        miniTournamentMatches.push({
+          id: `T-R1-M${matchCount}`,
+          round: 1,
+          home: high,
+          away: low,
+          winner: null
+        });
+      }
+      // 한 명만 있으면 부전승 (자동 승리)
+      else if(high !== null && low === null) {
+        matchCount++;
+        miniTournamentMatches.push({
+          id: `T-R1-M${matchCount}`,
+          round: 1,
+          home: high,
+          away: null,  // 부전승 표시
+          winner: 'home',  // 자동 승리
+          isBye: true  // 부전승 플래그
+        });
+        
+        // ⭐ 부전승 시 즉시 +1점 부여 (상위 랭커 특전)
+        if(isPracticeMode !== 'practice') {
+          if(roundMode === 'single') {
+            const p = players.find(pl => pl.name === high);
+            if(p) p.sScore = (p.sScore || 0) + 1;
+          } else {
+            high.forEach(name => {
+              const p = players.find(pl => pl.name === name);
+              if(p) p.dScore = (p.dScore || 0) + 1;
+            });
+          }
+          // 즉시 저장 및 재계산
+          computeAll();
+          sync();
+        }
+      }
+    }
+    
+    miniTournamentRound = 1;
+    renderMiniTournament();
+    
+    // 랭킹 업데이트 (부전승 점수 반영)
+    try{ if(typeof updateRoundRanking==='function') updateRoundRanking(); }catch(e){ console.warn('[round] updateRoundRanking failed:', e); }
+    
+    // 부전승 안내 메시지
+    if(byeCount > 0) {
+      setTimeout(() => {
+        alert(`💡 ${byeCount}명/팀이 부전승으로 다음 라운드에 자동 진출합니다.\n상위 랭커에게 부전승이 배정됩니다.`);
+      }, 500);
+    }
+  }
+
+  function renderMiniTournament() {
+    const list = $('round-match-list');
+    if(!list) return;
+    
+    const currentRound = miniTournamentMatches.filter(m => m.round === miniTournamentRound);
+    
+    if(currentRound.length === 0) {
+      list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-gray);">표시할 매치가 없습니다.</div>';
+      return;
+    }
+    
+    let html = `<div style="text-align:center; margin-bottom:20px; padding:15px; background:var(--wimbledon-sage); color:white; border-radius:12px; font-size:16px; font-weight:bold;">🏆 라운드 미니 토너먼트 - Round ${miniTournamentRound}</div>`;
+    
+    currentRound.forEach(m => {
+      const isFinished = m.winner !== null;
+      const isBye = m.isBye || false;
+      
+      // 부전승 처리
+      if(isBye) {
+        const homeDisplay = roundMode === 'single' ? displayName(m.home) : `${displayName(m.home[0])} & ${displayName(m.home[1])}`;
+        html += `
+          <div class="team-box" style="margin-bottom:10px; padding:12px; opacity:0.7; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);">
+            <div style="font-size:11px; color:var(--text-gray); margin-bottom:8px;">${m.id} - 부전승</div>
+            <div style="text-align:center; padding:10px;">
+              <span style="color:var(--wimbledon-sage); font-weight:700; font-size:15px;">
+                ✓ ${homeDisplay}
+              </span>
+              <div style="font-size:12px; color:var(--text-gray); margin-top:5px;">다음 라운드 자동 진출</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      // 일반 매치
+      const homeDisplay = roundMode === 'single' ? displayName(m.home) : `${displayName(m.home[0])} & ${displayName(m.home[1])}`;
+      const awayDisplay = roundMode === 'single' ? displayName(m.away) : `${displayName(m.away[0])} & ${displayName(m.away[1])}`;
+      
+      html += `
+        <div class="team-box" style="margin-bottom:10px; padding:12px; ${isFinished ? 'opacity:0.5;' : ''}">
+          <div style="font-size:11px; color:var(--text-gray); margin-bottom:8px;">${m.id}</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button onclick="setMiniTournamentWinner('${m.id}', 'home')" 
+              class="opt-btn" 
+              style="flex:1; padding:10px; ${m.winner === 'home' ? 'background:var(--wimbledon-sage); opacity:1;' : 'opacity:0.7;'}">
+              ${homeDisplay}
+            </button>
+            <div style="font-size:14px; color:var(--text-gray);">vs</div>
+            <button onclick="setMiniTournamentWinner('${m.id}', 'away')" 
+              class="opt-btn" 
+              style="flex:1; padding:10px; ${m.winner === 'away' ? 'background:var(--wimbledon-sage); opacity:1;' : 'opacity:0.7;'}">
+              ${awayDisplay}
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    
+    list.innerHTML = html;
+  }
+
+  function setMiniTournamentWinner(matchId, side) {
+    const match = miniTournamentMatches.find(m => m.id === matchId);
+    if(!match || match.winner !== null) return;
+    
+    match.winner = side;
+    const winner = side === 'home' ? match.home : match.away;
+    
+    // 이벤트성 점수 - 승리당 +1점만 (김작 가산점 룰)
+    if(isPracticeMode !== 'practice') {
+      if(roundMode === 'single') {
+        const p = players.find(pl => pl.name === winner);
+        if(p) p.sScore = (p.sScore || 0) + 1;
+      } else {
+        winner.forEach(name => {
+          const p = players.find(pl => pl.name === name);
+          if(p) p.dScore = (p.dScore || 0) + 1;
+        });
+      }
+    }
+    
+    
+    // ✅ 점수 반영 즉시 상단 랭킹판 실시간 업데이트
+    try{ if(typeof updateRoundRanking==='function') updateRoundRanking(); }catch(e){ console.warn('[round] updateRoundRanking failed:', e); }
+    // 현재 라운드의 모든 매치가 끝났는지 확인
+    const currentRound = miniTournamentMatches.filter(m => m.round === miniTournamentRound);
+    const allFinished = currentRound.every(m => m.winner !== null);
+    
+    if(allFinished) {
+      // 승자들로 다음 라운드 생성
+      const winners = currentRound.map(m => m.winner === 'home' ? m.home : m.away);
+      
+      if(winners.length === 1) {
+        // 우승자 결정
+        const champion = winners[0];
+        const champDisplay = roundMode === 'single' ? displayName(champion) : `${displayName(champion[0])} & ${displayName(champion[1])}`;
+        
+        if(isPracticeMode !== 'practice') {
+          computeAll();
+          sync();
+        }
+        
+        alert(`🏆 우승: ${champDisplay}!\n\n미니 토너먼트가 종료되었습니다.`);
+        return;
+      }
+      
+      // 다음 라운드 생성
+      miniTournamentRound++;
+      const nextMatches = [];
+      for(let i = 0; i < winners.length; i += 2) {
+        nextMatches.push({
+          id: `T-R${miniTournamentRound}-M${(i/2) + 1}`,
+          round: miniTournamentRound,
+          home: winners[i],
+          away: winners[i + 1],
+          winner: null
+        });
+      }
+      miniTournamentMatches.push(...nextMatches);
+    }
+    
+    renderMiniTournament();
   }
 
 
@@ -3389,5 +4072,38 @@ function showView(v){
   <div class="nav-item" onclick="switchView('stats', this)"><span class="material-symbols-outlined nav-icon">monitoring</span>통계</div>
   <div class="nav-item" onclick="switchView('admin', this)"><span class="material-symbols-outlined nav-icon">settings</span>운영</div>
 </nav>
+
+<!-- ========================================
+     미니 토너먼트 참가자 선택 모달
+     ======================================== -->
+<div id="tournament-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="material-symbols-outlined">emoji_events</span>
+      미니 토너먼트 참가자 선택
+    </div>
+    <div class="modal-body">
+      <div class="modal-info">
+        <strong>💡 선택 가이드</strong><br>
+        • 원하는 인원을 자유롭게 선택하세요<br>
+        • 2, 4, 8명: 정규 토너먼트<br>
+        • 그 외 인원: 상위 랭커 부전승 자동 배정
+      </div>
+      <div id="modal-participant-list" class="modal-participant-list"></div>
+      <div style="margin-top: 15px; text-align: center; color: var(--aussie-blue); font-weight: 400;">
+        선택된 인원: <strong><span id="modal-selected-count">0</span>명/팀</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-secondary" onclick="closeTournamentModal()">
+        <span class="material-symbols-outlined btn-ico">close</span>취소
+      </button>
+      <button class="modal-btn modal-btn-primary" onclick="startTournamentFromModal()">
+        <span class="material-symbols-outlined btn-ico">play_arrow</span>시작하기
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
