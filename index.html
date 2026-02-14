@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.78427</title>
+  <title>GrandSlam Ultimate v3.78428</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -417,18 +417,30 @@
     .p-label {
       min-width: 75px;
       flex: 0 0 auto;
+      box-sizing: border-box;
     }
 
     /* ========================================
-       모바일 선수 버튼 3개 배치 (공격적 축소)
+       모바일 선수 버튼 3개 배치 (완전 수정)
        ======================================== */
     @media (max-width: 420px) {
       .p-label {
-        min-width: 60px !important;
-        max-width: calc(30% - 4px) !important;
-        flex: 0 0 calc(30% - 4px) !important;
-        padding: 6px 3px !important;
+        /* ⭐ min-width 완전 제거 */
+        min-width: 0 !important;
+        /* ⭐ width와 max-width 동일하게 설정 */
+        width: calc(33.333% - 6px) !important;
+        max-width: calc(33.333% - 6px) !important;
+        /* ⭐ flex-basis도 동일하게 */
+        flex: 0 0 calc(33.333% - 6px) !important;
+        /* ⭐ box-sizing으로 padding 포함 계산 */
+        box-sizing: border-box !important;
+        /* ⭐ 패딩과 폰트 축소 */
+        padding: 6px 2px !important;
         font-size: 12px !important;
+        /* ⭐ 텍스트 줄바꿈 방지 */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
       }
       
       .p-rank {
@@ -437,6 +449,7 @@
         margin-top: 2px !important;
       }
     }
+
 
 </style>
 </head>
@@ -466,7 +479,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.78427</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.78428</div>
   </div>
 </div>
 
@@ -609,7 +622,7 @@
       <div class="r-line r-mini">- ✅ v3.61: HTML 부모 컨테이너 클래스 제거 — player-grid/pool-ladder 클래스 삭제로 Grid 완전 차단</div>
       <div class="r-line r-mini">- ✅ v3.693: UI 통일 완성 — ① 게스트 라벨만 회색 ② 왼쪽정렬 ③ 전체 뒤로가기 버튼 ④ 차트 게스트제외</div>
       <div class="r-line r-mini">- ✅ v3.71: 라운드 모드 추가 — Circle Method 원형 회전 방식, Kimjak Algorithm 순위 산정, 토너먼트 전환</div>
-      <div class="r-line r-mini">- ✅ v3.7847: 라운드 완결 도입 컬럼 개선, 버그 수정</div>
+      <div class="r-line r-mini">- ✅ v3.78428: 라운드 모드 완결. 핸드폰 화면 최적화 </div>
     </div>
   
     
