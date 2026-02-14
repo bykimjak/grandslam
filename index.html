@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.791</title>
+  <title>GrandSlam Ultimate v3.792</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -84,7 +84,7 @@
 
     .score-box { width: 70px; height: 55px; font-size: 26px; text-align: center; border-radius: 12px; border: 1px solid #D1D1D6; background: #F2F2F7; color: var(--text-dark); font-weight: 400; }
 
-    .pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; margin-top: 30px; }
+    .pool { display: block; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; margin-top: 30px; }
 
     .btn-main {
       width: 100%;
@@ -166,8 +166,8 @@
 
     
     .form-dot { width: 14px; height: 14px; border-radius: 50%; }
-    .win-dot { background: #34C759; }
-    .loss-dot { background: #FF3B30; }
+    .win-dot { background: var(--wimbledon-sage); }
+    .loss-dot { background: var(--up-red); }
 
     
     .pool-ladder { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; background: white; border: 2px solid #E5E5EA; border-radius: 15px; margin-bottom: 15px; }
@@ -672,7 +672,7 @@
       max-width: 200px;
     }
     .club-card-manage .club-manage-actions {
-      display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end;
+      display: flex; gap: 6px; flex-shrink: 0;
     }
     .club-manage-btn {
       padding: 8px 10px;
@@ -682,7 +682,6 @@
       font-weight: 400;
       cursor: pointer;
       color: white;
-      white-space: nowrap;
     }
 
 
@@ -786,7 +785,7 @@
 
     <div class="club-form-group">
       <label class="club-form-label">관리자 비밀번호 *</label>
-      <input type="text" class="club-form-input" id="cfPin" placeholder="예: 1234" maxlength="20" />
+      <input type="text" class="club-form-input" id="cfPin" placeholder="예: 0707" maxlength="20" />
     </div>
     <div class="club-form-group">
       <label class="club-form-label">날씨 검색 도시 (영문)</label>
@@ -833,7 +832,7 @@
       <tbody id="tbody"></tbody>
     </table>
     <div id="dynamicTip" class="tip-box" style="display:none;"><div id="tipContent" class="tip-text"></div></div>
-    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.791</div>
+    <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.792</div>
   </div>
 </div>
 
@@ -977,8 +976,7 @@
       <div class="r-line r-mini">- ✅ v3.693: UI 통일 완성 — ① 게스트 라벨만 회색 ② 왼쪽정렬 ③ 전체 뒤로가기 버튼 ④ 차트 게스트제외</div>
       <div class="r-line r-mini">- ✅ v3.71: 라운드 모드 추가 — Circle Method 원형 회전 방식, Kimjak Algorithm 순위 산정, 토너먼트 전환</div>
       <div class="r-line r-mini">- ✅ v3.78428: 라운드 모드 완결. 핸드폰 화면 최적화 </div>
-      <div class="r-line r-mini">- ✅ v3.791: 보안 강화, 폼 점수 색상 고정(승녹/패적), 비밀번호변경 버튼, 수정 시 비번 비노출</div>
-      <div class="r-line r-mini">- ✅ v3.79: 다중 클럽 시스템 — 클럽 추가/전환/관리, 자동 시트 생성, 마스터 비번 보안</div>
+      <div class="r-line r-mini">- ✅ v3.792: 다중 클럽 시스템 — 자동 시트 생성, 마스터 보안, 은은한 클럽 색상, 레이아웃 수정</div>
     </div>
   
     
@@ -1248,7 +1246,7 @@
         </button>
       </div>
       <p style="margin-top:12px; color:#8E8E93; font-size:12px; line-height:1.4;">
-        ※ v3.79: 다중 클럽 시스템 도입 완료! 교류전은 v4.0에서 본격 도입.
+        ※ v3.792: 다중 클럽 시스템 도입 완료! 교류전은 v4.0에서 본격 도입.
       </p>
     </div>
   <div style="padding: 0 15px;">
@@ -1266,7 +1264,7 @@
         <button class="btn-purple-main" onclick="checkAdminAndShow('player-mgmt')" style="display:flex; align-items:center; justify-content:center; gap:8px;">
           <span class="material-symbols-outlined">person_search</span> 선수 관리
         </button>
-        <button class="btn-purple-main" onclick="checkAdminAndShow('club-mgmt')" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+        <button class="btn-purple-main" onclick="showView('club-mgmt')" style="display:flex; align-items:center; justify-content:center; gap:8px;">
           <span class="material-symbols-outlined">home_work</span> 클럽 관리
         </button>
         <button class="btn-purple-main" onclick="comingSoon('데이터 백업')" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--text-gray);">
@@ -1274,7 +1272,7 @@
         </button>
       </div>
             <p style="margin-top:12px; color:#8E8E93; font-size:12px; line-height:1.4;">
-        ※ v3.79: 다중 클럽 시스템 도입! 클럽별 독립 데이터 운영.
+        ※ v3.792: 다중 클럽 시스템 도입! 클럽별 독립 데이터 운영.
       </p>
     </div>
   </div>
@@ -1302,7 +1300,7 @@
         <div class="r-line">• 클럽 삭제 시 앱 내 등록만 해제되며, <b>Google Sheets 데이터는 보존</b>됩니다.</div>
         <div class="r-line">• 클럽 생성/수정/삭제는 <b>총괄 관리자 비밀번호</b>가 필요합니다.</div>
         <div class="r-line">• 총괄 비번은 모든 클럽의 관리자 기능에도 접근 가능합니다.</div>
-        <div class="r-line r-mini">v3.79 | 다중 클럽 시스템 + 마스터 보안</div>
+        <div class="r-line r-mini">v3.792 | 다중 클럽 시스템 + 마스터 보안</div>
       </div>
     </div>
   </div>
@@ -1323,7 +1321,7 @@
   const ACTIVE_CLUB_KEY = 'grandslam_active_club_v2';
   const MASTER_PIN = "0707"; // 총괄 마스터 비밀번호 (모든 클럽 접근 가능)
   
-  const CLUB_COLORS = ['#5D9C76','#669DB3','#D98C73','#007AFF','#FF3B30','#AF52DE','#FF9500','#34C759','#5856D6','#0C2340'];
+  const CLUB_COLORS = ['#5D9C76','#669DB3','#D98C73','#4A6B8A','#C4A55A','#C27C7C','#8B7EB5','#7A9E6D','#6B7B99','#3D5A4E'];
 
   // 현재 활성 클럽
   var currentClub = null;
@@ -1495,7 +1493,6 @@
     $('clubFormTitle').textContent = '새 클럽 추가';
     $('cfName').value = '';
     $('cfPin').value = '';
-    $('cfPin').placeholder = '예: 1234';
     $('cfCity').value = '';
     $('cfCityKo').value = '';
     $('cfEditId').value = '';
@@ -1513,9 +1510,7 @@
     closeClubDropdown();
     $('clubFormTitle').textContent = '클럽 수정';
     $('cfName').value = club.clubName || '';
-    // ✅ v3.791: 보안 - 수정 시 기존 비번 노출하지 않음
-    $('cfPin').value = '';
-    $('cfPin').placeholder = '미입력 시 기존 비번 유지';
+    $('cfPin').value = club.adminPin || '';
     $('cfCity').value = club.city || '';
     $('cfCityKo').value = club.cityKo || '';
     $('cfEditId').value = club.clubId;
@@ -1542,19 +1537,19 @@
     if (!row) return;
     row.innerHTML = CLUB_COLORS.map(function(c) {
       return '<div class="club-color-chip ' + (c === selectedColor ? 'selected' : '') + '" ' +
-        'style="background:' + c + '" ' +
-        'onclick="selectClubColor(this, \'' + c + '\')"></div>';
+        'style="background:' + c + '" data-color="' + c + '" ' +
+        'onclick="selectClubColor(this)"></div>';
     }).join('');
   }
 
-  function selectClubColor(el, color) {
+  function selectClubColor(el) {
     document.querySelectorAll('.club-color-chip').forEach(function(c){ c.classList.remove('selected'); });
     el.classList.add('selected');
   }
 
   function getSelectedColor() {
     const sel = document.querySelector('.club-color-chip.selected');
-    return sel ? sel.style.background : CLUB_COLORS[0];
+    return sel ? (sel.getAttribute('data-color') || CLUB_COLORS[0]) : CLUB_COLORS[0];
   }
 
   var _clubFormSaving = false; // ✅ 중복 저장 방지
@@ -1568,8 +1563,7 @@
     const editId = $('cfEditId').value;
 
     if (!name) { alert('클럽 이름을 입력해주세요.'); return; }
-    // ✅ v3.791: 수정 시 비번 미입력이면 기존 유지, 신규 생성 시에만 필수
-    if (!editId && !pin) { alert('관리자 비밀번호를 입력해주세요.'); return; }
+    if (!pin) { alert('관리자 비밀번호를 입력해주세요.'); return; }
 
     _clubFormSaving = true; // 잠금
     $('loading-overlay').style.display = 'flex';
@@ -1579,11 +1573,9 @@
         // 수정
         const payload = {
           action: 'updateClub', clubId: editId,
-          clubName: name,
+          clubName: name, adminPin: pin,
           city: city || 'Gwangmyeong', cityKo: cityKo || city || '도시', color: color
         };
-        // ✅ v3.791: 비번 입력된 경우에만 변경
-        if (pin) payload.adminPin = pin;
         const r = await fetchWithTimeout(MASTER_GAS_URL, {
           method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
@@ -1660,40 +1652,6 @@
   }
 
   // --- 클럽 관리 화면 ---
-  // ✅ v3.791: 빠른 비밀번호 변경
-  async function quickChangePin(clubId) {
-    if (!checkMasterPin()) return;
-    const club = clubList.find(function(c){ return c.clubId === clubId; });
-    if (!club) return;
-    const newPin = prompt('🔑 ' + club.clubName + '\n새 관리자 비밀번호를 입력하세요:');
-    if (!newPin || !newPin.trim()) return;
-    if (newPin.trim() === MASTER_PIN) {
-      alert('총괄 마스터 비밀번호와 같은 비번은 사용할 수 없습니다!');
-      return;
-    }
-    if (!confirm('비밀번호를 "' + newPin.trim() + '"(으)로 변경하시겠습니까?')) return;
-    try {
-      $('loading-overlay').style.display = 'flex';
-      const r = await fetchWithTimeout(MASTER_GAS_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'updateClub', clubId: clubId, adminPin: newPin.trim() })
-      }, 12000);
-      const resp = await r.json();
-      if (!resp.ok) throw new Error(resp.error || '변경 실패');
-      await fetchClubList();
-      if (currentClub && currentClub.clubId === clubId) {
-        ADMIN_PIN = newPin.trim();
-        currentClub.adminPin = newPin.trim();
-      }
-      alert('✅ 비밀번호가 변경되었습니다!');
-    } catch(e) {
-      alert('오류: ' + e.message);
-    } finally {
-      $('loading-overlay').style.display = 'none';
-    }
-  }
-
   function renderClubManageList() {
     const container = $('clubManageList');
     if (!container) return;
@@ -1713,7 +1671,6 @@
           '<div class="club-manage-url">' + escapeHtml(c.cityKo || c.city || '') + '</div>' +
         '</div>' +
         '<div class="club-manage-actions">' +
-          '<button class="club-manage-btn" style="background:#AF52DE; font-size:11px;" onclick="quickChangePin(\'' + c.clubId + '\')">비밀번호변경</button>' +
           '<button class="club-manage-btn" style="background:var(--aussie-blue);" onclick="openClubEdit(\'' + c.clubId + '\')">수정</button>' +
           (!c.isDefault ? '<button class="club-manage-btn" style="background:var(--roland-clay);" onclick="deleteClub(\'' + c.clubId + '\')">삭제</button>' : '') +
         '</div>' +
@@ -1736,7 +1693,7 @@
   var tabNow = 1;        // 현재 탭 번호
 
   // Practice Mode
-  var isPracticeMode = localStorage.getItem('grandslam_practice_mode') || 'practice';  // ✅ 기본값 'practice', localStorage 연동
+  var isPracticeMode = localStorage.getItem('grandslam_practice_mode') || 'real';  // ✅ 기본값 'real', localStorage 연동
 
   // Admin
   let adminUnlocked = false;
@@ -2263,7 +2220,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
 
   async function save() {
     // 연습 모드 체크
-    if (isPracticeMode === 'practice') {
+    if (isPracticeMode) {
       alert("지금은 연습 모드입니다! 기록이 저장되지 않습니다. 🧪");
       return;
     }
@@ -2504,9 +2461,6 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
   function switchView(v, b) {
-    // ✅ v3.791: 보안 - 다른 카테고리 이동 시 관리자 인증 초기화
-    adminUnlocked = false;
-    masterUnlocked = false;
     document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
     if(b) b.classList.add('active');
     showView(v);
@@ -2515,9 +2469,9 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   // ===== v3.5 구조 정리: Game/운영 허브 =====
   
 function checkAdminAndShow(viewName) {
-    // ✅ v3.791: 선수관리, 클럽관리 진입 시 매번 비번 확인 (보안 강화)
-    if (viewName === 'player-mgmt' || viewName === 'club-mgmt') {
+    if (viewName === 'player-mgmt' && !adminUnlocked) {
       if (!checkClubPin()) return;
+      adminUnlocked = true;
     }
     showView(viewName);
 }
@@ -2525,26 +2479,13 @@ function showView(v){
     document.querySelectorAll('.app-screen').forEach(el=>el.style.display='none');
     const el = document.getElementById(`view-${v}`);
     if(el) el.style.display='block';
-    // ✅ v3.791: 보호된 뷰에서 나갈 때 인증 상태 리셋
-    if(v !== 'player-mgmt' && v !== 'club-mgmt') {
-      masterUnlocked = false;
-    }
     // subviews에서도 표는 자동 보정
     setTimeout(applyAutofitAllTables, 0);
 
     // 기존 훅 유지
     if(v==='tennis') sync();
     if(v==='player-mgmt') { updatePlayerList();  }
-    if(v==='record') { 
-      // ✅ v3.791: 단일게임 진입 시 선수선택/점수 초기화
-      hT = []; aT = [];
-      if($('hS')) $('hS').value = '';
-      if($('aS')) $('aS').value = '';
-      if($('hN')) $('hN').innerText = '';
-      if($('aN')) $('aN').innerText = '';
-      if($('record-cnt')) $('record-cnt').textContent = '0';
-      renderPool(); 
-    }
+    if(v==='record') renderPool();
     if(v==='ladder') renderLadderPlayerPool();
     if(v==='tournament') initTournament();
     if(v==='stats') renderStatsPlayerList();
