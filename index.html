@@ -851,6 +851,13 @@
     }
 
 
+    /* ✅ v3.81: 선수 관리 테이블 모바일 최적화 */
+    .player-mgmt-table { table-layout: auto !important; }
+    .player-mgmt-table td { overflow: visible !important; text-overflow: clip !important; }
+    .player-mgmt-table td:nth-child(1) { width: auto !important; }
+    .player-mgmt-table td:nth-child(2) { width: 50px !important; }
+    .player-mgmt-table td:nth-child(3) { width: 140px !important; }
+
     /* ========================================
        v3.81: 총무 모드 스타일
        ======================================== */
@@ -1331,7 +1338,7 @@
       <input type="checkbox" id="pIsGuest" style="margin:0;">
       <label for="pIsGuest">게스트로 등록 (체크 시 랭킹에서 게스트로 분리)</label>
     </div>
-    <table id="pL" class="tennis-table"><tbody></tbody></table>
+    <table id="pL" class="tennis-table player-mgmt-table"><tbody></tbody></table>
 
     
     
@@ -2794,7 +2801,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
 
   async function save() {
     // 연습 모드 체크
-    if (isPracticeMode) {
+    if (isPracticeMode === 'practice') {
       alert("지금은 연습 모드입니다! 기록이 저장되지 않습니다. 🧪");
       return;
     }
@@ -2985,15 +2992,23 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
     function updatePlayerList(){
-    document.querySelector('#pL tbody').innerHTML = players.map(p=>`<tr>
-      <td style="text-align:left; padding-left:15px; font-weight:400;">${escapeHtml(p.name)}</td>
-      <td style="text-align:center; font-size:11px; color:#666;">${p.isGuest ? '게스트' : '회원'}</td>
-      <td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
-        <button onclick="editP('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:var(--aussie-blue); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">수정</button>
-        <button onclick="toggleGuest('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:#8E8E93; color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">구분</button>
-        <button onclick="delP('${escapeHtml(p.name).replace(/'/g,"&#39;")}')" style="background:var(--roland-clay); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:400;">삭제</button>
-      </td>
-    </tr>`).join('');
+    const members = players.filter(p => !p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
+    const guests = players.filter(p => p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
+    const all = [...members, ...guests];
+    
+    document.querySelector('#pL tbody').innerHTML = all.map(p => {
+      const safeName = escapeHtml(p.name).replace(/'/g,"&#39;");
+      const typeLabel = p.isGuest ? '<span style="color:var(--text-gray);">게스트</span>' : '회원';
+      return `<tr>
+        <td style="text-align:left; padding-left:10px; font-weight:400; max-width:none; white-space:nowrap; overflow:visible; text-overflow:clip;">${escapeHtml(displayName(p.name))}</td>
+        <td style="text-align:center; font-size:12px; width:50px;">${typeLabel}</td>
+        <td style="text-align:right; padding-right:5px; width:140px; white-space:nowrap;">
+          <button onclick="editP('${safeName}')" style="background:var(--aussie-blue); color:white; border:none; padding:6px 8px; border-radius:8px; font-size:11px; font-weight:400;">수정</button>
+          <button onclick="toggleGuest('${safeName}')" style="background:#8E8E93; color:white; border:none; padding:6px 8px; border-radius:8px; font-size:11px; font-weight:400;">구분</button>
+          <button onclick="delP('${safeName}')" style="background:var(--roland-clay); color:white; border:none; padding:6px 8px; border-radius:8px; font-size:11px; font-weight:400;">삭제</button>
+        </td>
+      </tr>`;
+    }).join('');
   }
 
   async function resetScoresKeepPlayers(){
