@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.81</title>
+  <title>GrandSlam Ultimate v3.811</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -1151,11 +1151,11 @@
     <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>광명시 날씨</div>
     <div class="search-row">
       <input id="city" class="w-input" value="광명" placeholder="도시명 (예: 광명, 파주)" />
-      <button id="btnSearch" class="w-btn" onclick="loadWeather(getWed(0))">검색</button>
+      <button id="btnSearch" class="w-btn" onclick="loadWeatherForNextMeeting(0)">검색</button>
     </div>
     <div class="btn-row">
-      <button id="btnRefresh" class="w-btn active" onclick="loadWeather(getWed(0))">이번 주 날씨</button>
-      <button id="btnNext" class="w-btn" onclick="loadWeather(getWed(7))">다음 주 날씨</button>
+      <button id="btnRefresh" class="w-btn active" onclick="loadWeatherForNextMeeting(0)">이번 모임 날씨</button>
+      <button id="btnNext" class="w-btn" onclick="loadWeatherForNextMeeting(1)">다음 모임 날씨</button>
     </div>
     <button id="naverWeatherBtn" onclick="openNaverWeather()" class="btn-sub sky" style="width:100%; margin-bottom:15px; height:45px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
       <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>Naver 날씨 확인
@@ -1227,7 +1227,7 @@
     </div>
   </div>
 
-  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.81</div>
+  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.811</div>
 </div>
 
 <div id="view-tennis" class="app-screen">
@@ -1839,11 +1839,15 @@
             <input type="text" id="courtNoticeName" class="w-input" placeholder="코트명" style="flex:1; padding:10px;" />
           </div>
           <input type="text" id="courtNoticeAddr" class="w-input" placeholder="주소" style="width:100%; padding:10px; margin-bottom:8px; box-sizing:border-box;" />
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="courtNoticeTime" class="w-input" placeholder="시간 (예: 08:00-10:00)" style="flex:1; padding:10px;" />
-            <input type="text" id="courtNoticeMemo" class="w-input" placeholder="메모" style="flex:1; padding:10px;" />
+          <!-- ✅ v3.811: 시간대+코트번호 최대 3줄 -->
+          <div id="courtSlotRows">
+            <div class="court-slot-row" style="display:flex; gap:8px; margin-bottom:6px;">
+              <input type="text" class="w-input court-slot-time" placeholder="시간 (예: 07:00-11:00)" style="flex:1; padding:10px;" />
+              <input type="text" class="w-input court-slot-court" placeholder="코트번호 (예: 11,12번)" style="flex:1; padding:10px;" />
+            </div>
           </div>
-          <button class="btn-main" onclick="addCourtNotice()" style="margin-top:10px; font-size:14px; padding:12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <button type="button" id="btnAddSlot" onclick="addCourtSlotRow()" style="border:none; background:none; color:var(--aussie-blue); font-size:13px; cursor:pointer; padding:4px 0; margin-bottom:8px;">+ 시간대 추가 (최대 3개)</button>
+          <button class="btn-main" onclick="addCourtNotice()" style="margin-top:4px; font-size:14px; padding:12px; display:flex; align-items:center; justify-content:center; gap:6px;">
             <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>코트 공지 추가
           </button>
         </div>
@@ -2842,6 +2846,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     hT=[]; aT=[];
     $('hN').innerText='';
     $('aN').innerText='';
+    renderPool(); // ✅ v3.811: 선수 선택 버튼 리셋
     tab(1);
     renderStatsPlayerList();
 
@@ -3968,7 +3973,7 @@ function showView(v){
         const hhmm = tStr.split("T")[1];
         if(!hhmm) continue;
         const hh = parseInt(hhmm.slice(0,2), 10);
-        if(hh >= 5 && hh <= 12) wanted.push(i);
+        if(hh >= weatherTimeRange.startH && hh <= weatherTimeRange.endH) wanted.push(i);
       }
       if(wanted.length === 0) throw new Error("05~12시 데이터 없음");
 
@@ -4015,6 +4020,63 @@ function showView(v){
     return d;
   }
 
+  // ✅ v3.811: 코트 공지 기반 다음 모임 날짜 찾기
+  function getNextMeetingDates() {
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0,10);
+    
+    // 오늘 포함 미래 코트 공지를 날짜순 정렬
+    const futureDates = courtNotices
+      .map(n => n.date)
+      .filter(d => d >= todayStr)
+      .sort()
+      .filter((v,i,a) => a.indexOf(v) === i); // 중복 제거
+
+    return futureDates;
+  }
+
+  function loadWeatherForNextMeeting(index) {
+    const dates = getNextMeetingDates();
+    
+    if(dates.length > index) {
+      const dateStr = dates[index];
+      const d = new Date(dateStr + 'T12:00:00');
+      
+      // ✅ 해당 날짜의 코트 공지에서 시간대 파싱
+      const dayNotices = courtNotices.filter(n => n.date === dateStr);
+      let startH = 5, endH = 12; // 기본값
+      
+      if(dayNotices.length > 0) {
+        const allSlots = dayNotices.flatMap(n => n.slots || [{time: n.time}]);
+        let earliest = 24, latest = 0;
+        allSlots.forEach(s => {
+          if(!s.time) return;
+          const m = s.time.match(/(\d{1,2}):?\d{0,2}\s*[-~]\s*(\d{1,2})/);
+          if(m) {
+            earliest = Math.min(earliest, parseInt(m[1]));
+            latest = Math.max(latest, parseInt(m[2]));
+          }
+        });
+        if(earliest < 24 && latest > 0) {
+          startH = Math.max(0, earliest - 3);
+          endH = Math.min(23, latest + 1);
+        }
+      }
+      
+      weatherTimeRange = { startH, endH };
+      loadWeather(d);
+    } else {
+      // 코트 공지 없으면 기존 수요일 fallback
+      weatherTimeRange = { startH: 5, endH: 12 };
+      loadWeather(getWed(index * 7));
+    }
+    
+    if($('btnRefresh')) $('btnRefresh').classList.toggle('active', index === 0);
+    if($('btnNext')) $('btnNext').classList.toggle('active', index === 1);
+  }
+
+  var weatherTimeRange = { startH: 5, endH: 12 };
+
   // ========================================
   // v3.80: HOME - 코트 정보 시스템
   // ========================================
@@ -4033,23 +4095,40 @@ function showView(v){
   var announcements = [];
 
   function loadCourtInfo() {
-    // 오늘 날짜에 해당하는 코트 공지가 있으면 우선 표시
     const today = new Date();
     const todayStr = today.toISOString().slice(0,10);
-    const todayNotice = courtNotices.find(n => n.date === todayStr);
+    
+    // ✅ v3.811: 오늘 포함 가장 가까운 미래 공지 찾기
+    const upcoming = courtNotices
+      .filter(n => n.date >= todayStr)
+      .sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    
+    const notice = upcoming.length > 0 ? upcoming[0] : null;
 
-    if(todayNotice) {
-      $('courtName').textContent = todayNotice.courtName || defaultCourt.name;
-      $('courtTime').textContent = todayNotice.time || defaultCourt.time;
-      $('courtAddress').textContent = todayNotice.address || defaultCourt.address;
-      if(todayNotice.memo) {
-        $('courtMemo').textContent = todayNotice.memo;
+    if(notice) {
+      $('courtName').textContent = notice.courtName || defaultCourt.name;
+      // ✅ v3.811: slots 배열 지원
+      const slots = notice.slots || [{time: notice.time, court: notice.memo}];
+      const timeText = slots.map(s => s.time || '').filter(Boolean).join(' / ');
+      $('courtTime').textContent = timeText || defaultCourt.time;
+      $('courtAddress').textContent = notice.address || defaultCourt.address;
+      
+      const courtText = slots.map(s => s.court || '').filter(Boolean).join(', ');
+      if(courtText) {
+        $('courtMemo').textContent = '🎾 ' + courtText;
         $('courtMemo').style.display = 'block';
       } else {
         $('courtMemo').style.display = 'none';
       }
+      
+      // 날짜가 오늘이 아니면 날짜 표시
+      if(notice.date !== todayStr) {
+        const dayNames = ['일','월','화','수','목','금','토'];
+        const d = new Date(notice.date + 'T00:00:00');
+        const dayStr = isNaN(d.getTime()) ? '' : ` (${dayNames[d.getDay()]})`;
+        $('courtName').textContent = `[${notice.date.slice(5)}${dayStr}] ${notice.courtName || defaultCourt.name}`;
+      }
     } else {
-      // 기본 코트 정보 표시
       $('courtName').textContent = defaultCourt.name;
       $('courtTime').textContent = defaultCourt.time;
       $('courtAddress').textContent = defaultCourt.address;
@@ -4630,7 +4709,7 @@ function showView(v){
   }
 
   // ========================================
-  // 코트 공지 관리 CRUD + 프리셋
+  // 코트 공지 관리 CRUD + 프리셋 + 슬롯 (v3.811)
   // ========================================
 
   function getCourtPresetKey() {
@@ -4645,7 +4724,6 @@ function showView(v){
   }
 
   function saveCourtPresetToStorage(preset) {
-    // 중복 체크 (코트명 기준)
     const exists = courtPresets.find(p => p.name === preset.name);
     if(!exists) {
       courtPresets.push(preset);
@@ -4659,7 +4737,8 @@ function showView(v){
     if(!sel) return;
     sel.innerHTML = '<option value="">📌 저장된 코트 선택 (직접 입력)</option>';
     courtPresets.forEach((p, i) => {
-      sel.innerHTML += `<option value="${i}">${escapeHtml(p.name)} ${p.time ? '(' + escapeHtml(p.time) + ')' : ''}</option>`;
+      const slotsStr = (p.slots||[]).map(s=>s.time).filter(Boolean).join(', ');
+      sel.innerHTML += `<option value="${i}">${escapeHtml(p.name)} ${slotsStr ? '(' + escapeHtml(slotsStr) + ')' : ''}</option>`;
     });
   }
 
@@ -4670,16 +4749,55 @@ function showView(v){
     const p = courtPresets[idx];
     $('courtNoticeName').value = p.name || '';
     $('courtNoticeAddr').value = p.address || '';
-    $('courtNoticeTime').value = p.time || '';
-    $('courtNoticeMemo').value = p.memo || '';
+    
+    // 슬롯 복원
+    const container = $('courtSlotRows');
+    container.innerHTML = '';
+    const slots = p.slots || [{time:'', court:''}];
+    slots.forEach(s => {
+      const row = document.createElement('div');
+      row.className = 'court-slot-row';
+      row.style.cssText = 'display:flex; gap:8px; margin-bottom:6px;';
+      row.innerHTML = '<input type="text" class="w-input court-slot-time" placeholder="시간 (예: 07:00-11:00)" value="' + escapeHtml(s.time||'') + '" style="flex:1; padding:10px;" /><input type="text" class="w-input court-slot-court" placeholder="코트번호 (예: 11,12번)" value="' + escapeHtml(s.court||'') + '" style="flex:1; padding:10px;" />';
+      container.appendChild(row);
+    });
+    updateAddSlotBtn();
+  }
+
+  function addCourtSlotRow() {
+    const container = $('courtSlotRows');
+    const rows = container.querySelectorAll('.court-slot-row');
+    if(rows.length >= 3) return;
+    const row = document.createElement('div');
+    row.className = 'court-slot-row';
+    row.style.cssText = 'display:flex; gap:8px; margin-bottom:6px;';
+    row.innerHTML = '<input type="text" class="w-input court-slot-time" placeholder="시간 (예: 07:00-11:00)" style="flex:1; padding:10px;" /><input type="text" class="w-input court-slot-court" placeholder="코트번호 (예: 11,12번)" style="flex:1; padding:10px;" />';
+    container.appendChild(row);
+    updateAddSlotBtn();
+  }
+
+  function updateAddSlotBtn() {
+    const rows = $('courtSlotRows').querySelectorAll('.court-slot-row');
+    const btn = $('btnAddSlot');
+    if(btn) btn.style.display = rows.length >= 3 ? 'none' : 'block';
+  }
+
+  function getSlotValues() {
+    const rows = $('courtSlotRows').querySelectorAll('.court-slot-row');
+    const slots = [];
+    rows.forEach(row => {
+      const time = row.querySelector('.court-slot-time').value.trim();
+      const court = row.querySelector('.court-slot-court').value.trim();
+      if(time || court) slots.push({ time, court });
+    });
+    return slots;
   }
 
   function addCourtNotice() {
     const date = $('courtNoticeDate').value;
     const name = $('courtNoticeName').value.trim();
     const addr = $('courtNoticeAddr').value.trim();
-    const time = $('courtNoticeTime').value.trim();
-    const memo = $('courtNoticeMemo').value.trim();
+    const slots = getSlotValues();
 
     if(!date || !name) return alert('날짜와 코트명은 필수입니다.');
 
@@ -4688,18 +4806,14 @@ function showView(v){
       date: date,
       courtName: name,
       address: addr,
-      time: time,
-      memo: memo
+      slots: slots.length > 0 ? slots : [{time:'', court:''}],
+      time: slots.map(s=>s.time).filter(Boolean).join(' / '),
+      memo: slots.map(s=>s.court).filter(Boolean).join(', ')
     };
 
     courtNotices.push(notice);
-
-    // 프리셋 자동 저장
-    saveCourtPresetToStorage({ name, address: addr, time, memo });
-
-    // 입력 초기화 (날짜만)
+    saveCourtPresetToStorage({ name, address: addr, slots: notice.slots });
     $('courtNoticeDate').value = '';
-
     renderCourtNoticeList();
     loadCourtInfo();
     saveCourtNotice(notice);
@@ -4725,22 +4839,22 @@ function showView(v){
       const dayNames = ['일','월','화','수','목','금','토'];
       const d = new Date(n.date + 'T00:00:00');
       const dayStr = isNaN(d.getTime()) ? '' : ` (${dayNames[d.getDay()]})`;
-      return `
-        <div class="crud-item">
-          <div class="crud-item-header">
-            <div>
-              <div style="font-size:14px; color:var(--text-dark);">${escapeHtml(n.date)}${dayStr}</div>
-              <div style="font-size:15px; margin-top:4px;">${escapeHtml(n.courtName)}</div>
-              ${n.time ? `<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">⏰ ${escapeHtml(n.time)}</div>` : ''}
-              ${n.address ? `<div style="font-size:12px; color:var(--text-gray);">📍 ${escapeHtml(n.address)}</div>` : ''}
-              ${n.memo ? `<div style="font-size:12px; color:var(--aussie-blue); margin-top:2px;">💬 ${escapeHtml(n.memo)}</div>` : ''}
-            </div>
-            <div class="crud-item-actions">
-              <button class="crud-btn crud-btn-del" onclick="deleteCourtNotice('${n.id}')">삭제</button>
-            </div>
-          </div>
-        </div>
-      `;
+      const slots = n.slots || [{time: n.time, court: n.memo}];
+      const slotsHtml = slots.map(s => {
+        const parts = [];
+        if(s.time) parts.push('⏰ ' + escapeHtml(s.time));
+        if(s.court) parts.push('🎾 ' + escapeHtml(s.court));
+        return parts.length > 0 ? '<div style="font-size:12px; color:var(--text-gray); margin-top:2px;">' + parts.join(' &nbsp; ') + '</div>' : '';
+      }).join('');
+      
+      return '<div class="crud-item"><div class="crud-item-header"><div>' +
+        '<div style="font-size:14px; color:var(--text-dark);">' + escapeHtml(n.date) + dayStr + '</div>' +
+        '<div style="font-size:15px; margin-top:4px;">' + escapeHtml(n.courtName) + '</div>' +
+        slotsHtml +
+        (n.address ? '<div style="font-size:12px; color:var(--text-gray);">📍 ' + escapeHtml(n.address) + '</div>' : '') +
+        '</div><div class="crud-item-actions">' +
+        '<button class="crud-btn crud-btn-del" onclick="deleteCourtNotice(\'' + n.id + '\')">삭제</button>' +
+        '</div></div></div>';
     }).join('');
   }
 
@@ -5118,7 +5232,7 @@ function showView(v){
     try { await initClubSystem(); } catch(e) { console.error("initClubSystem() error:", e); }
 
     try { sync(); } catch(e) { console.error("sync() error:", e); }
-    try { loadWeather(getWed(0)); } catch(e) { console.error("loadWeather() error:", e); }
+    try { loadWeatherForNextMeeting(0); } catch(e) { console.error("loadWeather() error:", e); }
 
     // ✅ v3.80: 코트 공지 & 공지사항 로드
     try { await fetchCourtNotices(); } catch(e) { console.warn("fetchCourtNotices error:", e); }
