@@ -1992,9 +1992,12 @@
 
     // ✅ v3.81: 클럽 전환 시 총무 모드 리셋
     treasurerUnlocked = false;
-    financeData = financeData.filter(f => !f.auto); // 자동 항목 제거
+    financeData = [];
     feeData = {};
     monthlyFeeAmount = 0;
+    // ✅ v3.811: 클럽별 코트/공지 데이터 분리
+    courtNotices = [];
+    announcements = [];
     
     if (doSync !== false) {
       players = [];
@@ -3931,10 +3934,6 @@ function showView(v){
   }
 
   async function loadWeather(d) {
-    const isNextWeek = (d.getTime() > getWed(0).getTime());
-    if($('btnRefresh')) $('btnRefresh').classList.toggle('active', !isNextWeek);
-    if($('btnNext')) $('btnNext').classList.toggle('active', isNextWeek);
-
     $('tbl').style.display = "none";
     $('dynamicTip').style.display = "none";
     $("tbody").innerHTML = "";
@@ -4021,6 +4020,8 @@ function showView(v){
   }
 
   // ✅ v3.811: 코트 공지 기반 다음 모임 날짜 찾기
+  var weatherTimeRange = { startH: 5, endH: 12 };
+
   function getNextMeetingDates() {
     const today = new Date();
     const todayStr = today.toISOString().slice(0,10);
@@ -4074,8 +4075,6 @@ function showView(v){
     if($('btnRefresh')) $('btnRefresh').classList.toggle('active', index === 0);
     if($('btnNext')) $('btnNext').classList.toggle('active', index === 1);
   }
-
-  var weatherTimeRange = { startH: 5, endH: 12 };
 
   // ========================================
   // v3.80: HOME - 코트 정보 시스템
@@ -4306,21 +4305,36 @@ function showView(v){
 
   // ========================================
   // v3.80: GAS 연동 - 코트공지 & 공지사항 로드
+  // v3.811: localStorage fallback + 클럽별 분리 저장
   // ========================================
+
+  function getLocalCourtKey() { return 'grandslam_court_notices_' + getActiveClubId(); }
+  function getLocalAnnouncementKey() { return 'grandslam_announcements_' + getActiveClubId(); }
+
+  function persistCourtNoticesLocal() {
+    try { localStorage.setItem(getLocalCourtKey(), JSON.stringify(courtNotices)); } catch(e) {}
+  }
+  function persistAnnouncementsLocal() {
+    try { localStorage.setItem(getLocalAnnouncementKey(), JSON.stringify(announcements)); } catch(e) {}
+  }
 
   async function fetchCourtNotices() {
     if(!currentClub) return;
     try {
       const url = MASTER_GAS_URL + '?action=getCourtNotices&clubId=' + encodeURIComponent(getActiveClubId());
       const r = await fetchWithTimeout(url, {}, 12000);
-      if(!r.ok) return;
+      if(!r.ok) throw new Error('not ok');
       const resp = await r.json();
       if(resp.ok && Array.isArray(resp.notices)) {
         courtNotices = resp.notices;
+        persistCourtNoticesLocal();
+        return;
       }
     } catch(e) {
-      console.warn('fetchCourtNotices error:', e);
+      console.warn('fetchCourtNotices GAS error, using local:', e);
     }
+    // GAS 실패시 localStorage에서 복원
+    try { courtNotices = JSON.parse(localStorage.getItem(getLocalCourtKey())) || []; } catch(e) { courtNotices = []; }
   }
 
   async function fetchAnnouncements() {
@@ -4328,18 +4342,23 @@ function showView(v){
     try {
       const url = MASTER_GAS_URL + '?action=getAnnouncements&clubId=' + encodeURIComponent(getActiveClubId());
       const r = await fetchWithTimeout(url, {}, 12000);
-      if(!r.ok) return;
+      if(!r.ok) throw new Error('not ok');
       const resp = await r.json();
       if(resp.ok && Array.isArray(resp.announcements)) {
         announcements = resp.announcements;
+        persistAnnouncementsLocal();
+        return;
       }
     } catch(e) {
-      console.warn('fetchAnnouncements error:', e);
+      console.warn('fetchAnnouncements GAS error, using local:', e);
     }
+    // GAS 실패시 localStorage에서 복원
+    try { announcements = JSON.parse(localStorage.getItem(getLocalAnnouncementKey())) || []; } catch(e) { announcements = []; }
   }
 
-  // 코트공지 저장 (총무 모드용 - 추후 v3.81+)
+  // 코트공지 저장
   async function saveCourtNotice(notice) {
+    persistCourtNoticesLocal(); // 항상 로컬 먼저
     if(!currentClub) return false;
     try {
       const url = MASTER_GAS_URL + '?action=saveCourtNotice&clubId=' + encodeURIComponent(getActiveClubId());
@@ -4356,8 +4375,9 @@ function showView(v){
     }
   }
 
-  // 공지사항 저장 (총무 모드용 - 추후 v3.81+)
+  // 공지사항 저장
   async function saveAnnouncement(announcement) {
+    persistAnnouncementsLocal(); // 항상 로컬 먼저
     if(!currentClub) return false;
     try {
       const url = MASTER_GAS_URL + '?action=saveAnnouncement&clubId=' + encodeURIComponent(getActiveClubId());
@@ -4822,6 +4842,7 @@ function showView(v){
   function deleteCourtNotice(id) {
     if(!confirm('삭제할까요?')) return;
     courtNotices = courtNotices.filter(n => n.id !== id);
+    persistCourtNoticesLocal();
     renderCourtNoticeList();
     loadCourtInfo();
   }
@@ -4892,6 +4913,7 @@ function showView(v){
     if(!confirm('삭제할까요?')) return;
     const ann = announcements.find(a => a.id === id);
     if(ann) ann.deleted = true;
+    persistAnnouncementsLocal();
     renderAnnouncementMgmtList();
     loadNotices();
   }
@@ -6467,26 +6489,4 @@ window.addEventListener("resize", () => {
     </div>
     <div class="modal-body">
       <div class="modal-info">
-        <strong>💡 선택 가이드</strong><br>
-        • 원하는 인원을 자유롭게 선택하세요<br>
-        • 2, 4, 8명: 정규 토너먼트<br>
-        • 그 외 인원: 상위 랭커 부전승 자동 배정
-      </div>
-      <div id="modal-participant-list" class="modal-participant-list"></div>
-      <div style="margin-top: 15px; text-align: center; color: var(--aussie-blue); font-weight: 400;">
-        선택된 인원: <strong><span id="modal-selected-count">0</span>명/팀</strong>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-btn modal-btn-secondary" onclick="closeTournamentModal()">
-        <span class="material-symbols-outlined btn-ico">close</span>취소
-      </button>
-      <button class="modal-btn modal-btn-primary" onclick="startTournamentFromModal()">
-        <span class="material-symbols-outlined btn-ico">play_arrow</span>시작하기
-      </button>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
+       
