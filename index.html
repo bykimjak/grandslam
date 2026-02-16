@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.811</title>
+  <title>GrandSlam Ultimate v3.815</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -23,9 +23,11 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; align-items: center; justify-content: center; z-index: 30000; }
+    #splash { position: fixed; inset: 0; background: var(--wimbledon-sage); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 30000; gap: 20px; }
     #splash img { width: 140px; height: 140px; border-radius: 24px; transition: transform 0.7s ease, opacity 0.6s ease; }
     #splash.hide img { transform: scale(5); opacity: 0; }
+    #splash .loading-text { color: white; font-size: 16px; font-weight: 400; opacity: 0.9; }
+
 
     
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(255,255,255,0.98); border-top: 1px solid #d1d1d6; display: flex !important; justify-content: space-around; align-items: center; z-index: 21000 !important; }
@@ -1023,7 +1025,10 @@
 </head>
 
 <body>
-<div id="splash"><img src="icon.png" alt="GrandSlam Logo"></div>
+<div id="splash">
+  <img src="icon.png" alt="GrandSlam Logo">
+  <div class="loading-text">⌛ 데이터 동기화 중...</div>
+</div>
 <div id="loading-overlay">⌛ 데이터 동기화 중...</div>
 
 <!-- ✅ v3.79: 클럽 전환 셀렉터 바 -->
@@ -1120,7 +1125,7 @@
     <div class="club-form-group">
       <label class="club-form-label">관리자 비밀번호 *</label>
       <input type="password" class="club-form-input" id="cfPin" placeholder="예: 0707 (숫자+문자 가능)" maxlength="20" />
-      <div class="club-form-hint">⚠️ 비밀번호는 문자열로 저장됩니다. 0707 등 앞자리 0도 유지됩니다.</div>
+      <div class="club-form-hint">💡 4자리 숫자로 설정하세요 (예: 1234)</div>
     </div>
     <div class="club-form-group">
       <label class="club-form-label">날씨 검색 도시 (영문)</label>
@@ -2174,7 +2179,11 @@
         await fetchClubList();
         if (currentClub && currentClub.clubId === editId) {
           const updated = clubList.find(function(c){ return c.clubId === editId; });
-          if (updated) activateClub(updated, true);
+          if (updated) {
+            activateClub(updated, true);
+            // ✅ v3.815: 비밀번호 변경 후 즉시 반영
+            ADMIN_PIN = updated.adminPin || '0707';
+          }
         }
         alert('클럽 정보가 수정되었습니다!');
 
@@ -2703,14 +2712,96 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   function updateChartRange(rangeIdx) {
     document.querySelectorAll('.chart-nav .chart-btn').forEach((b,i) => b.className = i===rangeIdx ? 'chart-btn active' : 'chart-btn');
 
-    const labels = [
-      ['2/11', '2/18', '2/25', '3/4', '3/11', '3/18', '3/25', '4/1'],
-      ['4/8', '4/15', '4/22', '4/29', '5/6', '5/13', '5/20', '5/27'],
-      ['6/3', '6/10', '6/17', '6/24', '7/1', '7/8', '7/15', '7/22', '7/29'],
-      ['8/5', '8/12', '8/19', '8/26', '9/2', '9/9', '9/16', '9/23', '9/30'],
-      ['10/7', '10/14', '10/21', '10/28', '11/4', '11/11', '11/18', '11/25'],
-      ['12/2', '12/9', '12/16', '12/23', '12/30', '1/6', '1/13', '1/20']
-    ][rangeIdx];
+    // ✅ v3.815: 실제 경기 기록 날짜만 차트에 표시
+    if (!matchLog || matchLog.length === 0) {
+      // 경기 기록이 없으면 빈 차트
+      if(chart) chart.destroy();
+      chart = new Chart($('seasonChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+      return;
+    }
+    
+    // 날짜별로 그룹화 (MM/DD 형식) - 유효한 날짜만
+    const matchDates = [...new Set(matchLog
+      .filter(m => m.date && m.date.length >= 10) // 유효한 날짜만
+      .map(m => {
+        try {
+          const d = new Date(m.date);
+          return `${d.getMonth()+1}/${d.getDate()}`;
+        } catch(e) {
+          return null;
+        }
+      })
+      .filter(d => d !== null)
+    )].sort((a, b) => {
+      const [aM, aD] = a.split('/').map(Number);
+      const [bM, bD] = b.split('/').map(Number);
+      return (aM * 100 + aD) - (bM * 100 + bD);
+    });
+    
+    if (matchDates.length === 0) {
+      // 유효한 날짜가 없으면 빈 차트
+      if(chart) chart.destroy();
+      chart = new Chart($('seasonChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+      return;
+    }
+    
+    // 범위별로 날짜 필터링 (월 기준)
+    const monthRanges = [
+      [2, 3],   // 2-3월
+      [4, 5],   // 4-5월
+      [6, 7],   // 6-7월
+      [8, 9],   // 8-9월
+      [10, 11], // 10-11월
+      [12, 1]   // 12-1월
+    ];
+    
+    const [startMonth, endMonth] = monthRanges[rangeIdx];
+    const labels = matchDates.filter(dateStr => {
+      const month = parseInt(dateStr.split('/')[0]);
+      if (startMonth <= endMonth) {
+        return month >= startMonth && month <= endMonth;
+      } else {
+        // 12-1월 같은 경우
+        return month >= startMonth || month <= endMonth;
+      }
+    });
+    
+    // 레이블이 없으면 빈 차트
+    if (labels.length === 0) {
+      if(chart) chart.destroy();
+      chart = new Chart($('seasonChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+      return;
+    }
 
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
 
@@ -2722,7 +2813,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
 
     const datasets = members.map((p, i) => ({
       label: p.name,
-      data: labels.map((_, idx) => (rangeIdx === 0 && idx === 0) ? ranks[p.name] : null),
+      data: labels.map((dateLabel, idx) => idx === labels.length - 1 ? ranks[p.name] : null),
       borderColor: colors[i % colors.length],
       backgroundColor: colors[i % colors.length],
       pointRadius: 5,
@@ -4247,7 +4338,7 @@ function showView(v){
     let text = '';
 
     if(mode === 'weather' || mode === 'weather+court' || mode === 'all') {
-      text += `🎾 ${dateDisp} 아침 테니스\n`;
+      text += `🎾 ${dateDisp} 정보\n`;
       if(weatherSummary) text += `${weatherSummary}\n`;
     }
 
@@ -4269,7 +4360,7 @@ function showView(v){
     }
 
     if(mode === 'text') {
-      text = `🎾 ${dateDisp} 아침 테니스\n`;
+      text = `🎾 ${dateDisp} 정보\n`;
       text += `📍 ${courtName}\n`;
       text += `⏰ ${courtTime}\n`;
       if(courtAddress) text += `🗺️ ${courtAddress}\n`;
@@ -5240,16 +5331,10 @@ function showView(v){
     setTimeout(() => { sp.style.display = 'none'; }, 700);
   }
 
-  // DOM이 준비되면 먼저 인트로를 내려준다 (외부 리소스 로딩과 무관)
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(hideSplashSafe, 600);
-  });
+  // ✅ v3.813: 스플래시를 데이터 로딩 완료까지 유지 (자동 숨김 제거)
 
   // 리소스 로딩 완료 후 초기화(에러 나도 인트로는 이미 내려감)
   window.addEventListener("load", async () => {
-    // 혹시 DOMContentLoaded가 안 탔을 경우 대비
-    setTimeout(hideSplashSafe, 0);
-
     // ✅ v3.79: 클럽 시스템 초기화 (sync 전에 완료되어야 올바른 clubId 설정됨)
     try { await initClubSystem(); } catch(e) { console.error("initClubSystem() error:", e); }
 
@@ -5260,6 +5345,9 @@ function showView(v){
     try { await fetchCourtNotices(); } catch(e) { console.warn("fetchCourtNotices error:", e); }
     try { await fetchAnnouncements(); } catch(e) { console.warn("fetchAnnouncements error:", e); }
     try { loadCourtInfo(); loadNotices(); } catch(e) { console.warn("home render error:", e); }
+
+    // ✅ v3.813: 모든 데이터 로딩 완료 후 스플래시 숨김
+    setTimeout(hideSplashSafe, 300);
 
     // ✅ v3.79: 연습/실전 모드 버튼 상태 복원
     try {
@@ -6489,4 +6577,26 @@ window.addEventListener("resize", () => {
     </div>
     <div class="modal-body">
       <div class="modal-info">
-       
+        <strong>💡 선택 가이드</strong><br>
+        • 원하는 인원을 자유롭게 선택하세요<br>
+        • 2, 4, 8명: 정규 토너먼트<br>
+        • 그 외 인원: 상위 랭커 부전승 자동 배정
+      </div>
+      <div id="modal-participant-list" class="modal-participant-list"></div>
+      <div style="margin-top: 15px; text-align: center; color: var(--aussie-blue); font-weight: 400;">
+        선택된 인원: <strong><span id="modal-selected-count">0</span>명/팀</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-secondary" onclick="closeTournamentModal()">
+        <span class="material-symbols-outlined btn-ico">close</span>취소
+      </button>
+      <button class="modal-btn modal-btn-primary" onclick="startTournamentFromModal()">
+        <span class="material-symbols-outlined btn-ico">play_arrow</span>시작하기
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
