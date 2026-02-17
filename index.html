@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.815</title>
+  <title>GrandSlam Ultimate v3.818</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -1188,12 +1188,18 @@
       <div class="court-info-row">
         <span class="material-symbols-outlined">schedule</span>
         <span id="courtTime">07:00 ~ 11:00</span>
+        <span id="courtNumber" style="display:none; margin-left:8px; font-size:13px; color:var(--wimbledon-sage); font-weight:400; background:rgba(93,156,118,0.1); padding:2px 8px; border-radius:8px;"></span>
       </div>
       <div class="court-info-row">
         <span class="material-symbols-outlined">map</span>
         <span id="courtAddress">경기도 광명시 오리로 613</span>
       </div>
       <div id="courtMemo" class="court-info-memo" style="display:none;"></div>
+    </div>
+    <!-- ✅ v3.817: 공지 없을 때 안내 메시지 -->
+    <div id="courtNoNotice" style="display:none; padding:16px 0; text-align:center; color:var(--text-gray); font-size:13px;">
+      <span class="material-symbols-outlined" style="font-size:32px; display:block; margin-bottom:6px; opacity:0.4;">event_busy</span>
+      등록된 코트 공지가 없습니다
     </div>
     <div class="court-btn-row">
       <button class="btn-map" onclick="openCourtMap()">
@@ -1232,7 +1238,7 @@
     </div>
   </div>
 
-  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.811</div>
+  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.818</div>
 </div>
 
 <div id="view-tennis" class="app-screen">
@@ -1748,6 +1754,20 @@
             <span class="material-symbols-outlined">campaign</span> 공지사항 관리
           </button>
         </div>
+        <!-- ✅ v3.816: 1대2대결용 활성화 토글 -->
+        <div style="margin-top:20px; padding:15px; background:#f9f9f9; border-radius:14px; border:1px solid #eee;">
+          <div style="font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">⚙️ 클럽 게임 설정</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div>
+              <div style="font-size:13px; color:var(--text-dark); font-weight:400;">1대2대결용 활성화</div>
+              <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">게임 풀에 고정 버튼 표시 (랭킹/통계 제외)</div>
+            </div>
+            <label id="use1v2Toggle" onclick="toggle1v2()" style="position:relative; display:inline-block; width:48px; height:26px; cursor:pointer;">
+              <span id="use1v2Track" style="position:absolute; inset:0; border-radius:13px; background:#ccc; transition:background 0.2s;"></span>
+              <span id="use1v2Thumb" style="position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:white; box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:transform 0.2s;"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1987,6 +2007,11 @@
   }
 
   function activateClub(club, doSync) {
+    // ✅ v3.818: currentClub 바꾸기 전에 이전 클럽 ID로 먼저 저장 (버그 수정)
+    if(currentClub && currentClub.clubId) {
+      localStorage.setItem('grandslam_fee_data_' + currentClub.clubId, JSON.stringify(feeData));
+    }
+
     currentClub = club;
     ADMIN_PIN = club.adminPin || '0707';
     saveActiveClubId(club.clubId);
@@ -2449,6 +2474,9 @@
         matchLog = normalizeMatchLog(data?.matchLog || data?.logs || []);
       }
 
+      // ✅ v3.816: '1대2용' → '1대2대결용' 이름 마이그레이션 (옵션B)
+      migrate1v2Names();
+
       updateSeason();
       updateWeekly();
       if (tabNow === 1) updateChartRange(0);
@@ -2463,6 +2491,36 @@
       setStatus(`<div style="color:#ff3b30; font-size:12px; margin-bottom:10px;">데이터 동기화 실패 😵‍💫</div>`);
     } finally {
       $('loading-overlay').style.display = 'none';
+    }
+  }
+
+  // ✅ v3.816: '1대2용' → '1대2대결용' 마이그레이션 함수
+  function migrate1v2Names() {
+    let changed = false;
+    // players 배열에서 이름 변경
+    players.forEach(p => {
+      if(p.name === '1대2용') {
+        p.name = '1대2대결용';
+        changed = true;
+      }
+    });
+    // matchLog에서 이름 변경
+    if(matchLog && matchLog.length > 0) {
+      matchLog.forEach(log => {
+        ['home','away','winner','loser'].forEach(key => {
+          if(Array.isArray(log[key])) {
+            log[key] = log[key].map(n => n === '1대2용' ? '1대2대결용' : n);
+          } else if(log[key] === '1대2용') {
+            log[key] = '1대2대결용';
+            changed = true;
+          }
+        });
+      });
+    }
+    // 변경됐으면 서버에 push (조용히)
+    if(changed) {
+      console.log('[v3.816] 1대2용 → 1대2대결용 마이그레이션 완료, 서버 저장 중...');
+      pushPayload({ action: "save", data: players, matchLogAppend: [] }).catch(e => console.warn('migrate push error:', e));
     }
   }
 
@@ -2620,7 +2678,8 @@
 function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     const baseList = (() => {
       if (filterMode === 'guest') {
-        const guests = players.filter(p => p.isGuest);
+        // ✅ v3.816: HIDDEN_PLAYERS는 게스트 랭킹에서도 제외
+        const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
         const names = guests.map(p=>p.name);
         const agg = aggregateSeasonForNamesFromLog(names);
         // Merge computed season stats into the current player objects (keeps last-rank fields)
@@ -2712,108 +2771,79 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   function updateChartRange(rangeIdx) {
     document.querySelectorAll('.chart-nav .chart-btn').forEach((b,i) => b.className = i===rangeIdx ? 'chart-btn active' : 'chart-btn');
 
-    // ✅ v3.815: 실제 경기 기록 날짜만 차트에 표시
-    if (!matchLog || matchLog.length === 0) {
-      // 경기 기록이 없으면 빈 차트
+    const emptyChart = () => {
       if(chart) chart.destroy();
       chart = new Chart($('seasonChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
-      return;
-    }
-    
-    // 날짜별로 그룹화 (MM/DD 형식) - 유효한 날짜만
-    const matchDates = [...new Set(matchLog
-      .filter(m => m.date && m.date.length >= 10) // 유효한 날짜만
-      .map(m => {
-        try {
-          const d = new Date(m.date);
-          return `${d.getMonth()+1}/${d.getDate()}`;
-        } catch(e) {
-          return null;
-        }
-      })
-      .filter(d => d !== null)
-    )].sort((a, b) => {
-      const [aM, aD] = a.split('/').map(Number);
-      const [bM, bD] = b.split('/').map(Number);
-      return (aM * 100 + aD) - (bM * 100 + bD);
-    });
-    
-    if (matchDates.length === 0) {
-      // 유효한 날짜가 없으면 빈 차트
-      if(chart) chart.destroy();
-      chart = new Chart($('seasonChart').getContext('2d'), {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          }
-        }
-      });
-      return;
-    }
-    
-    // 범위별로 날짜 필터링 (월 기준)
-    const monthRanges = [
-      [2, 3],   // 2-3월
-      [4, 5],   // 4-5월
-      [6, 7],   // 6-7월
-      [8, 9],   // 8-9월
-      [10, 11], // 10-11월
-      [12, 1]   // 12-1월
-    ];
-    
-    const [startMonth, endMonth] = monthRanges[rangeIdx];
-    const labels = matchDates.filter(dateStr => {
-      const month = parseInt(dateStr.split('/')[0]);
-      if (startMonth <= endMonth) {
-        return month >= startMonth && month <= endMonth;
-      } else {
-        // 12-1월 같은 경우
-        return month >= startMonth || month <= endMonth;
-      }
-    });
-    
-    // 레이블이 없으면 빈 차트
-    if (labels.length === 0) {
-      if(chart) chart.destroy();
-      chart = new Chart($('seasonChart').getContext('2d'), {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          }
-        }
-      });
-      return;
-    }
+    };
 
+    // ✅ v3.818: 경기 기록 없으면 빈 차트
+    if (!matchLog || matchLog.length === 0) { emptyChart(); return; }
+
+    // 유효한 날짜 모두 수집 (중복 제거, 정렬)
+    const allDates = [...new Set(
+      matchLog
+        .filter(m => m.date && m.date.length >= 10)
+        .map(m => m.date.slice(0,10))
+    )].sort();
+
+    if (allDates.length === 0) { emptyChart(); return; }
+
+    // 범위별 월 필터
+    const monthRanges = [[2,3],[4,5],[6,7],[8,9],[10,11],[12,1]];
+    const [startMonth, endMonth] = monthRanges[rangeIdx];
+
+    const filteredDates = allDates.filter(d => {
+      const m = parseInt(d.slice(5,7));
+      return startMonth <= endMonth ? (m >= startMonth && m <= endMonth) : (m >= startMonth || m <= endMonth);
+    });
+
+    if (filteredDates.length === 0) { emptyChart(); return; }
+
+    // ✅ v3.818: 날짜별 누적 점수로 순위 계산
+    const members = players.filter(p => !p.isGuest);
     const colors = ['#FF3B30','#007AFF','#34C759','#FF9500','#AF52DE','#5856D6','#FF2D55','#5AC8FA','#FFCC00'];
 
-    // 정식 회원만 필터링
-    const members = players.filter(p => !p.isGuest);
-    const sorted = [...members].sort((a,b) => (b.score||0) - (a.score||0));
-    const ranks = {};
-    sorted.forEach((p, i) => ranks[p.name] = i + 1);
+    // 각 선수 누적 점수 초기화
+    const cumScore = {};
+    members.forEach(p => { cumScore[p.name] = 0; });
+
+    // matchLog를 날짜 오름차순으로 정렬
+    const sortedLog = [...matchLog].filter(m => m.date && m.date.length >= 10)
+      .sort((a,b) => a.date.localeCompare(b.date));
+
+    // 날짜별 순위 스냅샷 { 'YYYY-MM-DD': { 선수명: 순위 } }
+    const rankSnapshots = {};
+    let logIdx = 0;
+
+    allDates.forEach(dateStr => {
+      // 해당 날짜까지의 경기 반영
+      while(logIdx < sortedLog.length && sortedLog[logIdx].date.slice(0,10) <= dateStr) {
+        const log = sortedLog[logIdx];
+        const homeWin = log.winner === 'home';
+        const winners = homeWin ? (log.home || []) : (log.away || []);
+        const losers  = homeWin ? (log.away || []) : (log.home || []);
+        const isDouble = log.type === 'double';
+        winners.forEach(n => { if(cumScore[n] !== undefined) cumScore[n] += isDouble ? 3.0 : 4.0; });
+        losers.forEach(n  => { if(cumScore[n] !== undefined) cumScore[n] += isDouble ? 0.3 : 0.5; });
+        logIdx++;
+      }
+      // 현재 누적 점수로 순위 계산
+      const sorted = [...members].sort((a,b) => (cumScore[b.name]||0) - (cumScore[a.name]||0));
+      const snap = {};
+      sorted.forEach((p,i) => { snap[p.name] = i + 1; });
+      rankSnapshots[dateStr] = snap;
+    });
+
+    // 표시용 라벨 (MM/DD)
+    const labels = filteredDates.map(d => `${parseInt(d.slice(5,7))}/${parseInt(d.slice(8,10))}`);
 
     const datasets = members.map((p, i) => ({
       label: p.name,
-      data: labels.map((dateLabel, idx) => idx === labels.length - 1 ? ranks[p.name] : null),
+      data: filteredDates.map(d => rankSnapshots[d] ? (rankSnapshots[d][p.name] || null) : null),
       borderColor: colors[i % colors.length],
       backgroundColor: colors[i % colors.length],
       pointRadius: 5,
@@ -2910,6 +2940,13 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     const max = (mType === 'double') ? 2 : 1;
     if (hT.length !== max || aT.length !== max) return alert("팀 선택 먼저!");
 
+    // ✅ v3.816: 1대2대결용이 players에 없으면 자동 추가 (가상 플레이어 실체화)
+    [...hT, ...aT].forEach(name => {
+      if(HIDDEN_PLAYERS.includes(name) && !players.find(p => p.name === name)) {
+        players.push(ensure({ name, isGuest: true }));
+      }
+    });
+
     snapshotLastRanks();
 
     const homeScore = parseInt(hs, 10);
@@ -3005,7 +3042,8 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
 
   function renderPool(){
     const members = players.filter(p => !p.isGuest).sort((a, b) => (b.score || 0) - (a.score || 0));
-    const guests = players.filter(p => p.isGuest);
+    // ✅ v3.816: HIDDEN_PLAYERS 제외 (일반 게스트만), 1대2대결용은 별도 처리
+    const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
 
     let html = '';
 
@@ -3021,8 +3059,9 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     });
     html += '</div>';
 
-    // 2. 게스트 섹션 (게스트가 있을 때만 출력)
-    if (guests.length > 0) {
+    // 2. 게스트 섹션 (게스트가 있거나, 1대2대결용 활성화된 경우 출력)
+    const show1v2 = isUse1v2();
+    if (guests.length > 0 || show1v2) {
       html += '<div style="width:100%; margin:10px 0 15px; border-top:1px dashed #ddd; position:relative;">';
       html += '<span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#fff; padding:0 10px; font-size:11px; color:#999; font-weight:bold;">GUEST LIST</span>';
       html += '</div>';
@@ -3034,6 +3073,13 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
         html += `<input type="checkbox" id="${chkId}" class="p-chk" value="${escapeHtml(p.name)}" ${isSelected ? 'checked' : ''} onclick="pick('${escapeHtml(p.name).replace(/\'/g,"&#39;")}')">`;
         html += `<label for="${chkId}" class="p-label guest-label">[G] ${escapeHtml(p.name)}</label>`;
       });
+      // ✅ v3.816: 1대2대결용 고정 버튼 (활성화된 클럽만)
+      if(show1v2) {
+        const v2Name = '1대2대결용';
+        const isSelected = (window.hT && window.hT.includes(v2Name)) || (window.aT && window.aT.includes(v2Name));
+        html += `<input type="checkbox" id="pool_1v2" class="p-chk" value="${v2Name}" ${isSelected ? 'checked' : ''} onclick="pick('${v2Name}')">`;
+        html += `<label for="pool_1v2" class="p-label guest-label" style="background:#fff0f0; border-color:#ffb3b3; color:#cc4444;">[1대2] 1대2대결용</label>`;
+      }
       html += '</div>';
     }
 
@@ -3090,12 +3136,16 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     updateRecordCount();
   }
 
-    function updatePlayerList(){
+  function updatePlayerList(){
     const members = players.filter(p => !p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
     const guests = players.filter(p => p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
     const all = [...members, ...guests];
+
+    // ✅ v3.817: 1대2대결용 활성화 시, players에 없으면 가상으로 목록에 표시
+    const show1v2 = isUse1v2();
+    const has1v2 = players.find(p => p.name === '1대2대결용');
     
-    document.querySelector('#pL tbody').innerHTML = all.map(p => {
+    let rows = all.map(p => {
       const safeName = escapeHtml(p.name).replace(/'/g,"&#39;");
       const typeLabel = p.isGuest ? '<span style="color:var(--text-gray);">게스트</span>' : '회원';
       return `<tr>
@@ -3108,6 +3158,19 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
         </td>
       </tr>`;
     }).join('');
+
+    // 1대2대결용 활성화 && players에 없을 때 → 가상 행 추가
+    if(show1v2 && !has1v2) {
+      rows += `<tr style="opacity:0.5;">
+        <td style="text-align:left; padding-left:10px; font-weight:400; color:#cc4444;">1대2대결용</td>
+        <td style="text-align:center; font-size:12px; width:50px;"><span style="color:#cc4444;">가상</span></td>
+        <td style="text-align:right; padding-right:5px; width:140px; white-space:nowrap;">
+          <span style="font-size:11px; color:#999;">첫 경기 시 자동 등록</span>
+        </td>
+      </tr>`;
+    }
+
+    document.querySelector('#pL tbody').innerHTML = rows;
   }
 
   async function resetScoresKeepPlayers(){
@@ -3244,7 +3307,8 @@ function showView(v){
 
   function initTournament() {
     const members = players.filter(p => !p.isGuest).sort((a,b)=>(b.score||0)-(a.score||0));
-    const guests = players.filter(p => p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
+    // ✅ v3.816: HIDDEN_PLAYERS 제외
+    const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
 
     let html = '<div style="border: 2px solid #E5E5EA; border-radius: 15px; padding: 15px; background: white; margin-bottom: 30px;">';
 
@@ -3257,7 +3321,7 @@ function showView(v){
     });
     html += '</div>';
 
-    // 2. 게스트 섹션 (게스트가 있을 때만 출력)
+    // 2. 게스트 섹션 (게스트가 있을 때만 출력, ✅ v3.818: 1대2대결용 버튼 제외)
     if (guests.length > 0) {
       html += '<div style="width:100%; margin:10px 0 15px; border-top:1px dashed #ddd; position:relative;">';
       html += '<span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#fff; padding:0 10px; font-size:11px; color:#999; font-weight:bold;">GUEST LIST</span>';
@@ -3272,7 +3336,6 @@ function showView(v){
     }
 
     html += '</div>';
-
     $('pList').innerHTML = html;
   }
 
@@ -3821,7 +3884,8 @@ function showView(v){
 
   function renderLadderPlayerPool() {
     const members = players.filter(p => !p.isGuest).sort((a,b)=>(b.score||0)-(a.score||0));
-    const guests = players.filter(p => p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
+    // ✅ v3.816: HIDDEN_PLAYERS 제외
+    const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
 
     let html = '<div style="border: 2px solid #E5E5EA; border-radius: 15px; padding: 15px; background: white; margin-bottom: 30px;">';
 
@@ -3836,7 +3900,7 @@ function showView(v){
     });
     html += '</div>';
 
-    // 2. 게스트 섹션 (게스트가 있을 때만 출력)
+    // 2. 게스트 섹션 (게스트가 있을 때만 출력, ✅ v3.818: 1대2대결용 버튼 제외)
     if (guests.length > 0) {
       html += '<div style="width:100%; margin:10px 0 15px; border-top:1px dashed #ddd; position:relative;">';
       html += '<span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#fff; padding:0 10px; font-size:11px; color:#999; font-weight:bold;">GUEST LIST</span>';
@@ -4036,9 +4100,10 @@ function showView(v){
       const geo = await geocodeCity(cityInput);
       if(geo) {
         weatherCoords = geo;
-        // 헤더 업데이트
+        // ✅ v3.817: 헤더는 cityKo(한글) 우선, 없으면 geo.name
+        const displayCityName = (currentClub && currentClub.cityKo) ? currentClub.cityKo : geo.name;
         const headerBanner = document.querySelector('#view-home .header-banner');
-        if(headerBanner) headerBanner.innerHTML = '<span class="material-symbols-outlined">wb_sunny</span>' + escapeHtml(geo.name) + ' 날씨';
+        if(headerBanner) headerBanner.innerHTML = '<span class="material-symbols-outlined">wb_sunny</span>' + escapeHtml(displayCityName) + ' 날씨';
       } else {
         setStatus(`<div style="color:#ff3b30; font-size:12px; margin-bottom:10px;">"${escapeHtml(cityInput)}" 검색 실패. 기존 위치로 표시합니다.</div>`);
       }
@@ -4196,18 +4261,21 @@ function showView(v){
     const notice = upcoming.length > 0 ? upcoming[0] : null;
 
     if(notice) {
-      $('courtName').textContent = notice.courtName || defaultCourt.name;
+      $('courtName').textContent = notice.courtName || '';
       // ✅ v3.811: slots 배열 지원
       const slots = notice.slots || [{time: notice.time, court: notice.memo}];
       const timeText = slots.map(s => s.time || '').filter(Boolean).join(' / ');
-      $('courtTime').textContent = timeText || defaultCourt.time;
-      $('courtAddress').textContent = notice.address || defaultCourt.address;
+      $('courtTime').textContent = timeText || '';
+      $('courtAddress').textContent = notice.address || '';
       
+      // ✅ v3.816: 코트 번호를 시간 옆에 인라인 표시 + courtMemo는 숨김
       const courtText = slots.map(s => s.court || '').filter(Boolean).join(', ');
       if(courtText) {
-        $('courtMemo').textContent = '🎾 ' + courtText;
-        $('courtMemo').style.display = 'block';
+        $('courtNumber').textContent = courtText;
+        $('courtNumber').style.display = 'inline-block';
+        $('courtMemo').style.display = 'none';
       } else {
+        $('courtNumber').style.display = 'none';
         $('courtMemo').style.display = 'none';
       }
       
@@ -4216,18 +4284,18 @@ function showView(v){
         const dayNames = ['일','월','화','수','목','금','토'];
         const d = new Date(notice.date + 'T00:00:00');
         const dayStr = isNaN(d.getTime()) ? '' : ` (${dayNames[d.getDay()]})`;
-        $('courtName').textContent = `[${notice.date.slice(5)}${dayStr}] ${notice.courtName || defaultCourt.name}`;
+        $('courtName').textContent = `[${notice.date.slice(5)}${dayStr}] ${notice.courtName || ''}`;
       }
+
+      // 공지 있으면 카드 표시
+      $('courtInfoCard').style.display = 'block';
+      $('courtInfoContent').style.display = 'block';
+      $('courtNoNotice').style.display = 'none';
     } else {
-      $('courtName').textContent = defaultCourt.name;
-      $('courtTime').textContent = defaultCourt.time;
-      $('courtAddress').textContent = defaultCourt.address;
-      if(defaultCourt.memo) {
-        $('courtMemo').textContent = defaultCourt.memo;
-        $('courtMemo').style.display = 'block';
-      } else {
-        $('courtMemo').style.display = 'none';
-      }
+      // ✅ v3.817: 공지 없으면 빈 정보 대신 안내 메시지 (모든 클럽 동일)
+      $('courtInfoCard').style.display = 'block';
+      $('courtInfoContent').style.display = 'none';
+      $('courtNoNotice').style.display = 'block';
     }
   }
 
@@ -4311,8 +4379,12 @@ function showView(v){
 
     const courtName = $('courtName')?.textContent || '';
     const courtTime = $('courtTime')?.textContent || '';
+    const courtNumber = $('courtNumber')?.textContent || '';
     const courtAddress = $('courtAddress')?.textContent || '';
     const dateDisp = $('dateDisplay')?.textContent || '';
+
+    // ✅ v3.816: 코트 번호가 있으면 시간 뒤에 붙여서 표시
+    const courtTimeWithNum = courtNumber ? `${courtTime}  <${courtNumber}>` : courtTime;
 
     // 날씨 요약 생성
     let weatherSummary = '';
@@ -4344,7 +4416,7 @@ function showView(v){
 
     if(mode === 'weather+court' || mode === 'all' || mode === 'text') {
       text += `📍 ${courtName}\n`;
-      text += `⏰ ${courtTime}\n`;
+      text += `⏰ ${courtTimeWithNum}\n`;
       if(courtAddress) text += `🗺️ ${courtAddress}\n`;
     }
 
@@ -4362,7 +4434,7 @@ function showView(v){
     if(mode === 'text') {
       text = `🎾 ${dateDisp} 정보\n`;
       text += `📍 ${courtName}\n`;
-      text += `⏰ ${courtTime}\n`;
+      text += `⏰ ${courtTimeWithNum}\n`;
       if(courtAddress) text += `🗺️ ${courtAddress}\n`;
       if(weatherSummary) text += `${weatherSummary}\n`;
     }
@@ -4488,6 +4560,17 @@ function showView(v){
   // ========================================
   // v3.81: TREASURER MODE (총무 모드)
   // ========================================
+  // ✅ v3.816: 숨김 처리할 가상 플레이어 목록 (랭킹/통계/풀에서 보이지 않음)
+  const HIDDEN_PLAYERS = ['1대2용', '1대2대결용'];
+
+  // ✅ v3.816: 클럽별 1대2대결용 활성화 여부 (localStorage 저장)
+  function getUse1v2Key() { return 'grandslam_use1v2_' + getActiveClubId(); }
+  function isUse1v2() { return localStorage.getItem(getUse1v2Key()) === 'Y'; }
+  function setUse1v2(val) { localStorage.setItem(getUse1v2Key(), val ? 'Y' : 'N'); }
+
+  // ✅ v3.816: 가상 1대2대결용 플레이어 객체 (players 배열에 없어도 풀에 표시)
+  const VIRTUAL_1V2_PLAYER = { name: '1대2대결용', isGuest: true, isVirtual: true, score:0, wins:0, losses:0, dScore:0, dWins:0, dLosses:0, sScore:0, sWins:0, sLosses:0, last:0, lastD:0, lastS:0 };
+  // ========================================
 
   var treasurerUnlocked = false;
   var currentFinTab = 'income';
@@ -4528,6 +4611,30 @@ function showView(v){
     $('treasurer-pin-screen').style.display = 'none';
     $('treasurer-main').style.display = 'block';
     hideTreasurerSections();
+    // ✅ v3.816: 1대2대결용 토글 상태 렌더링
+    render1v2Toggle();
+  }
+
+  // ✅ v3.816: 1대2대결용 토글 상태 업데이트
+  function render1v2Toggle() {
+    const track = $('use1v2Track');
+    const thumb = $('use1v2Thumb');
+    if(!track || !thumb) return;
+    const active = isUse1v2();
+    track.style.background = active ? 'var(--wimbledon-sage)' : '#ccc';
+    thumb.style.transform = active ? 'translateX(22px)' : 'translateX(0)';
+  }
+
+  // ✅ v3.816: 1대2대결용 토글 클릭
+  function toggle1v2() {
+    setUse1v2(!isUse1v2());
+    render1v2Toggle();
+    // 게임 풀 즉시 갱신
+    renderPool();
+    renderLadderPlayerPool();
+    initTournament();
+    try { initRoundPlayerPool(); } catch(e) {}
+    alert(isUse1v2() ? '✅ 1대2대결용이 게임 풀에 표시됩니다.' : '❌ 1대2대결용이 숨겨집니다.');
   }
 
   function hideTreasurerSections() {
@@ -4564,6 +4671,14 @@ function showView(v){
     const savedFee = localStorage.getItem('grandslam_monthly_fee_' + getActiveClubId());
     if(savedFee) { monthlyFeeAmount = parseInt(savedFee) || 0; }
     $('monthlyFeeAmount').value = monthlyFeeAmount || '';
+    // ✅ v3.816: 회비 납부 현황 localStorage 복원 (clubId 있을 때만)
+    const cid = getActiveClubId();
+    if(cid) {
+      const savedFeeData = localStorage.getItem('grandslam_fee_data_' + cid);
+      if(savedFeeData) {
+        try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; }
+      }
+    }
     renderFeeTable();
   }
 
@@ -4606,6 +4721,9 @@ function showView(v){
   function toggleFee(name, key) {
     if(!feeData[name]) feeData[name] = {};
     feeData[name][key] = (feeData[name][key] === 'Y') ? 'N' : 'Y';
+    // ✅ v3.816: 변경 즉시 localStorage에 저장 (clubId 있을 때만)
+    const cid = getActiveClubId();
+    if(cid) localStorage.setItem('grandslam_fee_data_' + cid, JSON.stringify(feeData));
     renderFeeTable();
     syncFeeToFinance();
   }
@@ -4635,6 +4753,9 @@ function showView(v){
     }
     renderFeeTable();
     syncFeeToFinance();
+    // ✅ v3.816: 완납/해제 후 localStorage 저장 (clubId 있을 때만)
+    const cid = getActiveClubId();
+    if(cid) localStorage.setItem('grandslam_fee_data_' + cid, JSON.stringify(feeData));
   }
 
   // ✅ 회비 → 재정 수입 자동 연동
@@ -4701,6 +4822,16 @@ function showView(v){
     $('finDate').value = today;
     $('finDesc').value = '';
     $('finAmount').value = '';
+    // ✅ v3.817: 재정관리 진입 시 feeData 복원 (clubId 있을 때만)
+    const cid = getActiveClubId();
+    if(cid) {
+      const savedFeeData = localStorage.getItem('grandslam_fee_data_' + cid);
+      if(savedFeeData) {
+        try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; }
+      }
+      const savedFee = localStorage.getItem('grandslam_monthly_fee_' + cid);
+      if(savedFee) { monthlyFeeAmount = parseInt(savedFee) || 0; }
+    }
     syncFeeToFinance(); // 회비 자동 항목 갱신
     setFinanceTab('income');
     renderFinanceList();
@@ -5045,7 +5176,8 @@ function showView(v){
   
   function renderStatsPlayerList() {
     const members = players.filter(p => !p.isGuest).sort((a,b)=>(b.score||0)-(a.score||0));
-    const guests = players.filter(p => p.isGuest).sort((a,b)=>a.name.localeCompare(b.name));
+    // ✅ v3.816: HIDDEN_PLAYERS 제외
+    const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
 
     let html = '<div style="border: 2px solid #E5E5EA; border-radius: 15px; padding: 15px; background: white; margin-bottom: 30px;">';
 
@@ -5331,23 +5463,25 @@ function showView(v){
     setTimeout(() => { sp.style.display = 'none'; }, 700);
   }
 
-  // ✅ v3.813: 스플래시를 데이터 로딩 완료까지 유지 (자동 숨김 제거)
-
-  // 리소스 로딩 완료 후 초기화(에러 나도 인트로는 이미 내려감)
-  window.addEventListener("load", async () => {
+  // ✅ v3.817: DOMContentLoaded로 변경 + 병렬 fetch로 스플래시 딜레이 최소화
+  document.addEventListener("DOMContentLoaded", async () => {
     // ✅ v3.79: 클럽 시스템 초기화 (sync 전에 완료되어야 올바른 clubId 설정됨)
     try { await initClubSystem(); } catch(e) { console.error("initClubSystem() error:", e); }
 
-    try { sync(); } catch(e) { console.error("sync() error:", e); }
+    // ✅ v3.817: sync 완료 후 즉시 스플래시 숨김 (코트/공지는 병렬로)
+    try { await sync(); } catch(e) { console.error("sync() error:", e); }
+
+    // 스플래시는 sync 완료 즉시 숨김
+    hideSplashSafe();
+
+    // 날씨/코트/공지는 스플래시와 무관하게 병렬 처리
     try { loadWeatherForNextMeeting(0); } catch(e) { console.error("loadWeather() error:", e); }
-
-    // ✅ v3.80: 코트 공지 & 공지사항 로드
-    try { await fetchCourtNotices(); } catch(e) { console.warn("fetchCourtNotices error:", e); }
-    try { await fetchAnnouncements(); } catch(e) { console.warn("fetchAnnouncements error:", e); }
-    try { loadCourtInfo(); loadNotices(); } catch(e) { console.warn("home render error:", e); }
-
-    // ✅ v3.813: 모든 데이터 로딩 완료 후 스플래시 숨김
-    setTimeout(hideSplashSafe, 300);
+    Promise.all([
+      fetchCourtNotices().catch(e => console.warn("fetchCourtNotices error:", e)),
+      fetchAnnouncements().catch(e => console.warn("fetchAnnouncements error:", e))
+    ]).then(() => {
+      try { loadCourtInfo(); loadNotices(); } catch(e) { console.warn("home render error:", e); }
+    });
 
     // ✅ v3.79: 연습/실전 모드 버튼 상태 복원
     try {
@@ -5476,7 +5610,8 @@ window.addEventListener("resize", () => {
     // rank 필드도 미리 세팅 (다른 곳에서 쓸 수도 있으니까)
     members.forEach((p, idx) => { p.rank = rankMap[p.name] || p.rank || (idx+1); });
 
-    const guests = players.filter(p => p.isGuest);
+    // ✅ v3.816: HIDDEN_PLAYERS 제외
+    const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
 
     let html = '<div style="display:flex; flex-wrap:wrap; gap:8px;">';
 
@@ -5497,7 +5632,7 @@ window.addEventListener("resize", () => {
       });
     });
 
-    // 3) 게스트 버튼
+    // 3) 게스트 버튼 (✅ v3.818: 1대2대결용 버튼 제외)
     if(guests.length > 0) {
       html += '</div><div style="margin: 15px 0 10px 0; font-size:11px; color:#999; border-top:1px solid #ddd; padding-top:12px; font-weight:700;">GUEST LIST</div><div style="display:flex; flex-wrap:wrap; gap:8px;">';
       guests.forEach(p => {
