@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.818</title>
+  <title>GrandSlam Ultimate v3.8203</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -1031,6 +1031,50 @@
 </div>
 <div id="loading-overlay">⌛ 데이터 동기화 중...</div>
 
+<!-- ✅ v3.820: 커스텀 Alert 모달 -->
+<div id="gsAlertModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:25000; justify-content:center; align-items:center;">
+  <div style="background:#fff; border-radius:20px; padding:28px 24px 20px; width:300px; max-width:88vw; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <div id="gsAlertMsg" style="font-size:14px; color:var(--text-dark); line-height:1.6; margin-bottom:20px; white-space:pre-line;"></div>
+    <button onclick="gsAlertClose()" style="width:100%; padding:13px; background:var(--wimbledon-sage); color:white; border:none; border-radius:12px; font-size:15px; font-weight:400; cursor:pointer;">확인</button>
+  </div>
+</div>
+
+<!-- ✅ v3.820: 커스텀 Confirm 모달 -->
+<div id="gsConfirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:25000; justify-content:center; align-items:center;">
+  <div style="background:#fff; border-radius:20px; padding:28px 24px 20px; width:300px; max-width:88vw; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <div id="gsConfirmMsg" style="font-size:14px; color:var(--text-dark); line-height:1.6; margin-bottom:20px; white-space:pre-line;"></div>
+    <div style="display:flex; gap:10px;">
+      <button onclick="gsConfirmResolve(true)" style="flex:1; padding:13px; background:var(--wimbledon-sage); color:white; border:none; border-radius:12px; font-size:15px; font-weight:400; cursor:pointer;">확인</button>
+      <button onclick="gsConfirmResolve(false)" style="flex:1; padding:13px; background:#8E8E93; color:white; border:none; border-radius:12px; font-size:15px; font-weight:400; cursor:pointer;">취소</button>
+    </div>
+  </div>
+</div>
+<!-- ✅ v3.8203: 이름 수정 모달 (prompt 대체) -->
+<div id="gsEditNameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:25000; justify-content:center; align-items:center;">
+  <div style="background:#fff; border-radius:20px; padding:28px 24px 20px; width:300px; max-width:88vw; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <div style="font-size:14px; color:var(--text-dark); margin-bottom:14px; font-weight:400;">이름 수정</div>
+    <input type="text" id="gsEditNameInput" style="width:100%; box-sizing:border-box; padding:12px 14px; border:2px solid var(--wimbledon-sage); border-radius:12px; font-size:15px; outline:none; margin-bottom:16px;"
+      onkeydown="if(event.key==='Enter')gsEditNameConfirm()" />
+    <div style="display:flex; gap:10px;">
+      <button onclick="gsEditNameConfirm()" style="flex:1; padding:13px; background:var(--wimbledon-sage); color:white; border:none; border-radius:12px; font-size:15px; cursor:pointer;">확인</button>
+      <button onclick="gsEditNameCancel()" style="flex:1; padding:13px; background:#8E8E93; color:white; border:none; border-radius:12px; font-size:15px; cursor:pointer;">취소</button>
+    </div>
+  </div>
+</div>
+<div id="clubPinModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:20000; justify-content:center; align-items:center;">
+  <div style="background:#fff; border-radius:20px; padding:32px 24px; width:320px; max-width:90vw; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <span class="material-symbols-outlined" style="font-size:48px; color:var(--wimbledon-sage); display:block; margin-bottom:12px;">lock</span>
+    <div style="font-size:15px; color:var(--text-dark); margin-bottom:20px; font-weight:400;">관리자 비밀번호를 입력하세요</div>
+    <input type="password" id="clubPinInput" maxlength="10" placeholder="••••"
+      style="width:100%; box-sizing:border-box; padding:14px 16px; border:2px solid var(--wimbledon-sage); border-radius:12px; font-size:16px; text-align:center; letter-spacing:4px; outline:none;"
+      onkeydown="if(event.key==='Enter')confirmClubPin()" />
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button onclick="confirmClubPin()" style="flex:1; padding:14px; background:var(--wimbledon-sage); color:white; border:none; border-radius:12px; font-size:15px; font-weight:400; cursor:pointer;">확인</button>
+      <button onclick="cancelClubPin()" style="flex:1; padding:14px; background:#8E8E93; color:white; border:none; border-radius:12px; font-size:15px; font-weight:400; cursor:pointer;">취소</button>
+    </div>
+  </div>
+</div>
+
 <!-- ✅ v3.79: 클럽 전환 셀렉터 바 -->
 <div class="club-selector-bar" id="clubSelectorBar">
   <button class="club-selector-btn" onclick="openClubDropdown()">
@@ -1128,12 +1172,12 @@
       <div class="club-form-hint">💡 4자리 숫자로 설정하세요 (예: 1234)</div>
     </div>
     <div class="club-form-group">
-      <label class="club-form-label">날씨 검색 도시 (영문)</label>
-      <input type="text" class="club-form-input" id="cfCity" placeholder="예: Gwangmyeong" />
+      <label class="club-form-label">날씨 검색 도시 (한글 또는 영문)</label>
+      <input type="text" class="club-form-input" id="cfCity" placeholder="예: 광명" />
     </div>
     <div class="club-form-group">
       <label class="club-form-label">날씨 도시명 (한글)</label>
-      <input type="text" class="club-form-input" id="cfCityKo" placeholder="예: 광명시" />
+      <input type="text" class="club-form-input" id="cfCityKo" placeholder="예: 광명" />
     </div>
     <div class="club-form-group">
       <label class="club-form-label">클럽 테마 색상</label>
@@ -1153,9 +1197,9 @@
 
 <div id="view-home" class="app-screen active">
   <div class="weather-card">
-    <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>광명시 날씨</div>
+    <div class="header-banner"><span class="material-symbols-outlined">wb_sunny</span>광명 날씨</div>
     <div class="search-row">
-      <input id="city" class="w-input" value="광명" placeholder="도시명 (예: 광명, 파주)" />
+      <input id="city" class="w-input" value="광명" placeholder="예: 광명, Gwangmyeong, 파주" />
       <button id="btnSearch" class="w-btn" onclick="loadWeatherForNextMeeting(0)">검색</button>
     </div>
     <div class="btn-row">
@@ -1238,7 +1282,7 @@
     </div>
   </div>
 
-  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.818</div>
+  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.8203</div>
 </div>
 
 <div id="view-tennis" class="app-screen">
@@ -1299,6 +1343,8 @@
     
     <!-- ⭐ 추가: 참가 선수 선택 타이틀 -->
     <div class="tour-section-title"><span class="material-symbols-outlined">group_add</span>참가 선수 선택 (<span id="record-cnt">0</span>명)</div>
+    <!-- ✅ v3.8202: 1vs2용 설명 문구 (복식 모드 + 활성화 클럽만 표시) -->
+    <div id="hint-1v2" style="display:none; font-size:11px; color:#cc4444; margin:-4px 0 8px 4px; opacity:0.8;">💡 복식 1vs2 대결 시, 1명 팀에 [1vs2]용 버튼을 선택하세요</div>
     <div class="pool differ" id="pP"></div>
 
     <div style="display:flex; gap:8px; margin-top:20px;">
@@ -1428,7 +1474,7 @@
           <div id="res-s-best-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
         <div class="team-box" style="border:1px solid var(--up-red); background:rgba(255, 59, 48, 0.05);">
-          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">단식 최악 승률 상대(천적)</div>
+          <div style="font-size:11px; color:var(--up-red); font-weight:bold;">단식 라이벌(천적)</div>
           <div id="res-s-worst" style="font-size:16px; margin-top:5px;">-</div>
           <div id="res-s-worst-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
@@ -1438,17 +1484,17 @@
           <div id="res-d-partner-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
         <div class="team-box" style="border:1px solid #AF52DE; background:rgba(175, 82, 222, 0.05);">
-          <div style="font-size:11px; color:#AF52DE; font-weight:bold;">복식 최악 파트너</div>
+          <div style="font-size:11px; color:#AF52DE; font-weight:bold;">복식 분발 파트너</div>
           <div id="res-d-partner-worst" style="font-size:16px; margin-top:5px;">-</div>
           <div id="res-d-partner-worst-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
         <div class="team-box" style="border:1px solid var(--roland-clay); background:rgba(217, 140, 115, 0.10);">
-          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최악 상대1(천적1)</div>
+          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 라이벌1(천적1)</div>
           <div id="res-d-enemy1" style="font-size:16px; margin-top:5px;">-</div>
           <div id="res-d-enemy1-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
         <div class="team-box" style="border:1px solid var(--roland-clay); background:rgba(217, 140, 115, 0.10);">
-          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 최악 상대2(천적2)</div>
+          <div style="font-size:11px; color:var(--roland-clay); font-weight:bold;">복식 라이벌2(천적2)</div>
           <div id="res-d-enemy2" style="font-size:16px; margin-top:5px;">-</div>
           <div id="res-d-enemy2-sub" style="font-size:10px; color:var(--text-gray);">0승 0패</div>
         </div>
@@ -1759,7 +1805,7 @@
           <div style="font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">⚙️ 클럽 게임 설정</div>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
             <div>
-              <div style="font-size:13px; color:var(--text-dark); font-weight:400;">1대2대결용 활성화</div>
+              <div style="font-size:13px; color:var(--text-dark); font-weight:400;">[1vs2]용 활성화</div>
               <div style="font-size:11px; color:var(--text-gray); margin-top:2px;">게임 풀에 고정 버튼 표시 (랭킹/통계 제외)</div>
             </div>
             <label id="use1v2Toggle" onclick="toggle1v2()" style="position:relative; display:inline-block; width:48px; height:26px; cursor:pointer;">
@@ -1933,26 +1979,94 @@
   var GAS_URL = MASTER_GAS_URL;
   var ADMIN_PIN = "0707";
 
-  // ✅ 마스터 비번 확인 (총괄 관리자)
-  function checkMasterPin() {
-    if (masterUnlocked) return true;
-    const input = prompt("총괄 관리자 비밀번호를 입력하세요:");
-    if (input === MASTER_PIN) {
-      masterUnlocked = true;
-      return true;
-    }
-    if (input !== null) alert("비밀번호가 틀렸습니다.");
-    return false;
+  // ✅ v3.8203: 마스터 비번 확인 - 커스텀 모달 (prompt 대체)
+  var _masterPinCallback = null;
+
+  function checkMasterPin(callback) {
+    if (masterUnlocked) { if(callback) callback(true); return; }
+    _masterPinCallback = callback || null;
+    const modal = $('clubPinModal');
+    // 모달 타이틀 텍스트 변경
+    const titleEl = modal.querySelector('div[style*="font-size:15px"]');
+    if(titleEl) titleEl.textContent = '총괄 관리자 비밀번호를 입력하세요';
+    modal.dataset.mode = 'master';
+    modal.style.display = 'flex';
+    $('clubPinInput').value = '';
+    setTimeout(() => $('clubPinInput').focus(), 100);
   }
 
-  // ✅ 클럽 관리자 비번 확인 (마스터 비번도 통과)
-  function checkClubPin() {
-    if (masterUnlocked) return true;
-    const input = prompt("비번?");
-    if (input === MASTER_PIN) { masterUnlocked = true; return true; }
-    if (input === ADMIN_PIN) return true;
-    if (input !== null) alert("비번 틀림!");
-    return false;
+  // ✅ v3.820: 커스텀 Alert (alert() 대체)
+  var _gsAlertCallback = null;
+  function gsAlert(msg, cb) {
+    $('gsAlertMsg').textContent = msg;
+    $('gsAlertModal').style.display = 'flex';
+    _gsAlertCallback = cb || null;
+  }
+  function gsAlertClose() {
+    $('gsAlertModal').style.display = 'none';
+    if(_gsAlertCallback) { _gsAlertCallback(); _gsAlertCallback = null; }
+  }
+
+  // ✅ v3.820: 커스텀 Confirm (confirm() 대체) - 콜백 방식
+  var _gsConfirmCallback = null;
+  function gsConfirm(msg, cb) {
+    $('gsConfirmMsg').textContent = msg;
+    $('gsConfirmModal').style.display = 'flex';
+    _gsConfirmCallback = cb || null;
+  }
+  function gsConfirmResolve(result) {
+    $('gsConfirmModal').style.display = 'none';
+    if(_gsConfirmCallback) { _gsConfirmCallback(result); _gsConfirmCallback = null; }
+  }
+
+  // ✅ v3.8191: 클럽 관리자 비번 확인 - 커스텀 모달 (prompt 대체)
+  var _clubPinCallback = null;
+
+  function checkClubPin(callback) {
+    if (masterUnlocked) { callback(true); return; }
+    _clubPinCallback = callback;
+    const modal = $('clubPinModal');
+    modal.style.display = 'flex';
+    $('clubPinInput').value = '';
+    setTimeout(() => $('clubPinInput').focus(), 100);
+  }
+
+  function confirmClubPin() {
+    const input = $('clubPinInput').value;
+    const modal = $('clubPinModal');
+    const isMasterMode = modal.dataset.mode === 'master';
+    modal.style.display = 'none';
+    modal.dataset.mode = '';
+    $('clubPinInput').value = '';
+
+    // 모달 타이틀 원래대로 복원
+    const titleEl = modal.querySelector('div[style*="font-size:15px"]');
+    if(titleEl) titleEl.textContent = '관리자 비밀번호를 입력하세요';
+
+    if(isMasterMode) {
+      // 마스터 PIN 확인
+      if(input === MASTER_PIN) { masterUnlocked = true; if(_masterPinCallback) _masterPinCallback(true); }
+      else { if(input !== '') gsAlert('비밀번호가 틀렸습니다!'); if(_masterPinCallback) _masterPinCallback(false); }
+      _masterPinCallback = null;
+    } else {
+      // 클럽 관리자 PIN 확인
+      if(input === MASTER_PIN) { masterUnlocked = true; if(_clubPinCallback) _clubPinCallback(true); }
+      else if(input === ADMIN_PIN) { if(_clubPinCallback) _clubPinCallback(true); }
+      else { if(input !== '') gsAlert('비밀번호가 틀렸습니다!'); if(_clubPinCallback) _clubPinCallback(false); }
+      _clubPinCallback = null;
+    }
+  }
+
+  function cancelClubPin() {
+    const modal = $('clubPinModal');
+    modal.style.display = 'none';
+    modal.dataset.mode = '';
+    $('clubPinInput').value = '';
+    // 모달 타이틀 원래대로 복원
+    const titleEl = modal.querySelector('div[style*="font-size:15px"]');
+    if(titleEl) titleEl.textContent = '관리자 비밀번호를 입력하세요';
+    if(_masterPinCallback) { _masterPinCallback(false); _masterPinCallback = null; }
+    if(_clubPinCallback) { _clubPinCallback(false); _clubPinCallback = null; }
   }
 
   // ========================================
@@ -2025,6 +2139,14 @@
     financeData = [];
     feeData = {};
     monthlyFeeAmount = 0;
+    // ✅ v3.8191: 새 클럽 feeData + monthlyFeeAmount 즉시 복원
+    const newCid = club.clubId;
+    if(newCid) {
+      const savedFeeData = localStorage.getItem('grandslam_fee_data_' + newCid);
+      if(savedFeeData) { try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; } }
+      const savedFee = localStorage.getItem('grandslam_monthly_fee_' + newCid);
+      if(savedFee) { monthlyFeeAmount = parseInt(savedFee) || 0; }
+    }
     // ✅ v3.811: 클럽별 코트/공지 데이터 분리
     courtNotices = [];
     announcements = [];
@@ -2099,42 +2221,48 @@
       return;
     }
     closeClubDropdown();
-    if (!confirm('"' + club.clubName + '"(으)로 전환하시겠습니까?\n데이터가 새로 불러와집니다.')) return;
-    activateClub(club, true);
-    showView('weather');
+    gsConfirm('"' + club.clubName + '"(으)로 전환하시겠습니까?\n데이터가 새로 불러와집니다.', ok => {
+      if(!ok) return;
+      activateClub(club, true);
+      showView('weather');
+    });
   }
 
   // --- 클럽 생성/수정 ---
   function openClubCreate() {
-    if (!checkMasterPin()) return;
-    closeClubDropdown();
-    $('clubFormTitle').textContent = '새 클럽 추가';
-    $('cfName').value = '';
-    $('cfPin').value = '';
-    $('cfCity').value = '';
-    $('cfCityKo').value = '';
-    $('cfEditId').value = '';
-    renderColorChips('');
-    if ($('cfGuideToggle')) $('cfGuideToggle').style.display = 'block';
-    if ($('cfGuideBody')) $('cfGuideBody').style.display = 'none';
-    if ($('cfGuideArrow')) $('cfGuideArrow').style.transform = '';
-    $('clubFormModal').classList.add('active');
+    checkMasterPin(ok => {
+      if(!ok) return;
+      closeClubDropdown();
+      $('clubFormTitle').textContent = '새 클럽 추가';
+      $('cfName').value = '';
+      $('cfPin').value = '';
+      $('cfCity').value = '';
+      $('cfCityKo').value = '';
+      $('cfEditId').value = '';
+      renderColorChips('');
+      if ($('cfGuideToggle')) $('cfGuideToggle').style.display = 'block';
+      if ($('cfGuideBody')) $('cfGuideBody').style.display = 'none';
+      if ($('cfGuideArrow')) $('cfGuideArrow').style.transform = '';
+      $('clubFormModal').classList.add('active');
+    });
   }
 
   function openClubEdit(clubId) {
-    if (!checkMasterPin()) return;
-    const club = clubList.find(function(c){ return c.clubId === clubId; });
-    if (!club) return;
-    closeClubDropdown();
-    $('clubFormTitle').textContent = '클럽 수정';
-    $('cfName').value = club.clubName || '';
-    $('cfPin').value = club.adminPin || '';
-    $('cfCity').value = club.city || '';
-    $('cfCityKo').value = club.cityKo || '';
-    $('cfEditId').value = club.clubId;
-    renderColorChips(club.color || '');
-    if ($('cfGuideToggle')) $('cfGuideToggle').style.display = 'none';
-    $('clubFormModal').classList.add('active');
+    checkMasterPin(ok => {
+      if(!ok) return;
+      const club = clubList.find(function(c){ return c.clubId === clubId; });
+      if (!club) return;
+      closeClubDropdown();
+      $('clubFormTitle').textContent = '클럽 수정';
+      $('cfName').value = club.clubName || '';
+      $('cfPin').value = club.adminPin || '';
+      $('cfCity').value = club.city || '';
+      $('cfCityKo').value = club.cityKo || '';
+      $('cfEditId').value = club.clubId;
+      renderColorChips(club.color || '');
+      if ($('cfGuideToggle')) $('cfGuideToggle').style.display = 'none';
+      $('clubFormModal').classList.add('active');
+    });
   }
 
   function closeClubForm() {
@@ -2180,8 +2308,8 @@
     const color = getSelectedColor();
     const editId = $('cfEditId').value;
 
-    if (!name) { alert('클럽 이름을 입력해주세요.'); return; }
-    if (!pin) { alert('관리자 비밀번호를 입력해주세요.'); return; }
+    if (!name) { gsAlert('클럽 이름을 입력해주세요.'); return; }
+    if (!pin) { gsAlert('관리자 비밀번호를 입력해주세요.'); return; }
 
     _clubFormSaving = true; // 잠금
     $('loading-overlay').style.display = 'flex';
@@ -2210,7 +2338,7 @@
             ADMIN_PIN = updated.adminPin || '0707';
           }
         }
-        alert('클럽 정보가 수정되었습니다!');
+        gsAlert('클럽 정보가 수정되었습니다!');
 
       } else {
         // 새 클럽 생성 (자동 시트 생성!)
@@ -2226,15 +2354,18 @@
         if (!resp.ok) throw new Error(resp.error || '생성 실패');
         
         await fetchClubList();
-        alert('"' + name + '" 클럽이 생성되었습니다!\n(Google Sheets가 자동으로 만들어졌습니다)');
-        
-        if (resp.club && confirm('"' + name + '" 클럽으로 바로 전환하시겠습니까?')) {
-          const newClub = clubList.find(function(c){ return c.clubId === resp.club.clubId; });
-          if (newClub) { activateClub(newClub, true); showView('weather'); }
-        }
+        gsAlert('"' + name + '" 클럽이 생성되었습니다!\n(Google Sheets가 자동으로 만들어졌습니다)', () => {
+          if (resp.club) {
+            gsConfirm('"' + name + '" 클럽으로 바로 전환하시겠습니까?', ok => {
+              if(!ok) return;
+              const newClub = clubList.find(function(c){ return c.clubId === resp.club.clubId; });
+              if (newClub) { activateClub(newClub, true); showView('weather'); }
+            });
+          }
+        });
       }
     } catch(e) {
-      alert('오류: ' + e.message);
+      gsAlert('오류: ' + e.message);
     } finally {
       $('loading-overlay').style.display = 'none';
       _clubFormSaving = false; // ✅ 잠금 해제
@@ -2245,32 +2376,35 @@
   }
 
   async function deleteClub(clubId) {
-    if (!checkMasterPin()) return;
-    const club = clubList.find(function(c){ return c.clubId === clubId; });
-    if (!club) return;
-    if (club.isDefault) { alert('기본 클럽은 삭제할 수 없습니다.'); return; }
-    if (currentClub && currentClub.clubId === clubId) {
-      alert('현재 활성화된 클럽은 삭제할 수 없습니다.\n다른 클럽으로 전환 후 삭제해주세요.');
-      return;
-    }
-    if (!confirm('"' + club.clubName + '" 클럽을 삭제하시겠습니까?\n\n※ 앱 내 등록만 해제됩니다.\n※ Google Sheets 데이터는 보존됩니다.')) return;
-    
-    $('loading-overlay').style.display = 'flex';
-    try {
-      const r = await fetchWithTimeout(MASTER_GAS_URL, {
-        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'deleteClub', clubId: clubId })
-      }, 12000);
-      const resp = await r.json();
-      if (!resp.ok) throw new Error(resp.error || '삭제 실패');
-      await fetchClubList();
-      renderClubManageList();
-      alert('클럽 등록이 해제되었습니다.');
-    } catch(e) {
-      alert('오류: ' + e.message);
-    } finally {
-      $('loading-overlay').style.display = 'none';
-    }
+    checkMasterPin(async ok => {
+      if(!ok) return;
+      const club = clubList.find(function(c){ return c.clubId === clubId; });
+      if (!club) return;
+      if (club.isDefault) { gsAlert('기본 클럽은 삭제할 수 없습니다.'); return; }
+      if (currentClub && currentClub.clubId === clubId) {
+        gsAlert('현재 활성화된 클럽은 삭제할 수 없습니다.\n다른 클럽으로 전환 후 삭제해주세요.');
+        return;
+      }
+      gsConfirm('"' + club.clubName + '" 클럽을 삭제하시겠습니까?\n\n※ 앱 내 등록만 해제됩니다.\n※ Google Sheets 데이터는 보존됩니다.', async ok2 => {
+        if(!ok2) return;
+        $('loading-overlay').style.display = 'flex';
+        try {
+          const r = await fetchWithTimeout(MASTER_GAS_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'deleteClub', clubId: clubId })
+          }, 12000);
+          const resp = await r.json();
+          if (!resp.ok) throw new Error(resp.error || '삭제 실패');
+          await fetchClubList();
+          renderClubManageList();
+          gsAlert('클럽 등록이 해제되었습니다.');
+        } catch(e) {
+          gsAlert('오류: ' + e.message);
+        } finally {
+          $('loading-overlay').style.display = 'none';
+        }
+      });
+    });
   }
 
   // --- 클럽 관리 화면 ---
@@ -2930,15 +3064,15 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   async function save() {
     // 연습 모드 체크
     if (isPracticeMode === 'practice') {
-      alert("지금은 연습 모드입니다! 기록이 저장되지 않습니다. 🧪");
+      gsAlert("지금은 연습 모드입니다! 기록이 저장되지 않습니다. 🧪");
       return;
     }
 
     var hs=$('hS').value, as=$('aS').value;
-    if(!hs || !as || hs==as) return alert("점수 확인!");
+    if(!hs || !as || hs==as) gsAlert("점수 확인!"); return;
 
     const max = (mType === 'double') ? 2 : 1;
-    if (hT.length !== max || aT.length !== max) return alert("팀 선택 먼저!");
+    if (hT.length !== max || aT.length !== max) gsAlert("팀 선택 먼저!"); return;
 
     // ✅ v3.816: 1대2대결용이 players에 없으면 자동 추가 (가상 플레이어 실체화)
     [...hT, ...aT].forEach(name => {
@@ -2970,7 +3104,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
 
     matchLog.unshift(logEntry);
     const ok = await pushWithMatchLogAppend(logEntry);
-    if(ok) alert("저장!");
+    if(ok) gsAlert("저장!");
 
     $('hS').value='';
     $('aS').value='';
@@ -2985,19 +3119,38 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
   
+  // ✅ v3.8203: 이름 수정 모달 함수
+  var _gsEditNameCallback = null;
+  function gsEditName(defaultVal, cb) {
+    $('gsEditNameInput').value = defaultVal || '';
+    $('gsEditNameModal').style.display = 'flex';
+    _gsEditNameCallback = cb || null;
+    setTimeout(() => { $('gsEditNameInput').select(); $('gsEditNameInput').focus(); }, 100);
+  }
+  function gsEditNameConfirm() {
+    const val = $('gsEditNameInput').value;
+    $('gsEditNameModal').style.display = 'none';
+    if(_gsEditNameCallback) { _gsEditNameCallback(val); _gsEditNameCallback = null; }
+  }
+  function gsEditNameCancel() {
+    $('gsEditNameModal').style.display = 'none';
+    _gsEditNameCallback = null;
+  }
+
   function editP(oldName){
-    const newName = prompt("이름 수정:", oldName);
-    if(newName && newName.trim() && newName !== oldName){
-      const p = players.find(x => x.name === oldName);
-      if(p) { 
-        p.name = newName.trim(); 
-        matchLog.forEach(l => {
-          if(Array.isArray(l.home)) l.home = l.home.map(n => n === oldName ? p.name : n);
-          if(Array.isArray(l.away)) l.away = l.away.map(n => n === oldName ? p.name : n);
-        });
-        pushDataOnly(); updatePlayerList(); renderStatsPlayerList(); alert("수정 완료!");
+    gsEditName(oldName, newName => {
+      if(newName && newName.trim() && newName.trim() !== oldName){
+        const p = players.find(x => x.name === oldName);
+        if(p) {
+          p.name = newName.trim();
+          matchLog.forEach(l => {
+            if(Array.isArray(l.home)) l.home = l.home.map(n => n === oldName ? p.name : n);
+            if(Array.isArray(l.away)) l.away = l.away.map(n => n === oldName ? p.name : n);
+          });
+          pushDataOnly(); updatePlayerList(); renderStatsPlayerList(); gsAlert("수정 완료!");
+        }
       }
-    }
+    });
   }
   function addP(){
     var n=$('pI').value.trim();
@@ -3008,7 +3161,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
       $('pI').value='';
       if($('pIsGuest')) $('pIsGuest').checked = false;
       updatePlayerList();
-      alert(n + (isGuest ? ' (게스트) 등록!' : ' 등록!'));
+      gsAlert(n + (isGuest ? ' (게스트) 등록!' : ' 등록!'));
       renderLadderPlayerPool();
       initTournament();
       renderStatsPlayerList();
@@ -3017,8 +3170,10 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
   function delP(n){
-    if(checkClubPin()) {
-      if(confirm(n+' 삭제?')){
+    checkClubPin(ok => {
+      if(!ok) return;
+      gsConfirm(n+' 삭제?', ok2 => {
+        if(!ok2) return;
         players=players.filter(p=>p.name!=n);
         pushDataOnly();
         updatePlayerList();
@@ -3026,8 +3181,8 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
         initTournament();
         renderStatsPlayerList();
         setTimeout(applyAutofitAllTables, 0);
-      }
-    }
+      });
+    });
   }
 
   function toggleGuest(n){
@@ -3037,13 +3192,17 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     pushDataOnly();
     updatePlayerList();
     renderStatsPlayerList();
-    alert(p.name + '은(는) 이제 ' + (p.isGuest ? '게스트' : '회원') + '입니다.');
+    gsAlert(p.name + '은(는) 이제 ' + (p.isGuest ? '게스트' : '회원') + '입니다.');
   }
 
   function renderPool(){
     const members = players.filter(p => !p.isGuest).sort((a, b) => (b.score || 0) - (a.score || 0));
     // ✅ v3.816: HIDDEN_PLAYERS 제외 (일반 게스트만), 1대2대결용은 별도 처리
     const guests = players.filter(p => p.isGuest && !HIDDEN_PLAYERS.includes(p.name));
+
+    // ✅ v3.8202: 1vs2용 힌트 문구 - 복식 모드 + 활성화 클럽일 때만 표시
+    const hint = $('hint-1v2');
+    if(hint) hint.style.display = (isUse1v2() && mType === 'double') ? 'block' : 'none';
 
     let html = '';
 
@@ -3073,12 +3232,18 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
         html += `<input type="checkbox" id="${chkId}" class="p-chk" value="${escapeHtml(p.name)}" ${isSelected ? 'checked' : ''} onclick="pick('${escapeHtml(p.name).replace(/\'/g,"&#39;")}')">`;
         html += `<label for="${chkId}" class="p-label guest-label">[G] ${escapeHtml(p.name)}</label>`;
       });
-      // ✅ v3.816: 1대2대결용 고정 버튼 (활성화된 클럽만)
+      // ✅ v3.816: 1대2대결용 고정 버튼 (활성화된 클럽만, ✅ v3.8201: 복식에서만 활성화)
       if(show1v2) {
         const v2Name = '1대2대결용';
-        const isSelected = (window.hT && window.hT.includes(v2Name)) || (window.aT && window.aT.includes(v2Name));
-        html += `<input type="checkbox" id="pool_1v2" class="p-chk" value="${v2Name}" ${isSelected ? 'checked' : ''} onclick="pick('${v2Name}')">`;
-        html += `<label for="pool_1v2" class="p-label guest-label" style="background:#fff0f0; border-color:#ffb3b3; color:#cc4444;">[1대2] 1대2대결용</label>`;
+        const isDouble = mType === 'double';
+        const isSelected = isDouble && ((window.hT && window.hT.includes(v2Name)) || (window.aT && window.aT.includes(v2Name)));
+        if(isDouble) {
+          html += `<input type="checkbox" id="pool_1v2" class="p-chk" value="${v2Name}" ${isSelected ? 'checked' : ''} onclick="pick('${v2Name}')">`;
+          html += `<label for="pool_1v2" class="p-label guest-label" style="background:#fff0f0; border-color:#ffb3b3; color:#cc4444;">[1vs2]용</label>`;
+        } else {
+          // 단식에선 비활성화 표시
+          html += `<label class="p-label guest-label" style="background:#f5f5f5; border-color:#ddd; color:#bbb; cursor:not-allowed;" title="단식에서는 사용 불가">[1vs2]용</label>`;
+        }
       }
       html += '</div>';
     }
@@ -3134,6 +3299,8 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     
     // ⭐ 카운트 리셋
     updateRecordCount();
+    // ✅ v3.8201: 단식/복식 전환 시 1vs2용 버튼 상태 갱신
+    renderPool();
   }
 
   function updatePlayerList(){
@@ -3162,7 +3329,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
     // 1대2대결용 활성화 && players에 없을 때 → 가상 행 추가
     if(show1v2 && !has1v2) {
       rows += `<tr style="opacity:0.5;">
-        <td style="text-align:left; padding-left:10px; font-weight:400; color:#cc4444;">1대2대결용</td>
+        <td style="text-align:left; padding-left:10px; font-weight:400; color:#cc4444;">[1vs2]용</td>
         <td style="text-align:center; font-size:12px; width:50px;"><span style="color:#cc4444;">가상</span></td>
         <td style="text-align:right; padding-right:5px; width:140px; white-space:nowrap;">
           <span style="font-size:11px; color:#999;">첫 경기 시 자동 등록</span>
@@ -3174,7 +3341,8 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
   async function resetScoresKeepPlayers(){
-    if(checkClubPin()){
+    checkClubPin(async ok => {
+      if(!ok) return;
       players.forEach(p=>{
         Object.keys(p).forEach(k=>{
           if(k!=='name' && k!=='isGuest') p[k]=0;
@@ -3185,30 +3353,33 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
       tab(1);
       renderStatsPlayerList();
       setTimeout(applyAutofitAllTables, 0);
-    }
+    });
   }
 
   function resetWeeklyOnly(){
-    if(checkClubPin()){
+    checkClubPin(ok => {
+      if(!ok) return;
       players.forEach(p=>{
         ['weekly','wdScore','wsScore','wWins','wLosses','wdWins','wdLosses','wsWins','wsLosses','lastW','lastWD','lastWS'].forEach(f=>p[f]=0);
       });
       pushDataOnly();
       tab(2);
       setTimeout(applyAutofitAllTables, 0);
-    }
+    });
   }
 
   async function adminResetAll(){
-    if(checkClubPin()){
-      if(confirm("정말로 모든 데이터(선수 포함)를 삭제하시겠습니까?")){
+    checkClubPin(async ok => {
+      if(!ok) return;
+      gsConfirm("정말로 모든 데이터(선수 포함)를 삭제하시겠습니까?", async ok2 => {
+        if(!ok2) return;
         players=[];
         matchLog=[];
         await pushPayload({ action: "adminResetAll" });
         await pushPayload({ action: "saveDataOnly", data: [] });
         location.reload();
-      }
-    }
+      });
+    });
   }
 
   function switchView(v, b) {
@@ -3221,8 +3392,12 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   
 function checkAdminAndShow(viewName) {
     if (viewName === 'player-mgmt' && !adminUnlocked) {
-      if (!checkClubPin()) return;
-      adminUnlocked = true;
+      checkClubPin(ok => {
+        if(!ok) return;
+        adminUnlocked = true;
+        showView(viewName);
+      });
+      return;
     }
     showView(viewName);
 }
@@ -3266,25 +3441,26 @@ function showView(v){
   function openLadder(){ showView('ladder'); window.scrollTo({top:0, behavior:'smooth'}); }
 
   function comingSoon(name){
-    alert(`${name}은(는) 다음 버전에서 오픈!`);
+    gsAlert(`${name}은(는) 다음 버전에서 오픈!`);
   }
 
   function toggleTournamentMode() {
     const btn = $('btnTourMode');
     if(isPracticeMode === 'practice') {
-      if(checkClubPin()) {
+      checkClubPin(ok => {
+        if(!ok) return;
         isPracticeMode = 'real';
         localStorage.setItem('grandslam_practice_mode', 'real');
         btn.innerText = "🟥 실전 모드 (모든 기록 반영 O)";
         btn.style.background = "#FF3B30";
-        alert("실전 모드 ON ✅\n모든 게임 기록이 정상 반영됩니다!");
-      }
+        gsAlert("실전 모드 ON ✅\n모든 게임 기록이 정상 반영됩니다!");
+      });
     } else {
       isPracticeMode = 'practice';
       localStorage.setItem('grandslam_practice_mode', 'practice');
       btn.innerText = "🟩 전체 게임 연습 모드 (기록반영 X)";
       btn.style.background = "#34C759";
-      alert("전체 게임 연습 모드 ON ✅\n단일게임/토너먼트 모두 기록이 반영되지 않습니다!");
+      gsAlert("전체 게임 연습 모드 ON ✅\n단일게임/토너먼트 모두 기록이 반영되지 않습니다!");
     }
   }
 
@@ -3454,8 +3630,8 @@ function showView(v){
   }
 
   function makeBracket() {
-    if(tType === 'single' && selected.length < 3) return alert("최소 3명 필요!");
-    if(tType === 'double' && selected.length < 4) return alert("최소 4명 필요!");
+    if(tType === 'single' && selected.length < 3) gsAlert("최소 3명 필요!"); return;
+    if(tType === 'double' && selected.length < 4) gsAlert("최소 4명 필요!"); return;
 
     tourBuffer = [];
     tourCommitted = false;
@@ -3671,12 +3847,12 @@ function showView(v){
     tourCommitted = ok;
 
     if(ok){
-      alert(`토너먼트 결과 반영 완료 ✅\n(경기 ${tourBuffer.length}건 MatchLog 누적됨)`);
+      gsAlert(`토너먼트 결과 반영 완료 ✅\n(경기 ${tourBuffer.length}건 MatchLog 누적됨)`);
       updateSeason(); updateWeekly();
       renderStatsPlayerList();
       setTimeout(applyAutofitAllTables, 0);
     } else {
-      alert("토너먼트 결과 반영 실패 😵‍💫\n(네트워크/GAS 상태 확인 필요)");
+      gsAlert("토너먼트 결과 반영 실패 😵‍💫\n(네트워크/GAS 상태 확인 필요)");
     }
   }
 
@@ -3846,7 +4022,7 @@ function showView(v){
         break;
       }
     }
-    if(!found) alert("파트너를 기다리는 팀이 없습니다.");
+    if(!found) gsAlert("파트너를 기다리는 팀이 없습니다.");
   }
 
   function resetPage() {
@@ -3929,7 +4105,7 @@ function showView(v){
   }
 
   function initLadderGame() {
-    if(ldP.length < 2) return alert("선수를 선택해줘!");
+    if(ldP.length < 2) { gsAlert("선수를 선택해줘!"); return; }
     finalMapping = Array.from(document.querySelectorAll('.l-punish')).map(i => i.value.trim() || "패스").sort(() => Math.random() - 0.5);
     winHistory = [];
     $('ladder-final-msg').style.display = 'none';
@@ -4012,10 +4188,10 @@ function showView(v){
           $('ladder-final-msg').style.display = 'block';
           $('congrats-content').innerHTML = winHistory
             .filter(w => w.result !== "패스")
-            .map(w => `축하해요! <b>${escapeHtml(w.name)}</b>, <b>${escapeHtml(w.result)}</b> 감사합니다! 🎉`)
+            .map(w => `🎉 <b>${escapeHtml(w.name)}님</b>, <b>${escapeHtml(w.result)}</b> 감사합니다! 🎉`)
             .join('<br>');
         }
-        alert(`${ldP[sIdx]} 결과: ${res}`);
+        gsAlert(`${ldP[sIdx]}님 결과: ${res}`);
         return;
       }
 
@@ -4442,7 +4618,7 @@ function showView(v){
     // 클립보드에 복사
     if(navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text.trim()).then(() => {
-        alert('📋 클립보드에 복사되었습니다!\n카카오톡에 붙여넣기 하세요.');
+        gsAlert('📋 클립보드에 복사되었습니다!\n카카오톡에 붙여넣기 하세요.');
       }).catch(() => {
         fallbackCopy(text.trim());
       });
@@ -4459,9 +4635,9 @@ function showView(v){
     ta.select();
     try {
       document.execCommand('copy');
-      alert('📋 클립보드에 복사되었습니다!\n카카오톡에 붙여넣기 하세요.');
+      gsAlert('📋 클립보드에 복사되었습니다!\n카카오톡에 붙여넣기 하세요.');
     } catch(e) {
-      alert('복사 실패. 직접 선택하여 복사해주세요.');
+      gsAlert('복사 실패. 직접 선택하여 복사해주세요.');
     }
     document.body.removeChild(ta);
   }
@@ -4601,7 +4777,7 @@ function showView(v){
       treasurerUnlocked = true;
       showTreasurerMenu();
     } else {
-      alert('비밀번호가 틀렸습니다.');
+      gsAlert('비밀번호가 틀렸습니다.');
       $('treasurerPinInput').value = '';
       $('treasurerPinInput').focus();
     }
@@ -4634,7 +4810,7 @@ function showView(v){
     renderLadderPlayerPool();
     initTournament();
     try { initRoundPlayerPool(); } catch(e) {}
-    alert(isUse1v2() ? '✅ 1대2대결용이 게임 풀에 표시됩니다.' : '❌ 1대2대결용이 숨겨집니다.');
+    gsAlert(isUse1v2() ? '✅ [1vs2]용이 게임 풀에 표시됩니다.' : '❌ [1vs2]용이 숨겨집니다.');
   }
 
   function hideTreasurerSections() {
@@ -4679,6 +4855,7 @@ function showView(v){
         try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; }
       }
     }
+    syncFeeToFinance(); // ✅ v3.8191: 복원 후 재정 연동 즉시 갱신
     renderFeeTable();
   }
 
@@ -4765,8 +4942,10 @@ function showView(v){
 
     if(!monthlyFeeAmount) return;
 
-    // 각 월별 납부 인원 집계 → 자동 수입 생성
-    const year = $('feeYear') ? $('feeYear').value : new Date().getFullYear();
+    // ✅ v3.819: feeYear가 숨겨진 화면(재정관리)에서도 올바른 연도 사용
+    const feeYearEl = $('feeYear');
+    const year = (feeYearEl && feeYearEl.value) ? feeYearEl.value : String(new Date().getFullYear());
+
     for(let m = 1; m <= 12; m++) {
       const key = `${year}-${String(m).padStart(2,'0')}`;
       let paidCount = 0;
@@ -4809,7 +4988,7 @@ function showView(v){
     }
 
     if(navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => alert('📋 복사 완료! 카톡에 붙여넣기 하세요.'));
+      navigator.clipboard.writeText(text).then(() => gsAlert('📋 복사 완료! 카톡에 붙여넣기 하세요.'));
     } else { fallbackCopy(text); }
   }
 
@@ -4822,17 +5001,15 @@ function showView(v){
     $('finDate').value = today;
     $('finDesc').value = '';
     $('finAmount').value = '';
-    // ✅ v3.817: 재정관리 진입 시 feeData 복원 (clubId 있을 때만)
+    // ✅ v3.8191: feeData + monthlyFeeAmount 복원 확실히 보장 (모든 클럽 공통)
     const cid = getActiveClubId();
     if(cid) {
       const savedFeeData = localStorage.getItem('grandslam_fee_data_' + cid);
-      if(savedFeeData) {
-        try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; }
-      }
+      if(savedFeeData) { try { feeData = JSON.parse(savedFeeData); } catch(e) { feeData = {}; } }
       const savedFee = localStorage.getItem('grandslam_monthly_fee_' + cid);
       if(savedFee) { monthlyFeeAmount = parseInt(savedFee) || 0; }
     }
-    syncFeeToFinance(); // 회비 자동 항목 갱신
+    syncFeeToFinance();
     setFinanceTab('income');
     renderFinanceList();
   }
@@ -4849,8 +5026,8 @@ function showView(v){
     const desc = $('finDesc').value.trim();
     const amount = parseInt($('finAmount').value);
 
-    if(!desc) return alert('내용을 입력하세요.');
-    if(!amount || amount <= 0) return alert('금액을 입력하세요.');
+    if(!desc) { gsAlert('내용을 입력하세요.'); return; }
+    if(!amount || amount <= 0) { gsAlert('금액을 입력하세요.'); return; }
 
     financeData.push({
       id: Date.now().toString(),
@@ -4867,9 +5044,11 @@ function showView(v){
   }
 
   function deleteFinanceItem(id) {
-    if(!confirm('삭제할까요?')) return;
-    financeData = financeData.filter(f => f.id !== id);
-    renderFinanceList();
+    gsConfirm('삭제할까요?', ok => {
+      if(!ok) return;
+      financeData = financeData.filter(f => f.id !== id);
+      renderFinanceList();
+    });
   }
 
   function renderFinanceList() {
@@ -4946,7 +5125,7 @@ function showView(v){
     text += `💵 잔액: ${balance.toLocaleString()}원`;
 
     if(navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => alert('📋 복사 완료! 카톡에 붙여넣기 하세요.'));
+      navigator.clipboard.writeText(text).then(() => gsAlert('📋 복사 완료! 카톡에 붙여넣기 하세요.'));
     } else { fallbackCopy(text); }
   }
 
@@ -5041,7 +5220,7 @@ function showView(v){
     const addr = $('courtNoticeAddr').value.trim();
     const slots = getSlotValues();
 
-    if(!date || !name) return alert('날짜와 코트명은 필수입니다.');
+    if(!date || !name) gsAlert('날짜와 코트명은 필수입니다.'); return;
 
     const notice = {
       id: Date.now().toString(),
@@ -5062,11 +5241,13 @@ function showView(v){
   }
 
   function deleteCourtNotice(id) {
-    if(!confirm('삭제할까요?')) return;
-    courtNotices = courtNotices.filter(n => n.id !== id);
-    persistCourtNoticesLocal();
-    renderCourtNoticeList();
-    loadCourtInfo();
+    gsConfirm('삭제할까요?', ok => {
+      if(!ok) return;
+      courtNotices = courtNotices.filter(n => n.id !== id);
+      persistCourtNoticesLocal();
+      renderCourtNoticeList();
+      loadCourtInfo();
+    });
   }
 
   function renderCourtNoticeList() {
@@ -5107,12 +5288,12 @@ function showView(v){
 
   function addAnnouncement() {
     const active = announcements.filter(a => !a.deleted);
-    if(active.length >= 5) return alert('공지는 최대 5개까지만 등록 가능합니다.');
+    if(active.length >= 5) { gsAlert('공지는 최대 5개까지만 등록 가능합니다.'); return; }
 
     const title = $('announcementTitle').value.trim();
     const isImportant = $('announcementImportant').checked;
 
-    if(!title) return alert('공지 내용을 입력하세요.');
+    if(!title) { gsAlert('공지 내용을 입력하세요.'); return; }
 
     const today = new Date().toISOString().slice(0,10);
     announcements.push({
@@ -5132,12 +5313,14 @@ function showView(v){
   }
 
   function deleteAnnouncement(id) {
-    if(!confirm('삭제할까요?')) return;
-    const ann = announcements.find(a => a.id === id);
-    if(ann) ann.deleted = true;
-    persistAnnouncementsLocal();
-    renderAnnouncementMgmtList();
-    loadNotices();
+    gsConfirm('삭제할까요?', ok => {
+      if(!ok) return;
+      const ann = announcements.find(a => a.id === id);
+      if(ann) ann.deleted = true;
+      persistAnnouncementsLocal();
+      renderAnnouncementMgmtList();
+      loadNotices();
+    });
   }
 
   function renderAnnouncementMgmtList() {
@@ -5372,19 +5555,39 @@ function showView(v){
     const sBest = pickBestByRule(singleOppMap, true);
     const sWorst = pickBestByRule(singleOppMap, false);
     const dBestPartner = pickBestByRule(partnerMap, true);
-    const dWorstPartner = pickBestByRule(partnerMap, false);
 
-    const dEnemies = Object.entries(doubleEnemyMap).sort((a,b)=>{
-      const Ar=(a[1].w+a[1].l)>0?a[1].w/(a[1].w+a[1].l):0, Br=(b[1].w+b[1].l)>0?b[1].w/(b[1].w+b[1].l):0;
-      return Ar-Br || b[1].totalGames-a[1].totalGames;
-    });
+    // ✅ v3.8202: 분발 파트너 - 3가지 조건 모두 충족해야 표시
+    // 1) 최소 3경기 이상, 2) 최고 파트너와 다른 사람, 3) 패가 1개 이상
+    const dWorstPartnerRaw = pickBestByRule(partnerMap, false);
+    const dWorstPartner = (() => {
+      if (!dWorstPartnerRaw) return null;
+      const s = dWorstPartnerRaw.stat;
+      const minGames = s.totalGames >= 3;
+      const hasloss = s.l >= 1;
+      const diffFromBest = !dBestPartner || dWorstPartnerRaw.name !== dBestPartner.name;
+      return (minGames && hasloss && diffFromBest) ? dWorstPartnerRaw : null;
+    })();
+
+    // ✅ v3.8202: 라이벌(천적) - 상대에게 패가 1개 이상일 때만 표시
+    const dEnemies = Object.entries(doubleEnemyMap)
+      .filter(([,s]) => s.l >= 1)  // 내가 진 적 있는 상대만
+      .sort((a,b)=>{
+        const Ar=(a[1].w+a[1].l)>0?a[1].w/(a[1].w+a[1].l):0, Br=(b[1].w+b[1].l)>0?b[1].w/(b[1].w+b[1].l):0;
+        return Ar-Br || b[1].totalGames-a[1].totalGames;
+      });
     const dE1 = dEnemies[0], dE2 = dEnemies[1];
+
+    // ✅ v3.8202: 단식 라이벌(천적) - 패가 1개 이상일 때만
+    const sWorstFiltered = (() => {
+      if (!sWorst) return null;
+      return sWorst.stat.l >= 1 ? sWorst : null;
+    })();
 
     return {
       logs, dotsHTML, displayResults, streak, lastResult,
       sWins, sLosses, sScore, dWins, dLosses, dScore, totalWins, totalLosses, totalPt,
       tableHTML, footHTML,
-      sBest, sWorst, dBestPartner, dWorstPartner, dE1, dE2
+      sBest, sWorst: sWorstFiltered, dBestPartner, dWorstPartner, dE1, dE2
     };
   }
 
@@ -5720,17 +5923,17 @@ window.addEventListener("resize", () => {
     roundResults = [];
     
     if(roundMode === 'single' && checked.length < 3) {
-      alert('단식은 최소 3명 이상 필요합니다.');
+      gsAlert('단식은 최소 3명 이상 필요합니다.');
       return;
     }
     
     if(roundMode === 'double') {
       if(checked.length < 4) {
-        alert('복식은 최소 4명(2팀) 이상 필요합니다.');
+        gsAlert('복식은 최소 4명(2팀) 이상 필요합니다.');
         return;
       }
       if(checked.length % 2 !== 0) {
-        alert('복식은 짝수 인원이 필요합니다.');
+        gsAlert('복식은 짝수 인원이 필요합니다.');
         return;
       }
     }
@@ -6032,18 +6235,17 @@ window.addEventListener("resize", () => {
     const finishedMatches = roundMatches.filter(m => m.winner !== null);
     
     if(finishedMatches.length === 0) {
-      alert('완료된 경기가 없습니다.');
+      gsAlert('완료된 경기가 없습니다.');
       return;
     }
     
     if(isPracticeMode === 'practice') {
-      alert('⚠️ 현재 연습 모드입니다. 기록이 반영되지 않습니다.');
+      gsAlert('⚠️ 현재 연습 모드입니다. 기록이 반영되지 않습니다.');
       return;
     }
     
-    if(!confirm(`${finishedMatches.length}경기의 결과를 저장하시겠습니까?`)) {
-      return;
-    }
+    gsConfirm(`${finishedMatches.length}경기의 결과를 저장하시겠습니까?`, ok => {
+      if(!ok) return;
     
     // 순위 계산
     const standings = {};
@@ -6187,12 +6389,14 @@ window.addEventListener("resize", () => {
     // 저장
     sync();
     
-    alert('라운드 결과가 저장되었습니다!');
+    gsAlert('라운드 결과가 저장되었습니다!');
     showView('game');
+    }); // gsConfirm end
   }
 
   function resetRound() {
-    if(!confirm('라운드를 초기화하시겠습니까?')) return;
+    gsConfirm('라운드를 초기화하시겠습니까?', ok => {
+      if(!ok) return;
     
     roundParticipants = [];
     roundMatches = [];
@@ -6214,13 +6418,14 @@ window.addEventListener("resize", () => {
     if(cntSpan) cntSpan.textContent = '0';
 
     renderRoundPlayerList();
+    }); // gsConfirm end
   }
 
   function convertRoundToTournament() {
     const finishedMatches = roundMatches.filter(m => m.winner !== null);
     
     if(finishedMatches.length === 0) {
-      alert('완료된 경기가 없습니다.');
+      gsAlert('완료된 경기가 없습니다.');
       return;
     }
     
@@ -6347,7 +6552,7 @@ window.addEventListener("resize", () => {
     const checkboxes = document.querySelectorAll('#modal-participant-list .modal-checkbox:checked');
     
     if(checkboxes.length < 2) {
-      alert('최소 2명/팀을 선택해야 합니다.');
+      gsAlert('최소 2명/팀을 선택해야 합니다.');
       return;
     }
     
@@ -6405,7 +6610,7 @@ window.addEventListener("resize", () => {
     const rankTable = $('round-rank-table');
     
     if(!matchArea || !matchList) {
-      alert('토너먼트 영역을 찾을 수 없습니다.');
+      gsAlert('토너먼트 영역을 찾을 수 없습니다.');
       return;
     }
     
@@ -6488,7 +6693,7 @@ window.addEventListener("resize", () => {
   
   function startRoundMiniTournament(rankedParticipants) {
     if(!rankedParticipants || rankedParticipants.length === 0) {
-      alert('토너먼트를 시작할 수 없습니다. 참가자 데이터가 없습니다.');
+      gsAlert('토너먼트를 시작할 수 없습니다. 참가자 데이터가 없습니다.');
       return;
     }
     
@@ -6562,7 +6767,7 @@ window.addEventListener("resize", () => {
     // 부전승 안내 메시지
     if(byeCount > 0) {
       setTimeout(() => {
-        alert(`💡 ${byeCount}명/팀이 부전승으로 다음 라운드에 자동 진출합니다.\n상위 랭커에게 부전승이 배정됩니다.`);
+        gsAlert(`💡 ${byeCount}명/팀이 부전승으로 다음 라운드에 자동 진출합니다.\n상위 랭커에게 부전승이 배정됩니다.`);
       }, 500);
     }
   }
@@ -6669,7 +6874,7 @@ window.addEventListener("resize", () => {
           sync();
         }
         
-        alert(`🏆 우승: ${champDisplay}!\n\n미니 토너먼트가 종료되었습니다.`);
+        gsAlert(`🏆 우승: ${champDisplay}!\n\n미니 토너먼트가 종료되었습니다.`);
         return;
       }
       
