@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GrandSlam Ultimate v3.8203</title>
+  <title>GrandSlam Ultimate v3.8204</title>
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
   <link rel="shortcut icon" href="icon.png">
@@ -1049,7 +1049,7 @@
     </div>
   </div>
 </div>
-<!-- ✅ v3.8203: 이름 수정 모달 (prompt 대체) -->
+<!-- ✅ v3.8204: 이름 수정 모달 (prompt 대체) -->
 <div id="gsEditNameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:25000; justify-content:center; align-items:center;">
   <div style="background:#fff; border-radius:20px; padding:28px 24px 20px; width:300px; max-width:88vw; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
     <div style="font-size:14px; color:var(--text-dark); margin-bottom:14px; font-weight:400;">이름 수정</div>
@@ -1224,24 +1224,24 @@
       <span class="material-symbols-outlined">sports_tennis</span>
       오늘의 코트 정보
     </div>
-    <div id="courtInfoContent">
+    <div id="courtInfoContent" style="display:none;">
       <div class="court-info-row">
         <span class="material-symbols-outlined">location_on</span>
-        <span id="courtName">광명시민체육관 3번 코트</span>
+        <span id="courtName"></span>
       </div>
       <div class="court-info-row">
         <span class="material-symbols-outlined">schedule</span>
-        <span id="courtTime">07:00 ~ 11:00</span>
+        <span id="courtTime"></span>
         <span id="courtNumber" style="display:none; margin-left:8px; font-size:13px; color:var(--wimbledon-sage); font-weight:400; background:rgba(93,156,118,0.1); padding:2px 8px; border-radius:8px;"></span>
       </div>
       <div class="court-info-row">
         <span class="material-symbols-outlined">map</span>
-        <span id="courtAddress">경기도 광명시 오리로 613</span>
+        <span id="courtAddress"></span>
       </div>
       <div id="courtMemo" class="court-info-memo" style="display:none;"></div>
     </div>
     <!-- ✅ v3.817: 공지 없을 때 안내 메시지 -->
-    <div id="courtNoNotice" style="display:none; padding:16px 0; text-align:center; color:var(--text-gray); font-size:13px;">
+    <div id="courtNoNotice" style="display:block; padding:16px 0; text-align:center; color:var(--text-gray); font-size:13px;">
       <span class="material-symbols-outlined" style="font-size:32px; display:block; margin-bottom:6px; opacity:0.4;">event_busy</span>
       등록된 코트 공지가 없습니다
     </div>
@@ -1282,7 +1282,7 @@
     </div>
   </div>
 
-  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.8203</div>
+  <div style="text-align:right; font-size:11px; color:#ccc; margin-top:10px; font-weight:400; padding-right:5px;">v3.8204</div>
 </div>
 
 <div id="view-tennis" class="app-screen">
@@ -1979,7 +1979,7 @@
   var GAS_URL = MASTER_GAS_URL;
   var ADMIN_PIN = "0707";
 
-  // ✅ v3.8203: 마스터 비번 확인 - 커스텀 모달 (prompt 대체)
+  // ✅ v3.8204: 마스터 비번 확인 - 커스텀 모달 (prompt 대체)
   var _masterPinCallback = null;
 
   function checkMasterPin(callback) {
@@ -2177,7 +2177,7 @@
   function updateWeatherCityForClub(club) {
     const cityInput = $('city');
     const headerBanner = document.querySelector('#view-home .header-banner');
-    if (cityInput && club.city) cityInput.value = club.city;
+    if (cityInput) cityInput.value = '';
     if (headerBanner && club.cityKo) {
       headerBanner.innerHTML = '<span class="material-symbols-outlined">wb_sunny</span>' + escapeHtml(club.cityKo) + ' 날씨';
     }
@@ -3119,7 +3119,7 @@ function renderRankTable(tableId, scoreK, winK, lossK, lastK, filterMode) {
   }
 
   
-  // ✅ v3.8203: 이름 수정 모달 함수
+  // ✅ v3.8204: 이름 수정 모달 함수
   var _gsEditNameCallback = null;
   function gsEditName(defaultVal, cb) {
     $('gsEditNameInput').value = defaultVal || '';
@@ -4270,8 +4270,9 @@ function showView(v){
     $("tbody").innerHTML = "";
     setStatus(`<div style="color:#888; font-size:12px; margin-bottom:10px;">날씨 불러오는 중...</div>`);
 
-    // ✅ v3.81: 입력된 도시명으로 좌표 검색
-    const cityInput = ($('city').value || '').trim();
+    // ✅ v3.8204: 검색창 비어있으면 club.city fallback 사용
+    const cityInputEl = $('city');
+    const cityInput = (cityInputEl && cityInputEl.value.trim()) ? cityInputEl.value.trim() : (currentClub && currentClub.city ? currentClub.city : '');
     if(cityInput && cityInput !== weatherCoords.name) {
       const geo = await geocodeCity(cityInput);
       if(geo) {
@@ -5529,6 +5530,7 @@ function showView(v){
       if (l.type === "single") {
         const opps = getOpponentNames(l, name);
         opps.forEach(op => {
+          if(HIDDEN_PLAYERS.includes(op)) return;
           if(!singleOppMap[op]) singleOppMap[op] = { w:0, l:0, totalGames:0 };
           if(win) singleOppMap[op].w++; else singleOppMap[op].l++;
           singleOppMap[op].totalGames++;
@@ -5538,6 +5540,7 @@ function showView(v){
       if (l.type === "double") {
         const partners = getPartnerNames(l, name);
         partners.forEach(pt => {
+          if(HIDDEN_PLAYERS.includes(pt)) return;
           if(!partnerMap[pt]) partnerMap[pt] = { w:0, l:0, totalGames:0 };
           if(win) partnerMap[pt].w++; else partnerMap[pt].l++;
           partnerMap[pt].totalGames++;
@@ -5545,6 +5548,7 @@ function showView(v){
 
         const opps = getOpponentNames(l, name);
         opps.forEach(op => {
+          if(HIDDEN_PLAYERS.includes(op)) return;
           if(!doubleEnemyMap[op]) doubleEnemyMap[op] = { w:0, l:0, totalGames:0 };
           if(win) doubleEnemyMap[op].w++; else doubleEnemyMap[op].l++;
           doubleEnemyMap[op].totalGames++;
